@@ -3,6 +3,7 @@ define( "ScreenShotPlugin/View/Dialog/ScreenShotDialog", [
     'dojo/dom-construct',
     'dijit/focus',
     'dijit/form/CheckBox',
+    'dijit/form/NumberSpinner',
     'JBrowse/View/Dialog/WithActionBar',
     'dojo/on',
     'dijit/form/Button',
@@ -13,6 +14,7 @@ function (
     dom,
     focus,
     dijitCheckBox,
+    dijitNumberSpinner,
     ActionBarDialog,
     on,
     Button,
@@ -38,13 +40,13 @@ return declare (ActionBarDialog,{
      
      _fillActionBar: function( actionBar ){
         var ok_button = new Button({
-            label: "OK",
+            label: "Render",
             onClick: dojo.hitch(this, function() {
                 console.log(this.parameters);
                 //console.log(this.browser.makeCurrentViewURL());
                 //console.log(this.browser.makeCurrentViewURL({nav:0}));
                 this.setCallback && this.setCallback( );
-                this.hide();
+                //this.hide();
             })
         }).placeAt(actionBar);
 
@@ -62,15 +64,28 @@ return declare (ActionBarDialog,{
         // get inital parameters
 
         var mainPane = dom.create('div',{'id':'screenshot-dialog-pane'});
-        dom.create('h3',{'innerHTML':'General configurations'}, mainPane);
+        dom.create('h2',{'innerHTML':'General configurations'}, mainPane);
         // zoom parameters -> number slider
+        var zoomSpinner = new dijitNumberSpinner({
+            id:'screenshot-dialog-zoom-spinner',
+            value: thisB.parameters.zoom,
+            constraints: {min:1,max:10},
+            smallDelta:1,
+            intermediateChanges:true,
+            style:"width:35px;margin-left:10px"
+        });
+        zoomSpinner.onChange = dojo.hitch(thisB, '_setZoom',zoomSpinner);
+        dom.create('div',{'innerHTML':'Zoom factor',className:'screenshot-dialog-pane-label',style:'display:inline;'},mainPane);
+        mainPane.appendChild(zoomSpinner.domNode);
+        dom.create('br',{},mainPane);
 
         // track spacing -> numer slider
 
         // methylation -> if plugin is installed
         if(thisB.browser.plugins.hasOwnProperty('MethylationPlugin')){
             var methylPane = dom.create('div',{'id':'screenshot-dialog-pane-methylation'},mainPane);
-            dom.create('h2',{innerHTML:'Methylation'},methylPane);
+            dom.create('div',{innerHTML:'Methylation',className:'screenshot-dialog-pane-label',style:'display:block;'},methylPane);
+
             var m;
             for (m in thisB.parameters['methylation']){
                 var box = new dijitCheckBox({
@@ -80,10 +95,10 @@ return declare (ActionBarDialog,{
                     checked: thisB.parameters['methylation'][m]
                 });
                 box.onClick = dojo.hitch(thisB, '_setMethylation', box);
+                dom.create('span',{innerHTML:m},methylPane);
                 methylPane.appendChild(box.domNode);
-                dom.create('br',methylPane);
-                dom.create('label',{'for':'screenshot-dialog-methyl-'+m, 'innerHTML':m+' '},methylPane);
             }
+            dom.create('br',{},methylPane);
         }
 
         this.set('content', [
@@ -102,6 +117,10 @@ return declare (ActionBarDialog,{
             this.parameters['methylation'][box._prop] = box.checked;
         }
     },
+    _setZoom: function(spinner){
+        this.parameters.zoom = spinner.value;
+    },
+
     _getInitialParameters: function(){
         var browser = this.browser;
         // zoom

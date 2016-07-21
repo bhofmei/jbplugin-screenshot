@@ -1,18 +1,37 @@
 // out: main.css
 
+div#screenshot-dialog-pane h2{
+    margin-top: 10px;
+}
 #screenshot-dialog-img{
     width:200px;
     height:100px;
 }
 
-.CG-checkbox{
-    background-image: url("../../MethylationPlugin/img/checkmark-cg.png")
+#screenshot-dialog-zoom-spinner{
+    width: 35px;
+    margin-left: 10px;
 }
 
-.CHG-checkbox{
-    background-image: url("../../MethylationPlugin/img/checkmark-chg.png")
+div#screenshot-dialog-pane div.dijit.dijitReset.dijitInline.dijitCheckBox{
+    margin-left:2px;
 }
 
-.CHH-checkbox{
-    background-image: url("../../MethylationPlugin/img/checkmark-chh.png")
+div.dijit.dijitReset.dijitInline.CG-checkbox.dijitCheckBox{
+    margin-right:2px;
+    background-image: url("../../MethylationPlugin/img/checkmark-cg.png");
+}
+
+div.dijit.dijitReset.dijitInline.CHG-checkbox.dijitCheckBox{
+    margin-right:2px;
+    background-image: url("../../MethylationPlugin/img/checkmark-chg.png");
+}
+
+div.dijit.dijitReset.dijitInline.CHH-checkbox.dijitCheckBox{
+    background-image: url("../../MethylationPlugin/img/checkmark-chh.png");
+}
+
+.screenshot-dialog-pane-label{
+    font-weight: bold;
+    padding: 2px 0px 2px 0px;
 }
