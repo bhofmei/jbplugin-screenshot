@@ -2,6 +2,7 @@ define( "ScreenShotPlugin/View/Dialog/ScreenShotDialog", [
     'dojo/_base/declare',
     'dojo/dom-construct',
     'dijit/focus',
+    'dijit/form/CheckBox',
     'JBrowse/View/Dialog/WithActionBar',
     'dojo/on',
     'dijit/form/Button',
@@ -11,6 +12,7 @@ function (
     declare,
     dom,
     focus,
+    dijitCheckBox,
     ActionBarDialog,
     on,
     Button,
@@ -27,7 +29,9 @@ return declare (ActionBarDialog,{
      
      constructor: function( args ){
         this.browser = args.browser;
-        this.url = (args.url === undefined ? '#' : args.url );
+        this.parameters = this._getInitialParameters();
+        console.log(this.parameters);
+        this.requestUrl = args.requestUrl;
         this.setCallback    = args.setCallback || function() {};
         this.cancelCallback = args.cancelCallback || function() {};
      },
@@ -36,7 +40,9 @@ return declare (ActionBarDialog,{
         var ok_button = new Button({
             label: "OK",
             onClick: dojo.hitch(this, function() {
-                window.open(this.url);
+                console.log(this.parameters);
+                //console.log(this.browser.makeCurrentViewURL());
+                //console.log(this.browser.makeCurrentViewURL({nav:0}));
                 this.setCallback && this.setCallback( );
                 this.hide();
             })
@@ -53,12 +59,35 @@ return declare (ActionBarDialog,{
     
     show: function( callback ) {
         var thisB = this;
-        //dojo.addClass( thisB.domNode, 'screenshot-dialog' );
+        // get inital parameters
+
+        var mainPane = dom.create('div',{'id':'screenshot-dialog-pane'});
+        dom.create('h3',{'innerHTML':'General configurations'}, mainPane);
+        // zoom parameters -> number slider
+
+        // track spacing -> numer slider
+
+        // methylation -> if plugin is installed
+        if(thisB.browser.plugins.hasOwnProperty('MethylationPlugin')){
+            var methylPane = dom.create('div',{'id':'screenshot-dialog-pane-methylation'},mainPane);
+            dom.create('h2',{innerHTML:'Methylation'},methylPane);
+            var m;
+            for (m in thisB.parameters['methylation']){
+                var box = new dijitCheckBox({
+                    id:'screenshot-dialog-methyl-'+m,
+                    class:m+'-checkbox',
+                    _prop:m,
+                    checked: thisB.parameters['methylation'][m]
+                });
+                box.onClick = dojo.hitch(thisB, '_setMethylation', box);
+                methylPane.appendChild(box.domNode);
+                dom.create('br',methylPane);
+                dom.create('label',{'for':'screenshot-dialog-methyl-'+m, 'innerHTML':m+' '},methylPane);
+            }
+        }
 
         this.set('content', [
-            dom.create('div',{innerHTML:'Opens a new window'}),
-            dom.create( 'br' ),
-            dom.create('a',{innerHTML: "Results",target: '_blank', href: thisB.url})
+            mainPane
         ] );
 
         this.inherited( arguments );
@@ -67,6 +96,23 @@ return declare (ActionBarDialog,{
     hide: function() {
         this.inherited(arguments);
         window.setTimeout( dojo.hitch( this, 'destroyRecursive' ), 500 );
+    },
+    _setMethylation: function(box){
+        if(this.parameters.methylation.hasOwnProperty(box._prop)){
+            this.parameters['methylation'][box._prop] = box.checked;
+        }
+    },
+    _getInitialParameters: function(){
+        var browser = this.browser;
+        // zoom
+        var zoom = browser.config.highResolutionMode;
+        if (typeof zoom !== 'number')
+            zoom = 1
+        // track spacing
+        var trackSpacing = undefined;
+        if(browser.config.view.trackPadding !== undefined)
+            trackSpacing = browser.config.view.trackPadding;
+       return {zoom: zoom, trackSpacing: trackSpacing, methylation:{CG:true, CHG:true, CHH:true}}
     }
 });
 });
