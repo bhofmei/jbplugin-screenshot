@@ -69,17 +69,31 @@ return declare (ActionBarDialog,{
         var zoomSpinner = new dijitNumberSpinner({
             id:'screenshot-dialog-zoom-spinner',
             value: thisB.parameters.zoom,
+            _prop:'zoom',
             constraints: {min:1,max:10},
             smallDelta:1,
             intermediateChanges:true,
             style:"width:35px;margin-left:10px"
         });
-        zoomSpinner.onChange = dojo.hitch(thisB, '_setZoom',zoomSpinner);
+        zoomSpinner.onChange = dojo.hitch(thisB, '_setParameter',zoomSpinner);
         dom.create('div',{'innerHTML':'Zoom factor',className:'screenshot-dialog-pane-label',style:'display:inline;'},mainPane);
         mainPane.appendChild(zoomSpinner.domNode);
         dom.create('br',{},mainPane);
 
         // track spacing -> numer slider
+        var trackSpinner = new dijitNumberSpinner({
+            id:'screenshot-dialog-track-spinner',
+            value: thisB.parameters.trackSpacing,
+            _prop:'trackSpacing',
+            constraints: {min:0,max:40},
+            smallDelta:5,
+            intermediateChanges:true,
+            style:"width:50px;margin-left:10px"
+        });
+        zoomSpinner.onChange = dojo.hitch(thisB, '_setParameter',zoomSpinner);
+        dom.create('div',{'innerHTML':'Track spacing',className:'screenshot-dialog-pane-label',style:'display:inline;'},mainPane);
+        mainPane.appendChild(trackSpinner.domNode);
+        dom.create('br',{},mainPane);
 
         // methylation -> if plugin is installed
         if(thisB.browser.plugins.hasOwnProperty('MethylationPlugin')){
@@ -117,8 +131,13 @@ return declare (ActionBarDialog,{
             this.parameters['methylation'][box._prop] = box.checked;
         }
     },
-    _setZoom: function(spinner){
-        this.parameters.zoom = spinner.value;
+    _setParameter: function(spinner){
+        var prop = spinner._prop;
+        if(this.parameters.hasOwnProperty(prop))
+            this.parameters[prop] = spinner.value;
+    },
+     _setTrackSpacing: function(spinner){
+        this.parameters.trackSpacing = spinner.value;
     },
 
     _getInitialParameters: function(){
