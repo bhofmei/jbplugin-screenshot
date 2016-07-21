@@ -63,60 +63,68 @@ return declare (ActionBarDialog,{
         var thisB = this;
         // get inital parameters
 
-        var mainPane = dom.create('div',{'id':'screenshot-dialog-pane'});
-        dom.create('h2',{'innerHTML':'General configurations'}, mainPane);
-        // zoom parameters -> number slider
-        var zoomSpinner = new dijitNumberSpinner({
-            id:'screenshot-dialog-zoom-spinner',
-            value: thisB.parameters.zoom,
-            _prop:'zoom',
-            constraints: {min:1,max:10},
-            smallDelta:1,
-            intermediateChanges:true,
-            style:"width:35px;margin-left:10px"
-        });
-        zoomSpinner.onChange = dojo.hitch(thisB, '_setParameter',zoomSpinner);
-        dom.create('div',{'innerHTML':'Zoom factor',className:'screenshot-dialog-pane-label',style:'display:inline;'},mainPane);
-        mainPane.appendChild(zoomSpinner.domNode);
-        dom.create('br',{},mainPane);
+        var mainPaneLeft = dom.create('div',{'id':'screenshot-dialog-pane-left'});
+        dom.create('h2',{'innerHTML':'General configurations'}, mainPaneLeft);
+        var table = dom.create('table',{'id':'screenshot-dialog-opt-table'},mainPaneLeft);
+        // check box parameters -> location overview, tracklist, nav, menu bars
+        var boxParam = thisB.parameters.box;
+        var param;
+        for(param in boxParam){
+            var data = boxParam[param];
+            var row = dom.create('tr',{'id':'screenshot-dialog-row-'+param},table);
+            dom.create('td',{'innerHTML':data.title,'class':'screenshot-dialog-pane-label'}, row);
+            var boxD = dom.create('td',{},row);
+            var box = new dijitCheckBox({
+               id:'screenshot-dialog-opt-box-'+param,
+                _prop: param,
+                checked: data.value
+            });
+            box.onClick = dojo.hitch(thisB, '_setParameter', box);
+            box.placeAt(boxD,'first');
+        } // end for param
 
-        // track spacing -> numer slider
-        var trackSpinner = new dijitNumberSpinner({
-            id:'screenshot-dialog-track-spinner',
-            value: thisB.parameters.trackSpacing,
-            _prop:'trackSpacing',
-            constraints: {min:0,max:40},
-            smallDelta:5,
-            intermediateChanges:true,
-            style:"width:50px;margin-left:10px"
-        });
-        zoomSpinner.onChange = dojo.hitch(thisB, '_setParameter',zoomSpinner);
-        dom.create('div',{'innerHTML':'Track spacing',className:'screenshot-dialog-pane-label',style:'display:inline;'},mainPane);
-        mainPane.appendChild(trackSpinner.domNode);
-        dom.create('br',{},mainPane);
+        // spinner parameters -> zoom and track spacing
+        var spinnerParam = thisB.parameters.spinner;
+        for(param in spinnerParam){
+            var data = spinnerParam[param];
+            var row = dom.create('tr',{'id':'screenshot-dialog-row-'+param},table);
+            dom.create('td',{'innerHTML':data.title,'class':'screenshot-dialog-pane-label'}, row);
+            var spinD = dom.create('td',{},row);
+            var spinner = new dijitNumberSpinner({
+                id:'screenshot-dialog-'+param+'-spinner',
+                value: data.value,
+                _prop:param,
+                constraints: (param === 'zoom'? {min:1,max:10} : {min:0,max:40}),
+                smallDelta:(param === 'zoom' ? 1 : 5),
+                intermediateChanges:true,
+                style:"width:50px;"
+            });
+            spinner.onChange = dojo.hitch(thisB, '_setParameter',spinner);
+            spinner.placeAt(spinD,'first');
+        }
 
         // methylation -> if plugin is installed
         if(thisB.browser.plugins.hasOwnProperty('MethylationPlugin')){
-            var methylPane = dom.create('div',{'id':'screenshot-dialog-pane-methylation'},mainPane);
-            dom.create('div',{innerHTML:'Methylation',className:'screenshot-dialog-pane-label',style:'display:block;'},methylPane);
-
+            var row = dom.create('tr',{'id':'screenshot-dialog-row-methyl'},table);
+            dom.create('td',{innerHTML:'Methylation',className:'screenshot-dialog-pane-label', 'colspan':2},row);
+            var row2 = dom.create('tr',{'id':'screenshot-dialog-row-methyl-boxes'},table);
+            var methylD = dom.create('td',{'colspan':2},row2);
             var m;
-            for (m in thisB.parameters['methylation']){
-                var box = new dijitCheckBox({
+            for (m in thisB.parameters.methylation){
+                var mbox = new dijitCheckBox({
                     id:'screenshot-dialog-methyl-'+m,
                     class:m+'-checkbox',
                     _prop:m,
-                    checked: thisB.parameters['methylation'][m]
+                    checked: thisB.parameters.methylation[m]
                 });
-                box.onClick = dojo.hitch(thisB, '_setMethylation', box);
-                dom.create('span',{innerHTML:m},methylPane);
-                methylPane.appendChild(box.domNode);
+                mbox.onClick = dojo.hitch(thisB, '_setMethylation', mbox);
+                dom.create('span',{innerHTML:m},methylD);
+                methylD.appendChild(mbox.domNode);
             }
-            dom.create('br',{},methylPane);
         }
 
         this.set('content', [
-            mainPane
+            mainPaneLeft
         ] );
 
         this.inherited( arguments );
@@ -128,29 +136,40 @@ return declare (ActionBarDialog,{
     },
     _setMethylation: function(box){
         if(this.parameters.methylation.hasOwnProperty(box._prop)){
-            this.parameters['methylation'][box._prop] = box.checked;
+            this.parameters.methylation[box._prop] = box.checked;
         }
     },
-    _setParameter: function(spinner){
-        var prop = spinner._prop;
-        if(this.parameters.hasOwnProperty(prop))
-            this.parameters[prop] = spinner.value;
-    },
-     _setTrackSpacing: function(spinner){
-        this.parameters.trackSpacing = spinner.value;
+    _setParameter: function(input){
+        var prop = input._prop;
+        // check box parameters
+        if(input.hasOwnProperty('checked')){
+            if(this.parameters.box.hasOwnProperty(prop))
+                this.parameters.box[prop].value = !! input.checked;
+        }
+        // else spinner
+        else{
+            if(this.parameters.spinner.hasOwnProperty(prop))
+                this.parameters.spinner[prop].value = input.value;
+        }
     },
 
     _getInitialParameters: function(){
-        var browser = this.browser;
-        // zoom
-        var zoom = browser.config.highResolutionMode;
-        if (typeof zoom !== 'number')
-            zoom = 1
-        // track spacing
-        var trackSpacing = undefined;
-        if(browser.config.view.trackPadding !== undefined)
-            trackSpacing = browser.config.view.trackPadding;
-       return {zoom: zoom, trackSpacing: trackSpacing, methylation:{CG:true, CHG:true, CHH:true}}
+        var config = this.browser.config;
+        // spinner -> zoom and trackSpacing
+        var zoom = { value: config.highResolutionMode, title: 'Zoom factor'};
+        if (typeof zoom.value !== 'number')
+            zoom.value = 1
+        var trackSpacing = {value: undefined, title: 'Track spacing'};
+        if(config.view.trackPadding !== undefined)
+            trackSpacing.value = config.view.trackPadding;
+        // check boxes -> location overview, tracklist, nav, menu bars, track labels
+        var locOver = { value: config.show_overview, title:'Show location overview' };
+        var trackList = { value: config.show_tracklist, title:'Show track list' };
+        var nav = { value: config.show_nav, title:'Show navigation bar' };
+        var menu = { value: config.show_menu, title:'Show menu bar' }
+        var labels = {value:true, title:'Show track labels'}
+       return { spinner: {zoom: zoom, trackSpacing: trackSpacing},
+               box:{locOver, trackList, nav, menu, labels}, methylation:{CG:true, CHG:true, CHH:true} }
     }
 });
 });
