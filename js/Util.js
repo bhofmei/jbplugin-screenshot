@@ -1,10 +1,12 @@
 define( "ScreenShotPlugin/Util", [
     'dojo/_base/declare',
-    'dojo/_base/array'
+    'dojo/_base/array',
+    'dojo/json'
     ],
 function (
     declare,
-    array
+    array,
+    json
 ) {
 var Util;
 Util = {
@@ -12,6 +14,16 @@ Util = {
     // returns string with encode options for screenshot
         var gInputs = inputs.general;
         return this._encodeGeneralSettings(gInputs);
+    },
+
+    encodePhantomJSSettings: function(params){
+        // params include url, format, height, width, zoom
+        // ?request={url:"http://www.highcharts.com/demo/pie-donut",renderType:"jpg",renderSettings:{zoomFactor:2,viewport:{width:100,height:500}}}
+        var outDict = {url: params.url, renderType: params.format.value, renderSettings: {
+            zoomFactor: params.zoom.value, viewport: {width:params.width.value, height: params.height.value}}};
+        var outString = json.stringify(outDict);
+        outString = outString.replace(/\"([^(\")"]+)\":/g,"$1:");
+        return '?request='+outString;
     },
 
     decode: function(inStr){

@@ -1,19 +1,17 @@
 // out: main.css
 
-div#screenshot-dialog-pane h2{
+div.screenshot-dialog-pane h2 {
     margin-top: 10px;
 }
-#screenshot-dialog-img{
-    width:200px;
-    height:100px;
+
+.screenshot-dialog-pane-bottom-warning{
+    font-size: smaller;
+    text-align: center;
+    padding-top: 5px;
 }
 
-#screenshot-dialog-zoom-spinner{
-    width: 35px;
-    margin-left: 10px;
-}
-
-div#screenshot-dialog-pane div.dijit.dijitReset.dijitInline.dijitCheckBox{
+/* methylation checkboxes */
+div#screenshot-dialog-pane-left div.dijit.dijitReset.dijitInline.dijitCheckBox{
     margin-left:2px;
 }
 
@@ -31,7 +29,16 @@ div.dijit.dijitReset.dijitInline.CHH-checkbox.dijitCheckBox{
     background-image: url("../../MethylationPlugin/img/checkmark-chh.png");
 }
 
+.screenshot-dialog-opt-span{
+    margin-left: 3px;
+    margin-right: 1px;
+}
+
+/* options table formating */
 .screenshot-dialog-pane-label{
     font-weight: bold;
     padding: 2px 0px 2px 0px;
+}
+.screenshot-dialog-pane-input{
+    padding-left:5px;
 }

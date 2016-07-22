@@ -44,9 +44,9 @@ return declare( JBrowsePlugin,
         var baseUrl = this._defaultConfig().baseUrl;
         var thisB = this;
         var browser = this.browser;
-        
-        console.log(browser);
+
         this.config.apiKey = 'a-demo-key-with-low-quota-per-ip-address';
+
         browser.afterMilestone('initView',  function() {
             // get screen resolution
             if(typeof browser.config.highResolutionMode === 'number')
@@ -58,9 +58,17 @@ return declare( JBrowsePlugin,
 
             // create screenshot button (possibly tools menu)
             var menuBar = browser.menuBar;
-            if(browser.config.show_menu){
+            //if(browser.config.show_nav == false)
+                // put screenshot button somewhere else
+            //else
+                if(browser.config.show_menu){
                 menuBar.appendChild(thisB.makeScreenshotButton());
             }
+        });
+        browser.afterMilestone('initPlugins', function(){
+            console.log(browser);
+            browser.config.show_tracklabels=false;
+            //browser.config.view.trackPadding = 2;
         })
         
     }, // end constructor
@@ -69,26 +77,6 @@ return declare( JBrowsePlugin,
         var thisB = this;
         var browser = this.browser;
         var url = 'https://scholar.google.com/';
-        var useUrl = thisB.getPhantomJSUrl({url: url});
-        
-        // make popup
-        /*var container = dojo.create('div');
-        var link = dojo.create('a',{
-            innerHTML: "Results",
-            target: '_blank',
-            //href: thisB.getPhantomJSUrl({})
-            href: useUrl
-        }, container);
-        
-        var screenshotPane = new ActionBarDialog({
-            className: 'screenshot-popup',
-            title: 'Take screenshot',
-            //content: [container],
-            setCallback: function(){
-                window.open(thisB.getPhantomJSUrl({}));
-                console.log('popup callback');
-            }
-        });*/
         
         // make button
         var button = new dijitButton({
@@ -97,7 +85,9 @@ return declare( JBrowsePlugin,
             title: 'take screen shot of browser',
             onClick: function(){
                 new ScreenShotDialog({
-                    url: useUrl,
+                    requestUrl: thisB._getPhantomJSUrl(),
+                    useUrl: url,
+                    browser: browser,
                     setCallback: function(){
                         console.log('callback');
                     }
@@ -109,7 +99,23 @@ return declare( JBrowsePlugin,
         return button.domNode;
     },
     
-    getPhantomJSUrl: function( args ){
+    _getPhantomJSUrl: function(){
+        return 'https://phantomjscloud.com/api/browser/v2/' + this.config.apiKey + '/'
+    },
+
+    _getPhantomJSPost: function(args){
+        var browser = this.browser;
+        var currentUrl = (args.url === undefined ? browser.makeCurrentViewURL() : args.url );
+        // replace special characters
+        // & -> %26
+        currentUrl = currentUrl.replace(/\u0026/g,'%26');
+        var renderType = (args.renderType === undefined ? 'png' : args.renderType);
+        var height = (args.height === undefined ? '2000' : args.height);
+        var width = (args.width === undefined ? '3300' : args.width);
+        return {url:currentUrl,renderType:renderType,renderSettings:{viewport:{width:width,height:height}}}
+    }
+
+    /*getPhantomJSUrl: function( args ){
         var browser = this.browser;
         // current view
         var currentUrl = (args.url === undefined ? browser.makeCurrentViewURL() : args.url );
@@ -121,6 +127,6 @@ return declare( JBrowsePlugin,
         var width = (args.width === undefined ? '3300' : args.width);
         // if(browser.config.)
         return 'https://phantomjscloud.com/api/browser/v2/' + this.config.apiKey + '/?request={url:%22' + currentUrl + '%22,renderType:%22'+renderType+'%22,renderSettings:{viewport:{width:'+width+',height:'+height+'}}}'
-    }
+    }*/
 });
 });

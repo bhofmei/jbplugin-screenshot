@@ -38,7 +38,6 @@ return declare (ActionBarDialog,{
      constructor: function( args ){
         this.browser = args.browser;
         this.parameters = this._getInitialParameters();
-        console.log(this.parameters);
         this.requestUrl = args.requestUrl;
         this.setCallback    = args.setCallback || function() {};
         this.cancelCallback = args.cancelCallback || function() {};
@@ -48,16 +47,17 @@ return declare (ActionBarDialog,{
         var ok_button = new Button({
             label: "Render",
             onClick: dojo.hitch(this, function() {
-                // separate encoded parameters and output parameters
-                var out = this.parameters.output;
-                console.log(out);
-                var gEncode = this.parameters.view;
-                gEncode['methylation']=this.parameters.methylation;
-                gEncode['zoom'] = this.parameters.output.zoom
-                var toEncode = {general: gEncode};
-                console.log(Util.encode(toEncode));
-                console.log(Util.decode(toEncode));
-                //console.log(this.browser.makeCurrentViewURL({nav:0}));
+                // screenshot parameters
+                var gParams = this.parameters.view;
+                gParams['methylation']=this.parameters.methylation;
+                gParams['zoom'] = this.parameters.output.zoom
+                var scParams = {general: gParams};
+                // js params
+                var jsParams = this.parameters.output;
+                // get the url
+                var url = this._getPhantomJSUrl(scParams, jsParams);
+                console.log(url);
+                window.open(url);
                 this.setCallback && this.setCallback( );
                 //this.hide();
             })
@@ -74,11 +74,11 @@ return declare (ActionBarDialog,{
     
     show: function( callback ) {
         var thisB = this;
-        // get inital parameters
+        dojo.addClass(this.domNode, 'screenshot-dialog')
 
-        var mainPaneLeft = dom.create('div',{'id':'screenshot-dialog-pane-left'});
+        var mainPaneLeft = dom.create('div',{'id':'screenshot-dialog-pane-left','class':'screenshot-dialog-pane'});
         dom.create('h2',{'innerHTML':'General configuration options'}, mainPaneLeft);
-        var table = dom.create('table',{'id':'screenshot-dialog-opt-table'},mainPaneLeft);
+        var table = dom.create('table',{'class':'screenshot-dialog-opt-table'},mainPaneLeft);
         // check box parameters -> location overview, tracklist, nav, menu bars
 
         var viewParam = thisB.parameters.view;
@@ -125,15 +125,15 @@ return declare (ActionBarDialog,{
                     checked: thisB.parameters.methylation[m]
                 });
                 mbox.onClick = dojo.hitch(thisB, '_setMethylation', mbox);
-                dom.create('span',{innerHTML:m},methylD);
+                dom.create('span',{innerHTML:m,class:'screenshot-dialog-opt-span'},methylD);
                 methylD.appendChild(mbox.domNode);
             }
         }
 
         // Pane bottom is for output
-        var mainPaneBottom = dom.create('div',{'id':'screenshot-dialog-pane-right'});
+        var mainPaneBottom = dom.create('div',{'id':'screenshot-dialog-pane-bottom', 'class':'screenshot-dialog-pane'});
         dom.create('h2',{'innerHTML':'Output configuration options'}, mainPaneBottom);
-        var tableB = dom.create('table',{'id':'screenshot-dialog-opt-table'},mainPaneBottom);
+        var tableB = dom.create('table',{'class':'screenshot-dialog-opt-table'},mainPaneBottom);
 
         // output options -> format (PNG, JPEG, PDF), height, width
         var outParam = thisB.parameters.output;
@@ -154,7 +154,7 @@ return declare (ActionBarDialog,{
                         _prop: param
                     });
                     btn.onClick = dojo.hitch(thisB, '_setParameter', btn);
-                    dom.create('span',{innerHTML:f},outD);
+                    dom.create('span',{innerHTML:f, class:'screenshot-dialog-opt-span'},outD);
                     outD.appendChild(btn.domNode);
                 });
             } else {
@@ -176,10 +176,12 @@ return declare (ActionBarDialog,{
                 spinner.placeAt(spinD,'first');
             }
         }
+        var paneFooter = dom.create('div',{class:'screenshot-dialog-pane-bottom-warning',innerHTML:'Local configuration changes will be ignored. Default configuration will be used unless specified in this dialog.<br>Rendering will open a new window.'});
 
         this.set('content', [
             mainPaneLeft,
-            mainPaneBottom
+            mainPaneBottom,
+            paneFooter
         ] );
 
         this.inherited( arguments );
@@ -218,6 +220,7 @@ return declare (ActionBarDialog,{
     },
 
     _getInitialParameters: function(){
+        // get browser parameterss
         var config = this.browser.config;
         // spinner -> zoom and trackSpacing
         var zoom = { value: config.highResolutionMode, title: 'Zoom factor'};
@@ -238,6 +241,21 @@ return declare (ActionBarDialog,{
         var height = {value: 2400, title: 'Height (px)'}
 
        return { view:{trackSpacing, locOver, trackList, nav, menu, labels}, methylation:{CG:true, CHG:true, CHH:true}, output: {format, zoom, width, height} }
+    },
+
+    _getPhantomJSUrl: function(scParams, jsParams){
+        // get current url
+        var currentUrl = this.browser.makeCurrentViewURL();
+        //var currentUrl = 'http://epigenome.genetics.uga.edu/JBrowse/?data=eutrema&loc=scaffold_1%3A8767030..14194216&tracks=DNA%2Cgenes%2Crepeats%2Ces_h3_1.bw_coverage%2Crna_reads%2Ces_h3k56ac.bw_coverage&highlight=';
+        // encode scParams
+        var scEncode = Util.encode(scParams);
+        currentUrl += '&screenshot='+scEncode;
+        currentUrl = currentUrl.replace(/\u0026/g,'%26');
+        // encode jsParams
+        jsParams['url'] = currentUrl;
+        var jsEncode = Util.encodePhantomJSSettings(jsParams);
+        // put it all together
+        return this.requestUrl + jsEncode;
     }
 });
 });
