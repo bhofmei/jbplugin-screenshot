@@ -41,6 +41,7 @@ This plugin includes support for the MethylationPlugin \(available at (https://g
 Future support will be added for SmallRNAPlugin and SeqViewPlugin by the same author.
 
 ##Future Improvements
+- shortcut key, particularly useful when show_menu=0
 - Add PDF format as output type
 - Track-specific settings that override the default settings
 -- Min/max heights
