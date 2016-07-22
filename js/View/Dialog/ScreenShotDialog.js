@@ -175,7 +175,7 @@ return declare (ActionBarDialog,{
                     id:'screenshot-dialog-'+param+'-spinner',
                     value: data.value,
                     _prop:param,
-                    constraints: (param === 'zoom' ? {min:1,max:10} : {min:100,max:5000,pattern:'###0'}),
+                    constraints: (param === 'zoom' ? {min:1,max:10} : {min:100,max:10000,pattern:'###0'}),
                     smallDelta:(param === 'zoom' ? 1 : 100),
                     intermediateChanges:true,
                     style:"width:75px;"
