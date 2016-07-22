@@ -127,7 +127,7 @@ return declare (ActionBarDialog,{
             for (m in thisB.parameters.methylation){
                 var mbox = new dijitCheckBox({
                     id:'screenshot-dialog-methyl-'+m,
-                    class:m+'-checkbox',
+                    className:m+'-checkbox',
                     _prop:m,
                     checked: thisB.parameters.methylation[m]
                 });
@@ -161,7 +161,7 @@ return declare (ActionBarDialog,{
                         _prop: param
                     });
                     btn.onClick = dojo.hitch(thisB, '_setParameter', btn);
-                    dom.create('span',{innerHTML:f, class:'screenshot-dialog-opt-span'},outD);
+                    dom.create('span',{innerHTML:f, className:'screenshot-dialog-opt-span'},outD);
                     outD.appendChild(btn.domNode);
                 });
             } else {
@@ -233,7 +233,7 @@ return declare (ActionBarDialog,{
         var zoom = { value: config.highResolutionMode, title: 'Zoom factor'};
         if (typeof zoom.value !== 'number')
             zoom.value = 1
-        var trackSpacing = {value: undefined, title: 'Track spacing'};
+        var trackSpacing = {value: 20, title: 'Track spacing'};
         if(config.view !== undefined && config.view.trackPadding !== undefined)
             trackSpacing.value = config.view.trackPadding;
         // check boxes -> location overview, tracklist, nav, menu bars, track labels
