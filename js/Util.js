@@ -58,7 +58,7 @@ Util = {
 
     _decodeGeneralSettings: function (input){
         // locOver, menu, methylation, nav, trackList, trackSpacing, labels, zoom
-        var fLabels = { 'z':'highResolutionMode', 'p':'trackPadding', 'o':'show_overview', 'r':'show_tracklist', 'n':'show_nav', 'u':'show_menu', 'b':'showLabels', 'm':'methylation'};
+        /*var fLabels = { 'z':'highResolutionMode', 'p':'trackPadding', 'o':'show_overview', 'r':'show_tracklist', 'n':'show_nav', 'u':'show_menu', 'b':'showLabels', 'm':'methylation'};
         var outProp = {basic: {}, view: {}, methylation:{}};
         var prop;
         for(prop in fLabels){
@@ -85,6 +85,44 @@ Util = {
                 }
             }
         }//end for prop
+        return outProp;*/
+        var outProp = {basic:{}, view:{},methylation:{}};
+        // zoom
+        var resultZ = /z([0-9]+)/gi.exec(input);
+        if (resultZ != null)
+            outProp.basic['highResolutionMode'] = parseInt(resultZ[1]);
+        // overview
+        var resultO = /o([0-1])/gi.exec(input);
+        if (resultO != null)
+            outProp.basic['show_overview'] = this._decodeBoolen(resultO[1]);
+        // tracklist
+        var resultR = /r([0-1])/gi.exec(input);
+        if (resultR != null)
+            outProp.basic['show_tracklist'] = this._decodeBoolen(resultR[1]);
+        // navigation
+        var resultN = /n([0-1])/gi.exec(input);
+        if (resultN != null)
+            outProp.basic['show_nav'] = this._decodeBoolen(resultN[1]);
+        // menu
+        var resultU = /u([0-1])/gi.exec(input);
+        if (resultU != null)
+            outProp.basic['show_menu'] = this._decodeBoolen(resultU[1]);
+        // labels
+        var resultB = /b([0-1])/gi.exec(input);
+        if (resultB != null)
+            outProp.basic['show_tracklabels'] = this._decodeBoolen(resultB[1]);
+
+        // track padding
+        var resultP = /p([0-9]+)/gi.exec(input);
+        if (resultP != null)
+            outProp.view['trackPadding'] = parseInt(resultP[1]);
+        // methylation
+        var resultM = /m([0-9]+)/gi.exec(input);
+        if (resultM != null){
+            outProp.methylation['CG'] = this._decodeBoolen(resultM[1].substring(0,1));
+            outProp.methylation['CHG'] = this._decodeBoolen(resultM[1].substring(1,2));
+            outProp.methylation['CHH'] = this._decodeBoolen(resultM[1].substring(2,3));
+        }
         return outProp;
     }
 
