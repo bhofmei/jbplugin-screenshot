@@ -100,14 +100,19 @@ return declare (ActionBarDialog,{
                     style:"width:50px;"
                 });
             }else{
+                if(param === 'labels' && thisB.browser.plugins.hasOwnProperty('HideTrackLabels')===false){
+                    input = null;
+                }
                 input = new dijitCheckBox({
                     id:'screenshot-dialog-opt-box-'+param,
                     _prop: param,
                     checked: data.value
                 });
             }
-            input.onClick = dojo.hitch(thisB, '_setParameter', input);
-            input.placeAt(td,'first');
+            if(input !== null){
+                input.onClick = dojo.hitch(thisB, '_setParameter', input);
+                input.placeAt(td,'first');
+            }
         } // end for param
 
         // methylation -> if plugin is installed
