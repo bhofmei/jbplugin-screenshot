@@ -1,2 +1,12 @@
+v0.0.3 - Jul 22, 2016
+- removed PDF functionality as it is not functional
+
+v0.0.2 - Jul 22, 2016
+- functional with methylation context corrected
+- hide track label not supported
+
+v0.0.1
+- first functional version
+
 v0.0.0 July 18, 2016
 - initial set-up
