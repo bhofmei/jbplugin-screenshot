@@ -152,7 +152,8 @@ return declare (ActionBarDialog,{
                 var row2 = dom.create('tr',{'class':'screenshot-dialog-pane-input'},tableB);
                 var outD = dom.create('td',{'colspan':2},row2);
                 // 3 check boxes
-                var formatTypes = ['PNG','JPG','PDF'];
+                //var formatTypes = ['PNG','JPG','PDF'];
+                var formatTypes = ['PNG','JPG'];
                 array.forEach(formatTypes, function(f){
                     var btn = new dijitRadioButton({
                         id: 'screenshot-dialog-output-'+f,
