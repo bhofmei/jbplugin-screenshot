@@ -244,7 +244,7 @@ return declare (ActionBarDialog,{
         var menu = { value: config.show_menu, title:'Show menu bar' }
         var labels = {value:true, title:'Show track labels'}
         // output parameters
-        var format = {value: 'PNG', title: 'Output format'}
+        var format = {value: 'JPG', title: 'Output format'}
         var width = {value: 3300, title: 'Width (px)'}
         var height = {value: 2400, title: 'Height (px)'}
 
