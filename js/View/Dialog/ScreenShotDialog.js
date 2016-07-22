@@ -120,14 +120,14 @@ return declare (ActionBarDialog,{
         // methylation -> if plugin is installed
         if(thisB.browser.plugins.hasOwnProperty('MethylationPlugin')){
             var row = dom.create('tr',{'id':'screenshot-dialog-row-methyl'},table);
-            dom.create('td',{innerHTML:'Methylation',className:'screenshot-dialog-pane-label', 'colspan':2},row);
+            dom.create('td',{innerHTML:'Methylation',class:'screenshot-dialog-pane-label', 'colspan':2},row);
             var row2 = dom.create('tr',{'id':'screenshot-dialog-row-methyl-boxes'},table);
             var methylD = dom.create('td',{'colspan':2},row2);
             var m;
             for (m in thisB.parameters.methylation){
                 var mbox = new dijitCheckBox({
                     id:'screenshot-dialog-methyl-'+m,
-                    className:m+'-checkbox',
+                    class:m+'-checkbox',
                     _prop:m,
                     checked: thisB.parameters.methylation[m]
                 });
