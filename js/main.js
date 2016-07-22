@@ -24,16 +24,24 @@ return declare( Component,
 define('ScreenShotPlugin/main',[ 
     'dojo/_base/declare',
     'dojo/_base/lang',
+    'dojo/_base/array',
+    'dojo/dom',
+    "dojo/dom-attr",
     'dijit/form/Button',
     './View/Dialog/ScreenShotDialog',
+    './Util',
     'JBrowse/Plugin',
     "JBrowse/Browser"
 ],
 function(
     declare,
     lang,
+    array,
+    dom,
+    domAttr,
     dijitButton,
     ScreenShotDialog,
+    Util,
     JBrowsePlugin,
     Browser
 ){
@@ -44,33 +52,44 @@ return declare( JBrowsePlugin,
         var baseUrl = this._defaultConfig().baseUrl;
         var thisB = this;
         var browser = this.browser;
+        this.isScreenshot = false;
 
         this.config.apiKey = 'a-demo-key-with-low-quota-per-ip-address';
+        // PhantomJS Username
+        if( args.config.apiKey !== undefined )
+            this.config.apiKey = args.config.apiKey;
 
-        browser.afterMilestone('initView',  function() {
-            // get screen resolution
-            if(typeof browser.config.highResolutionMode === 'number')
-                this.config.resolution = browser.config.highResolutionMode
-
-            // PhantomJS Username
-            if( args.config.apiKey !== undefined )
-                this.config.apiKey = args.config.apiKey;
-
-            // create screenshot button (possibly tools menu)
-            var menuBar = browser.menuBar;
-            //if(browser.config.show_nav == false)
-                // put screenshot button somewhere else
-            //else
-                if(browser.config.show_menu){
-                menuBar.appendChild(thisB.makeScreenshotButton());
-            }
-        });
         browser.afterMilestone('initPlugins', function(){
             console.log(browser);
-            browser.config.show_tracklabels=false;
-            //browser.config.view.trackPadding = 2;
+            // check for screenshot query parameters
+            if(browser.config.queryParams.hasOwnProperty('screenshot')){
+                thisB.isScreenshot = true;
+                // get the parameters and decode
+                var encoded = browser.config.queryParams.screenshot;
+                var decoded = Util.decode(encoded);
+                //console.log(encoded);
+                //console.log(decoded);
+                // apply
+                thisB._applyScreenshotConfig(decoded);
+                browser.afterMilestone('loadConfig', function(){
+                    //console.log(browser.plugins);
+                    //console.log(browser.trackConfigsByName);
+                    thisB._applyMethylationConfig(decoded.methylation);
+                });
+            }
+        });
+
+        browser.afterMilestone('initView',  function() {
+            // create screenshot button (possibly tools menu)
+            var menuBar = browser.menuBar;
+            if(browser.config.show_menu && (thisB.isScreenshot === false)){
+                menuBar.appendChild(thisB.makeScreenshotButton());
+            }
+
+        });
+        browser.afterMilestone('completely initialized',function(){
+            //thisB._applyTrackLabelConfig();
         })
-        
     }, // end constructor
     
     makeScreenshotButton: function(){
@@ -103,30 +122,45 @@ return declare( JBrowsePlugin,
         return 'https://phantomjscloud.com/api/browser/v2/' + this.config.apiKey + '/'
     },
 
-    _getPhantomJSPost: function(args){
-        var browser = this.browser;
-        var currentUrl = (args.url === undefined ? browser.makeCurrentViewURL() : args.url );
-        // replace special characters
-        // & -> %26
-        currentUrl = currentUrl.replace(/\u0026/g,'%26');
-        var renderType = (args.renderType === undefined ? 'png' : args.renderType);
-        var height = (args.height === undefined ? '2000' : args.height);
-        var width = (args.width === undefined ? '3300' : args.width);
-        return {url:currentUrl,renderType:renderType,renderSettings:{viewport:{width:width,height:height}}}
-    }
+    _applyScreenshotConfig: function(params){
+        // params have basic, methylation, view, labels
+        // Note: this.browser.config gets overwritten with each mixin
+        lang.mixin(this.browser.config, params.basic);
+        lang.mixin(this.browser.config.view, params.view);
+    },
 
-    /*getPhantomJSUrl: function( args ){
-        var browser = this.browser;
-        // current view
-        var currentUrl = (args.url === undefined ? browser.makeCurrentViewURL() : args.url );
-        // replace special characters
-        // & -> %26
-        currentUrl = currentUrl.replace(/\u0026/g,'%26');
-        var renderType = (args.renderType === undefined ? 'png' : args.renderType);
-        var height = (args.height === undefined ? '2000' : args.height);
-        var width = (args.width === undefined ? '3300' : args.width);
-        // if(browser.config.)
-        return 'https://phantomjscloud.com/api/browser/v2/' + this.config.apiKey + '/?request={url:%22' + currentUrl + '%22,renderType:%22'+renderType+'%22,renderSettings:{viewport:{width:'+width+',height:'+height+'}}}'
-    }*/
+    _applyMethylationConfig: function(params){
+        var thisB = this;
+        //var methylation = thisB.decoded.methylation;
+        // check for methylation plugin
+        if(thisB.browser.plugins.hasOwnProperty('MethylationPlugin')){
+            var m,t;
+            var tracks = lang.clone(thisB.browser.trackConfigsByName);
+            for(m in params){
+                if(params[m] === false){
+                    var mix = {};
+                    mix['show'+m] = false;
+                    for(t in tracks){
+                        if(thisB._testMethylation(tracks[t].type)){
+                            lang.mixin(thisB.browser.trackConfigsByName[t], mix);
+                        }
+                    }
+                } // end if params[m] === false
+            } // end for m in params
+        } // end if MethylationPlugin
+    },
+    _testMethylation: function(trackType){
+        if(trackType === undefined || trackType === null)
+            return false;
+        return ((/\b(MethylXYPlot)/.test( trackType )  || /\b(MethylPlot)/.test( trackType ) ));
+    },
+
+    _applyTrackLabelConfig: function(){
+        var thisB = this;
+        if(thisB.browser.plugins.hasOwnProperty('HideTrackLabels')){
+            console.log('call')
+            thisB.browser.showTrackLabels((thisB.browser.config.show_tracklabels ? 'show' : 'hide'))
+        }
+    }
 });
 });
