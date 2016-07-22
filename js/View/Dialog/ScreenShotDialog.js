@@ -234,7 +234,7 @@ return declare (ActionBarDialog,{
         if (typeof zoom.value !== 'number')
             zoom.value = 1
         var trackSpacing = {value: undefined, title: 'Track spacing'};
-        if(config.view.trackPadding !== undefined)
+        if(config.view !== undefined && config.view.trackPadding !== undefined)
             trackSpacing.value = config.view.trackPadding;
         // check boxes -> location overview, tracklist, nav, menu bars, track labels
         var locOver = { value: config.show_overview, title:'Show location overview' };
