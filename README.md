@@ -29,7 +29,7 @@ If that doesn't work, add this to jbrowse_conf.json:
     }``
     
 ##Use
-Click the "Screen shot" button in the browser. A dialog box will open with options for the screenshot.
+Click the "Screen shot" button in the browser. A dialog box will open with options for the screenshot. You can also press the `s` key as a shortcut to open the dialog box.
 
 When increasing the zoom factor, you will likely need to increase the height and width to ensure a full image.
 

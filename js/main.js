@@ -50,7 +50,6 @@ return declare( JBrowsePlugin,
 {
     constructor: function( args ) { 
         var baseUrl = this._defaultConfig().baseUrl;
-        var thisB = this;
         var browser = this.browser;
         this.isScreenshot = false;
 
@@ -59,64 +58,48 @@ return declare( JBrowsePlugin,
         if( args.config.apiKey !== undefined )
             this.config.apiKey = args.config.apiKey;
 
+        var thisB = this;
         browser.afterMilestone('initPlugins', function(){
-            console.log(browser);
             // check for screenshot query parameters
             if(browser.config.queryParams.hasOwnProperty('screenshot')){
                 thisB.isScreenshot = true;
-                // get the parameters and decode
                 var encoded = browser.config.queryParams.screenshot;
                 var decoded = Util.decode(encoded);
-                //console.log(encoded);
-                //console.log(decoded);
                 // apply
                 thisB._applyScreenshotConfig(decoded);
                 browser.afterMilestone('loadConfig', function(){
-                    //console.log(browser.plugins);
-                    //console.log(browser.trackConfigsByName);
-                    thisB._applyMethylationConfig(decoded.methylation);
+ thisB._applyMethylationConfig(decoded.methylation);
                 });
             }
         });
 
         browser.afterMilestone('initView',  function() {
             // create screenshot button (possibly tools menu)
+            console.log(browser);
             var menuBar = browser.menuBar;
-            if(browser.config.show_menu && (thisB.isScreenshot === false)){
-                menuBar.appendChild(thisB.makeScreenshotButton());
+            function showScreenShotDialog(){
+                new ScreenShotDialog({
+                    requestUrl: thisB._getPhantomJSUrl(),
+                    browser: browser
+                }).show();
             }
 
+            if( browser.config.show_menu && (thisB.isScreenshot === false) ){
+                var button = new dijitButton({
+            className: 'screenshot-button',
+            innerHTML: 'Screen Shot',
+            title: 'take screen shot of browser',
+            onClick: showScreenShotDialog
+        });
+                menuBar.appendChild( button.domNode );
+            }
+            // shortcut key
+            browser.setGlobalKeyboardShortcut('s', showScreenShotDialog);
         });
         browser.afterMilestone('completely initialized',function(){
             //thisB._applyTrackLabelConfig();
         })
     }, // end constructor
-    
-    makeScreenshotButton: function(){
-        var thisB = this;
-        var browser = this.browser;
-        var url = 'https://scholar.google.com/';
-        
-        // make button
-        var button = new dijitButton({
-            className: 'screenshot-button',
-            innerHTML: 'Screen Shot',
-            title: 'take screen shot of browser',
-            onClick: function(){
-                new ScreenShotDialog({
-                    requestUrl: thisB._getPhantomJSUrl(),
-                    useUrl: url,
-                    browser: browser,
-                    setCallback: function(){
-                        console.log('callback');
-                    }
-                }).show();
-                return false;
-            }
-        });
-        
-        return button.domNode;
-    },
     
     _getPhantomJSUrl: function(){
         return 'https://phantomjscloud.com/api/browser/v2/' + this.config.apiKey + '/'
