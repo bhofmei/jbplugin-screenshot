@@ -1,8 +1,5 @@
 #Screen Shot Plugin
 
-**This plugin is still under development and should not be considered functional**
-
-
 This is a JBrowse plugin
  
 This plugin allows the user to take a high quality screenshot of the browser.
@@ -36,12 +33,11 @@ When increasing the zoom factor, you will likely need to increase the height and
 **Note:** Due to the nature of URL-encoded screenshots, default track configurations will be used unless overriden by settings selected in this dialog box. Locally added tracks, such as combination tracks, will not be included.
 
 ##Support for Additional Plugins
-This plugin includes support for the MethylationPlugin \(available at (https://github.com/bhofmei/jbplugin-methylation)\).
+This plugin includes support for the [MethylationPlugin](https://github.com/bhofmei/jbplugin-methylation).
 
 Future support will be added for SmallRNAPlugin and SeqViewPlugin by the same author.
 
 ##Future Improvements
-- shortcut key, particularly useful when show_menu=0
 - Add PDF format as output type
 - Track-specific settings that override the default settings
 -- Min/max heights

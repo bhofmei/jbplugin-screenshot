@@ -154,6 +154,7 @@ return declare (ActionBarDialog,{
                 // 3 check boxes
                 //var formatTypes = ['PNG','JPG','PDF'];
                 var formatTypes = ['PNG','JPG'];
+                var formatTypeTitles = {'PNG':'translucent background','JPG':'white background', 'PDF':'contains svg-like objects'}
                 array.forEach(formatTypes, function(f){
                     var btn = new dijitRadioButton({
                         id: 'screenshot-dialog-output-'+f,
@@ -162,7 +163,7 @@ return declare (ActionBarDialog,{
                         _prop: param
                     });
                     btn.onClick = dojo.hitch(thisB, '_setParameter', btn);
-                    dom.create('span',{innerHTML:f, className:'screenshot-dialog-opt-span'},outD);
+                    dom.create('span',{innerHTML:f, className:'screenshot-dialog-opt-span',title:formatTypeTitles[f]},outD);
                     outD.appendChild(btn.domNode);
                 });
             } else {
@@ -253,8 +254,8 @@ return declare (ActionBarDialog,{
 
     _getPhantomJSUrl: function(scParams, jsParams){
         // get current url
-        var currentUrl = this.browser.makeCurrentViewURL();
-        //var currentUrl = 'http://epigenome.genetics.uga.edu/JBrowse/?data=eutrema&loc=scaffold_1%3A8767030..14194216&tracks=DNA%2Cgenes%2Crepeats%2Ces_h3_1.bw_coverage%2Crna_reads%2Ces_h3k56ac.bw_coverage&highlight=';
+        //var currentUrl = this.browser.makeCurrentViewURL();
+        var currentUrl = 'http://epigenome.genetics.uga.edu/JBrowse/?data=eutrema&loc=scaffold_1%3A8767030..14194216&tracks=DNA%2Cgenes%2Crepeats%2Ces_h3_1.bw_coverage%2Crna_reads%2Ces_h3k56ac.bw_coverage&highlight=';
         // encode scParams
         var scEncode = Util.encode(scParams);
         currentUrl += '&screenshot='+scEncode;
