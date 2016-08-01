@@ -6,6 +6,8 @@ define( "ScreenShotPlugin/View/Dialog/ScreenShotDialog", [
     'dijit/form/CheckBox',
     'dijit/form/NumberSpinner',
     'dijit/form/RadioButton',
+    'dijit/TitlePane',
+    'dijit/layout/ContentPane',
     'JBrowse/View/Dialog/WithActionBar',
     'dojo/on',
     'dijit/form/Button',
@@ -20,6 +22,8 @@ function (
     dijitCheckBox,
     dijitNumberSpinner,
     dijitRadioButton,
+    TitlePane,
+    ContentPane,
     ActionBarDialog,
     on,
     Button,
@@ -76,66 +80,12 @@ return declare (ActionBarDialog,{
         var thisB = this;
         dojo.addClass(this.domNode, 'screenshot-dialog')
 
-        var mainPaneLeft = dom.create('div',{'id':'screenshot-dialog-pane-left','class':'screenshot-dialog-pane'});
-        dom.create('h2',{'innerHTML':'General configuration options'}, mainPaneLeft);
-        var table = dom.create('table',{'class':'screenshot-dialog-opt-table'},mainPaneLeft);
-        // check box parameters -> location overview, tracklist, nav, menu bars
-
-        var viewParam = thisB.parameters.view;
-        var param;
-        for(param in viewParam){
-            var data = viewParam[param];
-            var row = dom.create('tr',{'id':'screenshot-dialog-row-'+param},table);
-            dom.create('td',{'innerHTML':(param === 'labels' ? '' : data.title),'class':'screenshot-dialog-pane-label'}, row);
-            var td = dom.create('td',{'class':'screenshot-dialog-pane-input'},row);
-            var input;
-            if(param === 'trackSpacing'){
-                input = new dijitNumberSpinner({
-                    id:'screenshot-dialog-'+param+'-spinner',
-                    value: data.value,
-                    _prop:param,
-                    constraints: {min:0,max:40},
-                    smallDelta:5,
-                    intermediateChanges:true,
-                    style:"width:50px;"
-                });
-            }else{
-                //if(param === 'labels' && thisB.browser.plugins.hasOwnProperty('HideTrackLabels')===false){
-                if(param === 'labels'){
-                    input = null;
-                }else{
-                input = new dijitCheckBox({
-                    id:'screenshot-dialog-opt-box-'+param,
-                    _prop: param,
-                    checked: data.value
-                });
-                }
-            }
-            if(input !== null){
-                input.onClick = dojo.hitch(thisB, '_setParameter', input);
-                input.placeAt(td,'first');
-            }
-        } // end for param
+        //var mainPaneLeft = dom.create('div',{'id':'screenshot-dialog-pane-left','class':'screenshot-dialog-pane'});
+        var mainPaneLeftM = new TitlePane({ className: 'screenshot-dialog-pane','id':'screenshot-dialog-pane-left',title:'General configuration options'});
+        var mainPaneLeft = mainPaneLeftM.containerNode;
+        thisB._paneLeft(mainPaneLeft);
 
         // methylation -> if plugin is installed
-        if(thisB.browser.plugins.hasOwnProperty('MethylationPlugin')){
-            var row = dom.create('tr',{'id':'screenshot-dialog-row-methyl'},table);
-            dom.create('td',{innerHTML:'Methylation',class:'screenshot-dialog-pane-label', 'colspan':2},row);
-            var row2 = dom.create('tr',{'id':'screenshot-dialog-row-methyl-boxes'},table);
-            var methylD = dom.create('td',{'colspan':2},row2);
-            var m;
-            for (m in thisB.parameters.methylation){
-                var mbox = new dijitCheckBox({
-                    id:'screenshot-dialog-methyl-'+m,
-                    class:m+'-checkbox',
-                    _prop:m,
-                    checked: thisB.parameters.methylation[m]
-                });
-                mbox.onClick = dojo.hitch(thisB, '_setMethylation', mbox);
-                dom.create('span',{innerHTML:m,class:'screenshot-dialog-opt-span'},methylD);
-                methylD.appendChild(mbox.domNode);
-            }
-        }
 
         // Pane bottom is for output
         var mainPaneBottom = dom.create('div',{'id':'screenshot-dialog-pane-bottom', 'class':'screenshot-dialog-pane'});
@@ -188,7 +138,7 @@ return declare (ActionBarDialog,{
         var paneFooter = dom.create('div',{class:'screenshot-dialog-pane-bottom-warning',innerHTML:'Local configuration changes will be ignored. Default configuration will be used unless specified in this dialog.<br>Rendering will open a new window.'});
 
         this.set('content', [
-            mainPaneLeft,
+            mainPaneLeftM.domNode,
             mainPaneBottom,
             paneFooter
         ] );
@@ -196,6 +146,65 @@ return declare (ActionBarDialog,{
         this.inherited( arguments );
     },
     
+    _paneLeft: function(obj){
+        var thisB = this;
+        var viewParam = thisB.parameters.view;
+        var param;
+        var table = dom.create('table',{'class':'screenshot-dialog-opt-table'}, obj);
+        // check box parameters -> location overview, tracklist, nav, menu bars
+        for(param in viewParam){
+            var data = viewParam[param];
+            var row = dom.create('tr',{'id':'screenshot-dialog-row-'+param},table);
+            dom.create('td',{'innerHTML':(param === 'labels' ? '' : data.title),'class':'screenshot-dialog-pane-label'}, row);
+            var td = dom.create('td',{'class':'screenshot-dialog-pane-input'},row);
+            var input;
+            if(param === 'trackSpacing'){
+                input = new dijitNumberSpinner({
+                    id:'screenshot-dialog-'+param+'-spinner',
+                    value: data.value,
+                    _prop:param,
+                    constraints: {min:0,max:40},
+                    smallDelta:5,
+                    intermediateChanges:true,
+                    style:"width:50px;"
+                });
+            }else{
+                //if(param === 'labels' && thisB.browser.plugins.hasOwnProperty('HideTrackLabels')===false){
+                if(param === 'labels'){
+                    input = null;
+                }else{
+                input = new dijitCheckBox({
+                    id:'screenshot-dialog-opt-box-'+param,
+                    _prop: param,
+                    checked: data.value
+                });
+                }
+            }
+            if(input !== null){
+                input.onClick = dojo.hitch(thisB, '_setParameter', input);
+                input.placeAt(td,'first');
+            }
+        } // end for param
+        if(thisB.browser.plugins.hasOwnProperty('MethylationPlugin')){
+            var row = dom.create('tr',{'id':'screenshot-dialog-row-methyl'},table);
+            dom.create('td',{innerHTML:'Methylation',class:'screenshot-dialog-pane-label', 'colspan':2},row);
+            var row2 = dom.create('tr',{'id':'screenshot-dialog-row-methyl-boxes'},table);
+            var methylD = dom.create('td',{'colspan':2},row2);
+            var m;
+            for (m in thisB.parameters.methylation){
+                var mbox = new dijitCheckBox({
+                    id:'screenshot-dialog-methyl-'+m,
+                    class:m+'-checkbox',
+                    _prop:m,
+                    checked: thisB.parameters.methylation[m]
+                });
+                mbox.onClick = dojo.hitch(thisB, '_setMethylation', mbox);
+                dom.create('span',{innerHTML:m,class:'screenshot-dialog-opt-span'},methylD);
+                methylD.appendChild(mbox.domNode);
+            }
+        }
+    },
+
     hide: function() {
         this.inherited(arguments);
         window.setTimeout( dojo.hitch( this, 'destroyRecursive' ), 500 );
