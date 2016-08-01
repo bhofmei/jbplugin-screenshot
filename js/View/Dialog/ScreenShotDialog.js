@@ -6,7 +6,6 @@ define( "ScreenShotPlugin/View/Dialog/ScreenShotDialog", [
     'dijit/form/CheckBox',
     'dijit/form/NumberSpinner',
     'dijit/form/RadioButton',
-    'dijit/TitlePane',
     'dijit/layout/ContentPane',
     'JBrowse/View/Dialog/WithActionBar',
     'dojo/on',
@@ -22,7 +21,6 @@ function (
     dijitCheckBox,
     dijitNumberSpinner,
     dijitRadioButton,
-    TitlePane,
     ContentPane,
     ActionBarDialog,
     on,
@@ -178,7 +176,7 @@ return declare (ActionBarDialog,{
                 // 3 check boxes
                 //var formatTypes = ['PNG','JPG','PDF'];
                 var formatTypes = ['PNG','JPG'];
-                var formatTypeTitles = {'PNG':'translucent background','JPG':'white background', 'PDF':'contains svg-like objects'}
+                var formatTypeTitles = {'PNG':'transparent background','JPG':'white background', 'PDF':'contains svg-like objects'}
                 array.forEach(formatTypes, function(f){
                     var btn = new dijitRadioButton({
                         id: 'screenshot-dialog-output-'+f,
@@ -196,17 +194,19 @@ return declare (ActionBarDialog,{
                 var row = dom.create('tr',{'id':'screenshot-dialog-row-'+param},tableB);
                 dom.create('td',{'innerHTML':data.title,'class':'screenshot-dialog-pane-label'}, row);
                 var spinD = dom.create('td',{'class':'screenshot-dialog-pane-input'},row);
-                var spinner = new dijitNumberSpinner({
-                    id:'screenshot-dialog-'+param+'-spinner',
-                    value: data.value,
-                    _prop:param,
-                    constraints: (param === 'zoom' ? {min:1,max:10} : {min:100,max:10000,pattern:'###0'}),
-                    smallDelta:(param === 'zoom' ? 1 : 100),
-                    intermediateChanges:true,
-                    style:"width:75px;"
+                // create slider for quality and spinner for other
+                var widget = new dijitNumberSpinner({
+                        id:'screenshot-dialog-'+param+'-spinner',
+                        value: data.value,
+                        _prop:param,
+                        //constraints: (param === 'zoom' ? {min:1,max:10} : {min:100,max:10000,pattern:'###0'}),
+                        constraints: {min: data.min, max: data.max},
+                        smallDelta:data.delta,
+                        intermediateChanges:true,
+                        style:"width:75px;"
                 });
-                spinner.onChange = dojo.hitch(thisB, '_setParameter',spinner);
-                spinner.placeAt(spinD,'first');
+                widget.onChange = dojo.hitch(thisB, '_setParameter',widget);
+                widget.placeAt(spinD,'first');
             }
         }
     },
@@ -234,7 +234,7 @@ return declare (ActionBarDialog,{
             if(this.parameters.view.hasOwnProperty(prop))
                 this.parameters.view[prop].value = !! input.checked;
         }
-        // else spinner
+        // else spinner or slider
         else{
             if(this.parameters.view.hasOwnProperty(prop))
                 this.parameters.view[prop].value = input.value;
@@ -260,11 +260,15 @@ return declare (ActionBarDialog,{
         var menu = { value: config.show_menu, title:'Show menu bar' }
         var labels = {value:true, title:'Show track labels'}
         // output parameters
+        zoom['min'] = 0;
+        zoom['max'] = 10;
+        zoom['delta'] = 1;
         var format = {value: 'JPG', title: 'Output format'}
-        var width = {value: 3300, title: 'Width (px)'}
-        var height = {value: 2400, title: 'Height (px)'}
+        var width = {value: 3300, title: 'Width (px)', min:100, max:10000, delta:100}
+        var height = {value: 2400, title: 'Height (px)', min:100, max:10000, delta:100}
+        var quality = {value: 70, title: 'Render quality', min:0, max:100, delta:10}
 
-       return { view:{trackSpacing, locOver, trackList, nav, menu, labels}, methylation:{CG:true, CHG:true, CHH:true}, output: {format, zoom, width, height} }
+       return { view:{trackSpacing, locOver, trackList, nav, menu, labels}, methylation:{CG:true, CHG:true, CHH:true}, output: {format, zoom, quality, width, height} }
     },
 
     _getPhantomJSUrl: function(scParams, jsParams){
