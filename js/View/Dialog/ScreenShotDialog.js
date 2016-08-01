@@ -80,66 +80,21 @@ return declare (ActionBarDialog,{
         var thisB = this;
         dojo.addClass(this.domNode, 'screenshot-dialog')
 
-        //var mainPaneLeft = dom.create('div',{'id':'screenshot-dialog-pane-left','class':'screenshot-dialog-pane'});
-        var mainPaneLeftM = new TitlePane({ className: 'screenshot-dialog-pane','id':'screenshot-dialog-pane-left',title:'General configuration options'});
+        var mainPaneLeftM = new ContentPane({ className: 'screenshot-dialog-pane','id':'screenshot-dialog-pane-left',title:'General configuration options',open:false});
         var mainPaneLeft = mainPaneLeftM.containerNode;
         thisB._paneLeft(mainPaneLeft);
 
-        // methylation -> if plugin is installed
-
         // Pane bottom is for output
-        var mainPaneBottom = dom.create('div',{'id':'screenshot-dialog-pane-bottom', 'class':'screenshot-dialog-pane'});
-        dom.create('h2',{'innerHTML':'Output configuration options'}, mainPaneBottom);
-        var tableB = dom.create('table',{'class':'screenshot-dialog-opt-table'},mainPaneBottom);
+        //var mainPaneBottom = dom.create('div',{'id':'screenshot-dialog-pane-bottom', 'class':'screenshot-dialog-pane'});
+        var mainPaneBottomM = new ContentPane({className:'screenshot-dialog-pane', id:'screenshot-dialog-pane-bottom', title:'Output configuration options'});
+        var mainPaneBottom = mainPaneBottomM.containerNode;
+        thisB._paneBottom(mainPaneBottom);
 
-        // output options -> format (PNG, JPEG, PDF), height, width
-        var outParam = thisB.parameters.output;
-        for(param in outParam){
-            var data = outParam[param];
-            if(param === 'format'){
-                var row = dom.create('tr',{'id':'screenshot-dialog-row-'+param,'colspan':2},tableB);
-                dom.create('td',{'innerHTML':data.title,'class':'screenshot-dialog-pane-label'}, row);
-                var row2 = dom.create('tr',{'class':'screenshot-dialog-pane-input'},tableB);
-                var outD = dom.create('td',{'colspan':2},row2);
-                // 3 check boxes
-                //var formatTypes = ['PNG','JPG','PDF'];
-                var formatTypes = ['PNG','JPG'];
-                var formatTypeTitles = {'PNG':'translucent background','JPG':'white background', 'PDF':'contains svg-like objects'}
-                array.forEach(formatTypes, function(f){
-                    var btn = new dijitRadioButton({
-                        id: 'screenshot-dialog-output-'+f,
-                        checked: f === thisB.parameters.output.format.value,
-                        value: f,
-                        _prop: param
-                    });
-                    btn.onClick = dojo.hitch(thisB, '_setParameter', btn);
-                    dom.create('span',{innerHTML:f, className:'screenshot-dialog-opt-span',title:formatTypeTitles[f]},outD);
-                    outD.appendChild(btn.domNode);
-                });
-            } else {
-                // number spinners
-                var data = outParam[param];
-                var row = dom.create('tr',{'id':'screenshot-dialog-row-'+param},tableB);
-                dom.create('td',{'innerHTML':data.title,'class':'screenshot-dialog-pane-label'}, row);
-                var spinD = dom.create('td',{'class':'screenshot-dialog-pane-input'},row);
-                var spinner = new dijitNumberSpinner({
-                    id:'screenshot-dialog-'+param+'-spinner',
-                    value: data.value,
-                    _prop:param,
-                    constraints: (param === 'zoom' ? {min:1,max:10} : {min:100,max:10000,pattern:'###0'}),
-                    smallDelta:(param === 'zoom' ? 1 : 100),
-                    intermediateChanges:true,
-                    style:"width:75px;"
-                });
-                spinner.onChange = dojo.hitch(thisB, '_setParameter',spinner);
-                spinner.placeAt(spinD,'first');
-            }
-        }
         var paneFooter = dom.create('div',{class:'screenshot-dialog-pane-bottom-warning',innerHTML:'Local configuration changes will be ignored. Default configuration will be used unless specified in this dialog.<br>Rendering will open a new window.'});
 
         this.set('content', [
             mainPaneLeftM.domNode,
-            mainPaneBottom,
+            mainPaneBottomM.domNode,
             paneFooter
         ] );
 
@@ -201,6 +156,55 @@ return declare (ActionBarDialog,{
                 mbox.onClick = dojo.hitch(thisB, '_setMethylation', mbox);
                 dom.create('span',{innerHTML:m,class:'screenshot-dialog-opt-span'},methylD);
                 methylD.appendChild(mbox.domNode);
+            }
+        }
+    },
+
+    _paneBottom: function(obj){
+        var thisB = this;
+        var tableB = dom.create('table',{'class':'screenshot-dialog-opt-table'},obj);
+        var param;
+        // output options -> format (PNG, JPEG, PDF), height, width
+        var outParam = thisB.parameters.output;
+        for(param in outParam){
+            var data = outParam[param];
+            if(param === 'format'){
+                var row = dom.create('tr',{'id':'screenshot-dialog-row-'+param,'colspan':2},tableB);
+                dom.create('td',{'innerHTML':data.title,'class':'screenshot-dialog-pane-label'}, row);
+                var row2 = dom.create('tr',{'class':'screenshot-dialog-pane-input'},tableB);
+                var outD = dom.create('td',{'colspan':2},row2);
+                // 3 check boxes
+                //var formatTypes = ['PNG','JPG','PDF'];
+                var formatTypes = ['PNG','JPG'];
+                var formatTypeTitles = {'PNG':'translucent background','JPG':'white background', 'PDF':'contains svg-like objects'}
+                array.forEach(formatTypes, function(f){
+                    var btn = new dijitRadioButton({
+                        id: 'screenshot-dialog-output-'+f,
+                        checked: f === thisB.parameters.output.format.value,
+                        value: f,
+                        _prop: param
+                    });
+                    btn.onClick = dojo.hitch(thisB, '_setParameter', btn);
+                    dom.create('span',{innerHTML:f, className:'screenshot-dialog-opt-span',title:formatTypeTitles[f]},outD);
+                    outD.appendChild(btn.domNode);
+                });
+            } else {
+                // number spinners
+                var data = outParam[param];
+                var row = dom.create('tr',{'id':'screenshot-dialog-row-'+param},tableB);
+                dom.create('td',{'innerHTML':data.title,'class':'screenshot-dialog-pane-label'}, row);
+                var spinD = dom.create('td',{'class':'screenshot-dialog-pane-input'},row);
+                var spinner = new dijitNumberSpinner({
+                    id:'screenshot-dialog-'+param+'-spinner',
+                    value: data.value,
+                    _prop:param,
+                    constraints: (param === 'zoom' ? {min:1,max:10} : {min:100,max:10000,pattern:'###0'}),
+                    smallDelta:(param === 'zoom' ? 1 : 100),
+                    intermediateChanges:true,
+                    style:"width:75px;"
+                });
+                spinner.onChange = dojo.hitch(thisB, '_setParameter',spinner);
+                spinner.placeAt(spinD,'first');
             }
         }
     },
