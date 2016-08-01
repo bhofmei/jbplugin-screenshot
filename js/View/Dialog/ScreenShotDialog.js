@@ -105,6 +105,7 @@ return declare (ActionBarDialog,{
         var thisB = this;
         var viewParam = thisB.parameters.view;
         var param;
+        dom.create('h2',{'innerHTML':'General configuration options'}, obj);
         var table = dom.create('table',{'class':'screenshot-dialog-opt-table'}, obj);
         // check box parameters -> location overview, tracklist, nav, menu bars
         for(param in viewParam){
@@ -162,6 +163,7 @@ return declare (ActionBarDialog,{
 
     _paneBottom: function(obj){
         var thisB = this;
+        dom.create('h2',{'innerHTML':'Output configuration options'}, obj);
         var tableB = dom.create('table',{'class':'screenshot-dialog-opt-table'},obj);
         var param;
         // output options -> format (PNG, JPEG, PDF), height, width
