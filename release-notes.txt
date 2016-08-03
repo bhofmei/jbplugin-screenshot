@@ -1,3 +1,7 @@
+v0.0.4 - Aug 3, 2016
+- added render quality as output option
+- dialog box is reorganized
+
 v0.0.3 - Jul 22, 2016
 - removed PDF functionality as it is not functional
 

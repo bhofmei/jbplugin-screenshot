@@ -6,6 +6,7 @@ define( "ScreenShotPlugin/View/Dialog/ScreenShotDialog", [
     'dijit/form/CheckBox',
     'dijit/form/NumberSpinner',
     'dijit/form/RadioButton',
+    'dijit/layout/ContentPane',
     'JBrowse/View/Dialog/WithActionBar',
     'dojo/on',
     'dijit/form/Button',
@@ -20,6 +21,7 @@ function (
     dijitCheckBox,
     dijitNumberSpinner,
     dijitRadioButton,
+    dijitContentPane,
     ActionBarDialog,
     on,
     Button,
@@ -44,6 +46,7 @@ return declare (ActionBarDialog,{
      },
      
      _fillActionBar: function( actionBar ){
+        dojo.addClass(actionBar, 'screenshot-dialog-actionbar');
         var ok_button = new Button({
             label: "Render",
             onClick: dojo.hitch(this, function() {
@@ -76,13 +79,56 @@ return declare (ActionBarDialog,{
         var thisB = this;
         dojo.addClass(this.domNode, 'screenshot-dialog')
 
-        var mainPaneLeft = dom.create('div',{'id':'screenshot-dialog-pane-left','class':'screenshot-dialog-pane'});
-        dom.create('h2',{'innerHTML':'General configuration options'}, mainPaneLeft);
-        var table = dom.create('table',{'class':'screenshot-dialog-opt-table'},mainPaneLeft);
-        // check box parameters -> location overview, tracklist, nav, menu bars
+        var mainPaneLeft = dom.create('div',
+            {className: 'screenshot-dialog-pane',
+            'id':'screenshot-dialog-pane-left'});
+        var mainPaneLeftTop = new dijitContentPane({
+            className: 'screenshot-dialog-pane-sub',
+            'id':'screenshot-dialog-pane-left-top',
+            title:'General configuration options'
+        });
+        var mainPaneLeftT = mainPaneLeftTop.containerNode;
+        thisB._paneGen(mainPaneLeftT);
+        mainPaneLeftTop.placeAt(mainPaneLeft);
 
+
+        var mainPaneLeftBottom = new dijitContentPane({
+            className:'screenshot-dialog-pane-sub',
+            id:'screenshot-dialog-pane-left-bottom',
+            title:'Output configuration options'
+        });
+        var mainPaneLeftB = mainPaneLeftBottom.containerNode;
+        thisB._paneOut(mainPaneLeftB);
+        mainPaneLeftBottom.placeAt(mainPaneLeft);
+
+        // for tracks
+
+        var mainPaneRightM = new dijitContentPane({
+            className: 'screenshot-dialog-pane',
+            id: 'screenshot-dialog-pane-right',
+            title: 'Track-specific configuration options'
+        });
+        var mainPaneRight = mainPaneRightM.containerNode;
+        thisB._paneTracks( mainPaneRight );
+
+        var paneFooter = dom.create('div',{class:'screenshot-dialog-pane-bottom-warning',innerHTML:'Local configuration changes will be ignored. Default configuration will be used unless specified in this dialog.<br>Rendering will open a new window.'});
+
+        this.set('content', [
+            mainPaneLeft,
+            mainPaneRightM.domNode,
+            paneFooter
+        ] );
+
+        this.inherited( arguments );
+    },
+    
+    _paneGen: function(obj){
+        var thisB = this;
         var viewParam = thisB.parameters.view;
         var param;
+        dom.create('h2',{'innerHTML':'General configuration options'}, obj);
+        var table = dom.create('table',{'class':'screenshot-dialog-opt-table'}, obj);
+        // check box parameters -> location overview, tracklist, nav, menu bars
         for(param in viewParam){
             var data = viewParam[param];
             var row = dom.create('tr',{'id':'screenshot-dialog-row-'+param},table);
@@ -116,8 +162,6 @@ return declare (ActionBarDialog,{
                 input.placeAt(td,'first');
             }
         } // end for param
-
-        // methylation -> if plugin is installed
         if(thisB.browser.plugins.hasOwnProperty('MethylationPlugin')){
             var row = dom.create('tr',{'id':'screenshot-dialog-row-methyl'},table);
             dom.create('td',{innerHTML:'Methylation',class:'screenshot-dialog-pane-label', 'colspan':2},row);
@@ -136,12 +180,13 @@ return declare (ActionBarDialog,{
                 methylD.appendChild(mbox.domNode);
             }
         }
+    },
 
-        // Pane bottom is for output
-        var mainPaneBottom = dom.create('div',{'id':'screenshot-dialog-pane-bottom', 'class':'screenshot-dialog-pane'});
-        dom.create('h2',{'innerHTML':'Output configuration options'}, mainPaneBottom);
-        var tableB = dom.create('table',{'class':'screenshot-dialog-opt-table'},mainPaneBottom);
-
+    _paneOut: function(obj){
+        var thisB = this;
+        dom.create('h2',{'innerHTML':'Output configuration options'}, obj);
+        var tableB = dom.create('table',{'class':'screenshot-dialog-opt-table'},obj);
+        var param;
         // output options -> format (PNG, JPEG, PDF), height, width
         var outParam = thisB.parameters.output;
         for(param in outParam){
@@ -154,6 +199,7 @@ return declare (ActionBarDialog,{
                 // 3 check boxes
                 //var formatTypes = ['PNG','JPG','PDF'];
                 var formatTypes = ['PNG','JPG'];
+                var formatTypeTitles = {'PNG':'transparent background','JPG':'white background', 'PDF':'contains svg-like objects'}
                 array.forEach(formatTypes, function(f){
                     var btn = new dijitRadioButton({
                         id: 'screenshot-dialog-output-'+f,
@@ -162,7 +208,7 @@ return declare (ActionBarDialog,{
                         _prop: param
                     });
                     btn.onClick = dojo.hitch(thisB, '_setParameter', btn);
-                    dom.create('span',{innerHTML:f, className:'screenshot-dialog-opt-span'},outD);
+                    dom.create('span',{innerHTML:f, className:'screenshot-dialog-opt-span',title:formatTypeTitles[f]},outD);
                     outD.appendChild(btn.domNode);
                 });
             } else {
@@ -171,30 +217,29 @@ return declare (ActionBarDialog,{
                 var row = dom.create('tr',{'id':'screenshot-dialog-row-'+param},tableB);
                 dom.create('td',{'innerHTML':data.title,'class':'screenshot-dialog-pane-label'}, row);
                 var spinD = dom.create('td',{'class':'screenshot-dialog-pane-input'},row);
-                var spinner = new dijitNumberSpinner({
-                    id:'screenshot-dialog-'+param+'-spinner',
-                    value: data.value,
-                    _prop:param,
-                    constraints: (param === 'zoom' ? {min:1,max:10} : {min:100,max:10000,pattern:'###0'}),
-                    smallDelta:(param === 'zoom' ? 1 : 100),
-                    intermediateChanges:true,
-                    style:"width:75px;"
+                // create slider for quality and spinner for other
+                var widget = new dijitNumberSpinner({
+                        id:'screenshot-dialog-'+param+'-spinner',
+                        value: data.value,
+                        _prop:param,
+                        //constraints: (param === 'zoom' ? {min:1,max:10} : {min:100,max:10000,pattern:'###0'}),
+                        constraints: {min: data.min, max: data.max},
+                        smallDelta:data.delta,
+                        intermediateChanges:true,
+                        style:"width:75px;"
                 });
-                spinner.onChange = dojo.hitch(thisB, '_setParameter',spinner);
-                spinner.placeAt(spinD,'first');
+                widget.onChange = dojo.hitch(thisB, '_setParameter',widget);
+                widget.placeAt(spinD,'first');
             }
         }
-        var paneFooter = dom.create('div',{class:'screenshot-dialog-pane-bottom-warning',innerHTML:'Local configuration changes will be ignored. Default configuration will be used unless specified in this dialog.<br>Rendering will open a new window.'});
-
-        this.set('content', [
-            mainPaneLeft,
-            mainPaneBottom,
-            paneFooter
-        ] );
-
-        this.inherited( arguments );
     },
-    
+
+    _paneTracks: function(obj){
+        var thisB = this;
+        dom.create('h2',{'innerHTML':'Track-specific options'}, obj);
+        dom.create('p',{'innerHTML':'Coming soon'}, obj);
+    },
+
     hide: function() {
         this.inherited(arguments);
         window.setTimeout( dojo.hitch( this, 'destroyRecursive' ), 500 );
@@ -218,7 +263,7 @@ return declare (ActionBarDialog,{
             if(this.parameters.view.hasOwnProperty(prop))
                 this.parameters.view[prop].value = !! input.checked;
         }
-        // else spinner
+        // else spinner or slider
         else{
             if(this.parameters.view.hasOwnProperty(prop))
                 this.parameters.view[prop].value = input.value;
@@ -244,17 +289,21 @@ return declare (ActionBarDialog,{
         var menu = { value: config.show_menu, title:'Show menu bar' }
         var labels = {value:true, title:'Show track labels'}
         // output parameters
+        zoom['min'] = 0;
+        zoom['max'] = 10;
+        zoom['delta'] = 1;
         var format = {value: 'JPG', title: 'Output format'}
-        var width = {value: 3300, title: 'Width (px)'}
-        var height = {value: 2400, title: 'Height (px)'}
+        var width = {value: 3300, title: 'Width (px)', min:100, max:10000, delta:100}
+        var height = {value: 2400, title: 'Height (px)', min:100, max:10000, delta:100}
+        var quality = {value: 70, title: 'Render quality', min:0, max:100, delta:10}
 
-       return { view:{trackSpacing, locOver, trackList, nav, menu, labels}, methylation:{CG:true, CHG:true, CHH:true}, output: {format, zoom, width, height} }
+       return { view:{trackSpacing, locOver, trackList, nav, menu, labels}, methylation:{CG:true, CHG:true, CHH:true}, output: {format, zoom, quality, width, height} }
     },
 
     _getPhantomJSUrl: function(scParams, jsParams){
         // get current url
-        var currentUrl = this.browser.makeCurrentViewURL();
-        //var currentUrl = 'http://epigenome.genetics.uga.edu/JBrowse/?data=eutrema&loc=scaffold_1%3A8767030..14194216&tracks=DNA%2Cgenes%2Crepeats%2Ces_h3_1.bw_coverage%2Crna_reads%2Ces_h3k56ac.bw_coverage&highlight=';
+        //var currentUrl = this.browser.makeCurrentViewURL();
+        var currentUrl = 'http://epigenome.genetics.uga.edu/JBrowse/?data=eutrema&loc=scaffold_1%3A8767030..14194216&tracks=DNA%2Cgenes%2Crepeats%2Ces_h3_1.bw_coverage%2Crna_reads%2Ces_h3k56ac.bw_coverage&highlight=';
         // encode scParams
         var scEncode = Util.encode(scParams);
         currentUrl += '&screenshot='+scEncode;

@@ -57,35 +57,6 @@ Util = {
     },
 
     _decodeGeneralSettings: function (input){
-        // locOver, menu, methylation, nav, trackList, trackSpacing, labels, zoom
-        /*var fLabels = { 'z':'highResolutionMode', 'p':'trackPadding', 'o':'show_overview', 'r':'show_tracklist', 'n':'show_nav', 'u':'show_menu', 'b':'showLabels', 'm':'methylation'};
-        var outProp = {basic: {}, view: {}, methylation:{}};
-        var prop;
-        for(prop in fLabels){
-            var p = fLabels[prop];
-            var regex = new RegExp("/"+prop+"([0-9]+)/",'gi');
-            var result = regex.exec(input);
-            if(result !== null){
-                // handle the types
-                if(prop === 'z')
-                    outProp.basic[p] = parseInt(result[1]);
-                else if(prop === 'p'){
-                    outProp.view[p] = parseInt(result[1]);
-                }
-                else if(prop === 'm'){
-                    outProp.methylation.CG =
-                        this._decodeBoolen(result[1].substring(0,1));
-                    outProp.methylation.CHG =
-                        this._decodeBoolen(result[1].substring(1,2));
-                    outProp.methylation.CHH =
-                        this._decodeBoolen(result[1].substring(2,3));
-                }
-                else{
-                    outProp.basic[p] = this._decodeBoolen(result[1]);
-                }
-            }
-        }//end for prop
-        return outProp;*/
         var outProp = {basic:{}, view:{},methylation:{}};
         // zoom
         var resultZ = /z([0-9]+)/gi.exec(input);
