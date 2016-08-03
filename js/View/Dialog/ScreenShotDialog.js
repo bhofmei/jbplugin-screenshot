@@ -21,7 +21,7 @@ function (
     dijitCheckBox,
     dijitNumberSpinner,
     dijitRadioButton,
-    ContentPane,
+    dijitContentPane,
     ActionBarDialog,
     on,
     Button,
@@ -46,6 +46,7 @@ return declare (ActionBarDialog,{
      },
      
      _fillActionBar: function( actionBar ){
+        dojo.addClass(actionBar, 'screenshot-dialog-actionbar');
         var ok_button = new Button({
             label: "Render",
             onClick: dojo.hitch(this, function() {
@@ -78,28 +79,50 @@ return declare (ActionBarDialog,{
         var thisB = this;
         dojo.addClass(this.domNode, 'screenshot-dialog')
 
-        var mainPaneLeftM = new ContentPane({ className: 'screenshot-dialog-pane','id':'screenshot-dialog-pane-left',title:'General configuration options',open:false});
-        var mainPaneLeft = mainPaneLeftM.containerNode;
-        thisB._paneLeft(mainPaneLeft);
+        var mainPaneLeft = dom.create('div',
+            {className: 'screenshot-dialog-pane',
+            'id':'screenshot-dialog-pane-left'});
+        var mainPaneLeftTop = new dijitContentPane({
+            className: 'screenshot-dialog-pane-sub',
+            'id':'screenshot-dialog-pane-left-top',
+            title:'General configuration options'
+        });
+        var mainPaneLeftT = mainPaneLeftTop.containerNode;
+        thisB._paneGen(mainPaneLeftT);
+        mainPaneLeftTop.placeAt(mainPaneLeft);
 
-        // Pane bottom is for output
-        //var mainPaneBottom = dom.create('div',{'id':'screenshot-dialog-pane-bottom', 'class':'screenshot-dialog-pane'});
-        var mainPaneBottomM = new ContentPane({className:'screenshot-dialog-pane', id:'screenshot-dialog-pane-bottom', title:'Output configuration options'});
-        var mainPaneBottom = mainPaneBottomM.containerNode;
-        thisB._paneBottom(mainPaneBottom);
+
+        var mainPaneLeftBottom = new dijitContentPane({
+            className:'screenshot-dialog-pane-sub',
+            id:'screenshot-dialog-pane-left-bottom',
+            title:'Output configuration options'
+        });
+        var mainPaneLeftB = mainPaneLeftBottom.containerNode;
+        thisB._paneOut(mainPaneLeftB);
+        mainPaneLeftBottom.placeAt(mainPaneLeft);
+
+        // for tracks
+
+        var mainPaneRightM = new dijitContentPane({
+            className: 'screenshot-dialog-pane',
+            id: 'screenshot-dialog-pane-right',
+            title: 'Track-specific configuration options'
+        });
+        var mainPaneRight = mainPaneRightM.containerNode;
+        thisB._paneTracks( mainPaneRight );
 
         var paneFooter = dom.create('div',{class:'screenshot-dialog-pane-bottom-warning',innerHTML:'Local configuration changes will be ignored. Default configuration will be used unless specified in this dialog.<br>Rendering will open a new window.'});
 
         this.set('content', [
-            mainPaneLeftM.domNode,
-            mainPaneBottomM.domNode,
+            mainPaneLeft,
+            mainPaneRightM.domNode,
             paneFooter
         ] );
 
         this.inherited( arguments );
     },
     
-    _paneLeft: function(obj){
+    _paneGen: function(obj){
         var thisB = this;
         var viewParam = thisB.parameters.view;
         var param;
@@ -159,7 +182,7 @@ return declare (ActionBarDialog,{
         }
     },
 
-    _paneBottom: function(obj){
+    _paneOut: function(obj){
         var thisB = this;
         dom.create('h2',{'innerHTML':'Output configuration options'}, obj);
         var tableB = dom.create('table',{'class':'screenshot-dialog-opt-table'},obj);
@@ -209,6 +232,12 @@ return declare (ActionBarDialog,{
                 widget.placeAt(spinD,'first');
             }
         }
+    },
+
+    _paneTracks: function(obj){
+        var thisB = this;
+        dom.create('h2',{'innerHTML':'Track-specific options'}, obj);
+        dom.create('p',{'innerHTML':'Coming soon'}, obj);
     },
 
     hide: function() {

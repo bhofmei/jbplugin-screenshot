@@ -24,6 +24,13 @@ If that doesn't work, add this to jbrowse_conf.json:
     ``"plugins" : {
         "ScreenShotPlugin" : { "location" : "plugins/ScreenShotPlugin" }
     }``
+
+**Important**:  
+For this plugin to work properly, a change needs to be made to the ``index.html`` file.  The line which parses query parameters, about line 50, currently reads
+   ``var queryParams = ioQuery.queryToObject( window.location.search.slice(1) );``
+
+Change this to   
+   ``var queryParams = ioQuery.queryToObject( decodeURIComponent(window.location.search.slice(1) ) );``
     
 ##Use
 Click the "Screen shot" button in the browser. A dialog box will open with options for the screenshot. You can also press the `s` key as a shortcut to open the dialog box.
