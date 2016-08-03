@@ -302,8 +302,8 @@ return declare (ActionBarDialog,{
 
     _getPhantomJSUrl: function(scParams, jsParams){
         // get current url
-        //var currentUrl = this.browser.makeCurrentViewURL();
-        var currentUrl = 'http://epigenome.genetics.uga.edu/JBrowse/?data=eutrema&loc=scaffold_1%3A8767030..14194216&tracks=DNA%2Cgenes%2Crepeats%2Ces_h3_1.bw_coverage%2Crna_reads%2Ces_h3k56ac.bw_coverage&highlight=';
+        var currentUrl = this.browser.makeCurrentViewURL();
+        //var currentUrl = 'http://epigenome.genetics.uga.edu/JBrowse/?data=eutrema&loc=scaffold_1%3A8767030..14194216&tracks=DNA%2Cgenes%2Crepeats%2Ces_h3_1.bw_coverage%2Crna_reads%2Ces_h3k56ac.bw_coverage&highlight=';
         // encode scParams
         var scEncode = Util.encode(scParams);
         currentUrl += '&screenshot='+scEncode;
