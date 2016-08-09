@@ -75,7 +75,7 @@ return declare( JBrowsePlugin,
 
         browser.afterMilestone('initView',  function() {
             // create screenshot button (possibly tools menu)
-            console.log(browser);
+            //console.log(browser);
             var menuBar = browser.menuBar;
             function showScreenShotDialog(){
                 new ScreenShotDialog({
