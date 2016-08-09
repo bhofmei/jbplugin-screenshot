@@ -1,5 +1,6 @@
 define( "ScreenShotPlugin/View/Dialog/ScreenShotDialog", [
     'dojo/_base/declare',
+    'dojo/_base/lang',
     'dojo/dom-construct',
     'dojo/_base/array',
     'dijit/focus',
@@ -7,6 +8,7 @@ define( "ScreenShotPlugin/View/Dialog/ScreenShotDialog", [
     'dijit/form/NumberSpinner',
     'dijit/form/RadioButton',
     'dijit/layout/ContentPane',
+    'dijit/layout/AccordionContainer',
     'JBrowse/View/Dialog/WithActionBar',
     'dojo/on',
     'dijit/form/Button',
@@ -15,6 +17,7 @@ define( "ScreenShotPlugin/View/Dialog/ScreenShotDialog", [
     ],
 function (
     declare,
+    lang,
     dom,
     array,
     focus,
@@ -22,6 +25,7 @@ function (
     dijitNumberSpinner,
     dijitRadioButton,
     dijitContentPane,
+    dijitAccordionContainer,
     ActionBarDialog,
     on,
     Button,
@@ -43,6 +47,10 @@ return declare (ActionBarDialog,{
         this.requestUrl = args.requestUrl;
         this.setCallback    = args.setCallback || function() {};
         this.cancelCallback = args.cancelCallback || function() {};
+        this.vTracks = this.browser.view.visibleTracks();
+        console.log(this.vTracks);
+        this.trackParameters = this._getTrackParameters();
+         console.log(this.trackParameters);
      },
      
      _fillActionBar: function( actionBar ){
@@ -82,6 +90,7 @@ return declare (ActionBarDialog,{
         var mainPaneLeft = dom.create('div',
             {className: 'screenshot-dialog-pane',
             'id':'screenshot-dialog-pane-left'});
+
         var mainPaneLeftTop = new dijitContentPane({
             className: 'screenshot-dialog-pane-sub',
             'id':'screenshot-dialog-pane-left-top',
@@ -103,19 +112,24 @@ return declare (ActionBarDialog,{
 
         // for tracks
 
-        var mainPaneRightM = new dijitContentPane({
+       var mainPaneRight = dom.create('div',
+            {className: 'screenshot-dialog-pane',
+            'id':'screenshot-dialog-pane-right',
+            className:'screenshot-dialog-pane'});
+
+        /*var mainPaneRightM = new dijitContentPane({
             className: 'screenshot-dialog-pane',
             id: 'screenshot-dialog-pane-right',
             title: 'Track-specific configuration options'
         });
-        var mainPaneRight = mainPaneRightM.containerNode;
+        var mainPaneRight = mainPaneRightM.containerNode;*/
         thisB._paneTracks( mainPaneRight );
 
         var paneFooter = dom.create('div',{class:'screenshot-dialog-pane-bottom-warning',innerHTML:'Local configuration changes will be ignored. Default configuration will be used unless specified in this dialog.<br>Rendering will open a new window.'});
 
         this.set('content', [
             mainPaneLeft,
-            mainPaneRightM.domNode,
+            mainPaneRight,
             paneFooter
         ] );
 
@@ -236,8 +250,22 @@ return declare (ActionBarDialog,{
 
     _paneTracks: function(obj){
         var thisB = this;
-        dom.create('h2',{'innerHTML':'Track-specific options'}, obj);
-        dom.create('p',{'innerHTML':'Coming soon'}, obj);
+        dom.create('h2',{'innerHTML':'Track-specific configuration options'}, obj);
+
+        var acc = new dijitAccordionContainer({
+            id:'screenshot-dialog-pane-accordian'
+        });
+
+        acc.addChild(new dijitContentPane({
+            content: 'text',
+            title: 'track1'
+        }));
+        acc.addChild(new dijitContentPane({
+            content: 'other text',
+            title: 'track2'
+        }));
+        acc.placeAt(obj);
+        acc.startup();
     },
 
     hide: function() {
@@ -298,6 +326,30 @@ return declare (ActionBarDialog,{
         var quality = {value: 70, title: 'Render quality', min:0, max:100, delta:10}
 
        return { view:{trackSpacing, locOver, trackList, nav, menu, labels}, methylation:{CG:true, CHG:true, CHH:true}, output: {format, zoom, quality, width, height} }
+    },
+
+    _getTrackParameters: function(){
+        var thisB = this;
+        var out = {};
+        array.forEach(this.vTracks, function(track){
+           var tType = track.config.type;
+            // handle parameters by type
+            out[track.config.label] = thisB._handleTrackTypeParameters(tType, track.config);
+        });
+        return out;
+    },
+
+    _handleTrackTypeParameters(tType, config){
+        var out = {};
+        // DNA sequence has no options for now
+        if(/\b(Sequence)/.test( tType ))
+            return {opts:false,key:config.key};
+        // test methylation tracks
+        if(/\b(MethylPlot)/.test( tType ))
+            lang.mixin(out,{showCG: config.showCG, showCHG: config.showCHG, showCHH: config.showCHH});
+        // all other track types add options
+        lang.mixin(out, {yScalePosition:config.yScalePosition, min_score: config.min_score, max_score: config.max_score, style: {height: config.style.height}});
+        return out;
     },
 
     _getPhantomJSUrl: function(scParams, jsParams){
