@@ -248,23 +248,86 @@ return declare (ActionBarDialog,{
         }
     },
 
-    _paneTracks: function(obj){
+    _paneTracks: function(rPane){
         var thisB = this;
-        dom.create('h2',{'innerHTML':'Track-specific configuration options'}, obj);
+        var locationList = ['left','center','right','none'];
+        dom.create('h2',{'innerHTML':'Track-specific configuration options'}, rPane);
 
         var acc = new dijitAccordionContainer({
             id:'screenshot-dialog-pane-accordian'
         });
+        var label, tParams, pane, param;
+        // need to loop through the tracks and create content panes
+        array.forEach(thisB.vTracks, function(track){
+            // get parameters
+            label = track.config.label
+            tParams = thisB.trackParameters[label];
+            pane = new dijitContentPane({
+                title: (tParams.key===undefined ? label : tParams.key ),
+                id: 'screenshot-dialog-track-'+label
+            });
+            var obj = pane.containerNode;
 
-        acc.addChild(new dijitContentPane({
-            content: 'text',
-            title: 'track1'
-        }));
-        acc.addChild(new dijitContentPane({
-            content: 'other text',
-            title: 'track2'
-        }));
-        acc.placeAt(obj);
+            if(tParams.opts === false){
+                pane.set('content','No available options');
+                acc.addChild(pane);
+                return
+            }
+            var table = dom.create('table',{'class':'screenshot-dialog-opt-table'}, obj);
+            // loop through parameters
+            for(param in tParams){
+                // yscale is radio boxes
+                if(param === 'ypos'){
+                    // yscale position radio boxes
+                    if(tParams.ypos !== false){
+                        var row = dom.create('tr',{'id':'screenshot-dialog-row-'+label+'-ypos'},table);
+                        dom.create('td',{'innerHTML':'Y-scale position','class':'screenshot-dialog-pane-label'}, row);
+                        array.forEach(locationList, function(loc){
+                            var button = new dijitRadioButton({
+                                name:'yscale-'+label,
+                                checked: loc === tParams.ypos,
+                                id:'screenshot-dialog-radio-'+label+'-'+loc,
+                                value: loc,
+                                _label: label,
+                                _prop: 'ypos'
+                        });
+                        button.onClick = dojo.hitch(thisB, '_setTrackParameter', button);
+                        var td = dom.create('td',{class:'screenshot-dialog-td-button'},row);
+                        button.placeAt(td,'first');
+                        dom.create('label',{"for":'yscale-dialog-radio-'+label+'-'+loc, innerHTML: loc}, td);
+                    });
+                    } // end y-scale position
+                }
+                else if(param==='methyl'){
+                    // methylation check boxes
+                    var data = tParams.methyl;
+                    var row = dom.create('tr',{'id':'screenshot-dialog-row-'+label+'-methyl'},table);
+                    dom.create('td',{'innerHTML':'Methylation','class':'screenshot-dialog-pane-label'}, row);
+                    for(var m in data){
+                        var box = new dijitCheckBox({
+                                checked: tParams.methyl[m],
+                                id:'screenshot-dialog-radio-'+label+'-'+m,
+                                value: m,
+                                class: m+'-checkbox',
+                                _label: label,
+                                _prop: 'methyl'
+                        });
+                        box.onClick = dojo.hitch(thisB, '_setTrackParameter', box);
+                        var td = dom.create('td',{class:'screenshot-dialog-td-button'},row);
+                        box.placeAt(td,'first');
+                        dom.create('label',{"for":'yscale-dialog-radio-'+label+'-'+m, innerHTML: m}, td);
+                    }
+
+                }
+                else{
+                    // otherwise its a number spinner text box thing
+                }
+            } // end for param
+
+            acc.addChild(pane);
+        });
+
+        acc.placeAt(rPane);
         acc.startup();
     },
 
@@ -298,6 +361,23 @@ return declare (ActionBarDialog,{
             else if(this.parameters.output.hasOwnProperty(prop))
                 this.parameters.output[prop].value = input.value;
         }
+    },
+
+    _setTrackParameter: function(input){
+        var tLabel = input._label;
+        var prop = input._prop;
+        // handle methylation
+        if(prop === 'methyl'){
+            if(this.trackParameters[tLabel].methyl.hasOwnProperty(input.value)){
+                this.trackParameters[tLabel].methyl[input.value] = input.checked;
+            }
+        }
+        if(input.hasOwnProperty('checked' && input.checked)){
+            if(this.trackParameters.hasOwnProperty(tLabel)){
+                this.trackParameters[tLabel][prop] = input.value;
+            }
+        }
+
     },
 
     _getInitialParameters: function(){
@@ -340,15 +420,31 @@ return declare (ActionBarDialog,{
     },
 
     _handleTrackTypeParameters(tType, config){
-        var out = {};
+        var out = {key:config.key};
         // DNA sequence has no options for now
-        if(/\b(Sequence)/.test( tType ))
-            return {opts:false,key:config.key};
+        if(/\b(Sequence)/.test( tType )){
+            lang.mixin(out,{opts:false});
+            return out;
+        }
         // test methylation tracks
-        if(/\b(MethylPlot)/.test( tType ))
-            lang.mixin(out,{showCG: config.showCG, showCHG: config.showCHG, showCHH: config.showCHH});
-        // all other track types add options
-        lang.mixin(out, {yScalePosition:config.yScalePosition, min_score: config.min_score, max_score: config.max_score, style: {height: config.style.height}});
+       if(/\b(MethylPlot)/.test( tType )|| /\b(MethylPlot)/.test( tType )){
+            lang.mixin(out,{methyl:{CG: config.showCG, CHG: config.showCHG, CHH: config.showCHH}});
+            // also mixin the bigwig like features
+            lang.mixin(out, {ypos:config.yScalePosition, min: config.min_score, max: config.max_score, height: config.style.height, quant:true});
+        }
+        // test bigwig
+        else if(/\b(XYPlot)/.test( tType ) || /\b(XYDensity)/.test( tType )){
+            lang.mixin(out, {ypos:config.yScalePosition, min: config.min_score, max: config.max_score, height: config.style.height, quant:true});
+        }
+        // else get track height from maxHeight and set ypos = false
+        else{
+            lang.mixin(out, {height:config.maxHeight, ypos: false});
+        }
+        // Canvas/Alignments2 have maxHeight option and possibly histogram with min/max and height
+        // test for histograms
+        if(config.histograms !== undefined){
+            lang.mixin(out, {min: config.histograms.min, max: config.histograms.max, ypos: config.yScalePosition, quant: false});
+        }
         return out;
     },
 
