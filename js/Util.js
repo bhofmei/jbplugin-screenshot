@@ -13,7 +13,9 @@ Util = {
     encode: function(inputs){
     // returns string with encode options for screenshot
         var gInputs = inputs.general;
-        return this._encodeGeneralSettings(gInputs);
+        var tInputs = inputs.tracks;
+        //console.log(tInputs);
+        return this._encodeGeneralSettings(gInputs) + this._endcodeTrackSettings(tInputs);
     },
 
     encodePhantomJSSettings: function(params){
@@ -26,9 +28,15 @@ Util = {
         return '?request='+outString;
     },
 
-    decode: function(inStr){
+    decode: function(inStr, tracks){
     // returns javascript object to be applied
-        return this._decodeGeneralSettings(inStr);
+        // split inStr
+        var opts = inStr.split('~');
+        var trackList = tracks.split(',')
+        var gSettings = this._decodeGeneralSettings(opts[0])
+        var tSettings = this._decodeTrackSettings(opts.slice(1), trackList);
+        //console.log(tSettings);
+        return {general:gSettings, tracks:tSettings};
     },
 
     _encodeGeneralSettings: function(params){
@@ -46,6 +54,45 @@ Util = {
                 output += eLabels[param] + this._encodeBoolean(data.value);
         }
         return output;
+    },
+
+    _endcodeTrackSettings: function(tracks){
+        var output = '';
+        // go through object
+        var t, params;
+        for(t in tracks){
+            params = tracks[t];
+            // if we need to encode params
+            if (params.hasOwnProperty('opts') === false){
+                output += this._encodeTrack(params);
+            }
+        }
+        return(output);
+    },
+
+    _encodeTrack: function(params){
+        // q[0|1] quantitative, y[0|1|2|3] yscale none, center, left, right
+        // h# track height, i# min, x# max
+        var eLabels = {height: 'h', min: 'i', max: 'x', quant: 'q', ypos: 'y'};
+        var locDict = {'none': 0, 'center': 1, 'left': 2, 'right':3 };
+        var param, data;
+
+        var output = '~' + params.trackNum;
+        // loop through parameters
+        for(param in params){
+            data = params[param];
+            if(param==='quant')
+                output += eLabels[param] + this._encodeBoolean(data);
+            else if(!(data === undefined || data.value === undefined || eLabels.hasOwnProperty(param)===false )){
+                output += eLabels[param]
+                // ypos
+                if (param === 'ypos')
+                    output += locDict[data.value];
+                else
+                    output += data.value;
+            }
+        } // end param
+        return(output)
     },
 
     _encodeBoolean: function(input){
@@ -95,6 +142,72 @@ Util = {
             outProp.methylation['CHH'] = this._decodeBoolen(resultM[1].substring(2,3));
         }
         return outProp;
+    },
+
+    _decodeTrackSettings: function(input, trackLabels){
+        var thisB = this;
+        // input and trackLabels are both arrays -- iterate through input
+        var out = {};
+        array.forEach(input, function(parmStr){
+            var tInt = parseInt(parmStr.slice(0,1));
+            var tLabel = trackLabels[tInt];
+            parmStr = parmStr.slice(1);
+            out[tLabel] = {};
+            var isQuant = null;
+            // get quant
+            var resultQ = /q([0-1])/gi.exec(parmStr);
+            if (resultQ != null){
+                isQuant = thisB._decodeBoolen(resultQ[1]);
+                if(isQuant)
+                    out[tLabel]['style'] = {};
+                else
+                    out[tLabel]['histograms'] = {}
+
+            }
+            // get min
+            var resultI = /i(-?[0-9]+(\.[0-9])?)/gi.exec(parmStr);
+            //console.log(resultI);
+            if (resultI != null){
+            var min = parseFloat(resultI[1]);
+                if(isQuant)
+                    out[tLabel]['min_score'] = min;
+                else
+                    out[tLabel]['histograms']['min'] = min;
+            }
+            // get max
+            var resultX = /x(-?[0-9]+(\.[0-9])?)/gi.exec(parmStr);
+            //console.log(resultX);
+            if (resultX != null){
+            var max = parseFloat(resultX[1]);
+                if(isQuant)
+                    out[tLabel]['max_score'] = max;
+                else
+                    out[tLabel]['histograms']['max'] = max;
+            }
+            // get height
+            var resultH = /h([0-9]+)/gi.exec(parmStr);
+            //console.log(resultH);
+            if (resultH != null){
+                var height = parseInt(resultH[1]);
+                if(isQuant)
+                    out[tLabel]['style']['height'] = height;
+                else if(isQuant === false){
+                    out[tLabel]['maxHeight'] = height;
+                    out[tLabel]['histograms']['height'] = height;
+                } else {
+                    out[tLabel]['maxHeight'] = height;
+                }
+            }
+            // get ypos
+            var resultY = /y([0-3])/gi.exec(parmStr);
+            //console.log(resultY);
+            if (resultY != null){
+                var locList = ['none','center','left','right'];
+                var yposI = parseInt(resultY[1]);
+                out[tLabel]['yScalePosition'] = locList[yposI];
+            }
+        });
+        return out;
     }
 
 }

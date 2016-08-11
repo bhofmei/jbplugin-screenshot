@@ -1,5 +1,6 @@
 define( "ScreenShotPlugin/View/Dialog/ScreenShotDialog", [
     'dojo/_base/declare',
+    'dojo/_base/lang',
     'dojo/dom-construct',
     'dojo/_base/array',
     'dijit/focus',
@@ -7,6 +8,7 @@ define( "ScreenShotPlugin/View/Dialog/ScreenShotDialog", [
     'dijit/form/NumberSpinner',
     'dijit/form/RadioButton',
     'dijit/layout/ContentPane',
+    'dijit/layout/AccordionContainer',
     'JBrowse/View/Dialog/WithActionBar',
     'dojo/on',
     'dijit/form/Button',
@@ -15,6 +17,7 @@ define( "ScreenShotPlugin/View/Dialog/ScreenShotDialog", [
     ],
 function (
     declare,
+    lang,
     dom,
     array,
     focus,
@@ -22,6 +25,7 @@ function (
     dijitNumberSpinner,
     dijitRadioButton,
     dijitContentPane,
+    dijitAccordionContainer,
     ActionBarDialog,
     on,
     Button,
@@ -43,6 +47,10 @@ return declare (ActionBarDialog,{
         this.requestUrl = args.requestUrl;
         this.setCallback    = args.setCallback || function() {};
         this.cancelCallback = args.cancelCallback || function() {};
+        this.vTracks = this.browser.view.visibleTracks();
+        //console.log(this.vTracks);
+        this.trackParameters = this._getTrackParameters();
+        //console.log(this.trackParameters);
      },
      
      _fillActionBar: function( actionBar ){
@@ -51,10 +59,11 @@ return declare (ActionBarDialog,{
             label: "Render",
             onClick: dojo.hitch(this, function() {
                 // screenshot parameters
+                //console.log(this.trackParameters);
                 var gParams = this.parameters.view;
                 gParams['methylation']=this.parameters.methylation;
                 gParams['zoom'] = this.parameters.output.zoom
-                var scParams = {general: gParams};
+                var scParams = {general: gParams, tracks: this.trackParameters};
                 // js params
                 var jsParams = this.parameters.output;
                 // get the url
@@ -69,6 +78,7 @@ return declare (ActionBarDialog,{
         var cancel_button = new Button({
             label: "Cancel",
             onClick: dojo.hitch(this, function() {
+                //console.log(this.trackParameters);
                 this.cancelCallback && this.cancelCallback();
                 this.hide();
             })
@@ -82,6 +92,7 @@ return declare (ActionBarDialog,{
         var mainPaneLeft = dom.create('div',
             {className: 'screenshot-dialog-pane',
             'id':'screenshot-dialog-pane-left'});
+
         var mainPaneLeftTop = new dijitContentPane({
             className: 'screenshot-dialog-pane-sub',
             'id':'screenshot-dialog-pane-left-top',
@@ -103,19 +114,24 @@ return declare (ActionBarDialog,{
 
         // for tracks
 
-        var mainPaneRightM = new dijitContentPane({
+       var mainPaneRight = dom.create('div',
+            {className: 'screenshot-dialog-pane',
+            'id':'screenshot-dialog-pane-right',
+            className:'screenshot-dialog-pane'});
+
+        /*var mainPaneRightM = new dijitContentPane({
             className: 'screenshot-dialog-pane',
             id: 'screenshot-dialog-pane-right',
             title: 'Track-specific configuration options'
         });
-        var mainPaneRight = mainPaneRightM.containerNode;
+        var mainPaneRight = mainPaneRightM.containerNode;*/
         thisB._paneTracks( mainPaneRight );
 
-        var paneFooter = dom.create('div',{class:'screenshot-dialog-pane-bottom-warning',innerHTML:'Local configuration changes will be ignored. Default configuration will be used unless specified in this dialog.<br>Rendering will open a new window.'});
+        var paneFooter = dom.create('div',{class:'screenshot-dialog-pane-bottom-warning', innerHTML:'Local configuration changes will be ignored. Default configuration will be used unless specified in this dialog.<br>Rendering will open a new window.'});
 
         this.set('content', [
             mainPaneLeft,
-            mainPaneRightM.domNode,
+            mainPaneRight,
             paneFooter
         ] );
 
@@ -234,10 +250,103 @@ return declare (ActionBarDialog,{
         }
     },
 
-    _paneTracks: function(obj){
+    _paneTracks: function(rPane){
         var thisB = this;
-        dom.create('h2',{'innerHTML':'Track-specific options'}, obj);
-        dom.create('p',{'innerHTML':'Coming soon'}, obj);
+        var locationList = ['left','center','right','none'];
+        dom.create('h2',{'innerHTML':'Track-specific configuration options'}, rPane);
+
+        var acc = new dijitAccordionContainer({
+            id:'screenshot-dialog-pane-accordian'
+        });
+        var label, tParams, pane, param, data;
+        // need to loop through the tracks and create content panes
+        array.forEach(thisB.vTracks, function(track){
+            // get parameters
+            label = track.config.label
+            tParams = thisB.trackParameters[label];
+            pane = new dijitContentPane({
+                title: (tParams.key===undefined ? label : tParams.key ),
+                id: 'screenshot-dialog-track-'+label
+            });
+            var obj = pane.containerNode;
+
+            if(tParams.opts === false){
+                pane.set('content','No available options');
+                acc.addChild(pane);
+                return
+            }
+            var table = dom.create('table',{'class':'screenshot-dialog-opt-table'}, obj);
+            // loop through parameters
+            for(param in tParams){
+                data = tParams[param];
+                // yscale is radio boxes
+                if(param === 'ypos'){
+                    // yscale position radio boxes
+                    if(tParams.ypos !== false){
+                        var row = dom.create('tr',{'id':'screenshot-dialog-row-'+label+'-ypos'},table);
+                        dom.create('td',{'innerHTML':'Y-scale position','class':'screenshot-dialog-pane-label'}, row);
+                        array.forEach(locationList, function(loc){
+                            var button = new dijitRadioButton({
+                                name:'yscale-'+label,
+                                checked: loc === tParams.ypos,
+                                id:'screenshot-dialog-radio-'+label+'-'+loc,
+                                value: loc,
+                                _label: label,
+                                _prop: 'ypos'
+                        });
+                        button.onClick = dojo.hitch(thisB, '_setTrackParameter', button);
+                        var td = dom.create('td',{class:'screenshot-dialog-td-button'},row);
+                        button.placeAt(td,'first');
+                        dom.create('label',{"for":'yscale-dialog-radio-'+label+'-'+loc, innerHTML: loc}, td);
+                    });
+                    } // end y-scale position
+                }
+                // methylation check boxes
+                /*else if(param==='methyl'){
+                    // paramater data
+                    data = tParams.methyl;
+                    var row = dom.create('tr',{'id':'screenshot-dialog-row-'+label+'-methyl'},table);
+                    dom.create('td',{'innerHTML':'Methylation','class':'screenshot-dialog-pane-label'}, row);
+                    for(var m in data){
+                        var box = new dijitCheckBox({
+                                checked: tParams.methyl[m],
+                                id:'screenshot-dialog-radio-'+label+'-'+m,
+                                value: m,
+                                class: m+'-checkbox',
+                                _label: label,
+                                _prop: 'methyl'
+                        });
+                        box.onClick = dojo.hitch(thisB, '_setTrackParameter', box);
+                        var td = dom.create('td',{class:'screenshot-dialog-pane-input'},row);
+                        box.placeAt(td,'first');
+                        dom.create('label',{"for":'yscale-dialog-radio-'+label+'-'+m, innerHTML: m}, td);
+                    }
+
+                } */
+                else if(data.hasOwnProperty('value')){
+                    // otherwise its a number spinner text box thing
+                    var row = dom.create('tr',{'id':'screenshot-dialog-row-'+label+'-'+param},table);
+                    dom.create('td',{'innerHTML':data.title,'class':'screenshot-dialog-pane-label'}, row);
+                    var widget = new dijitNumberSpinner({
+                        id:'screenshot-dialog-spinner-'+label+'-'+param,
+                        value: data.value,
+                        _prop:param,
+                        _label: label,
+                        smallDelta:data.delta,
+                        intermediateChanges:true,
+                        style:"width:60px;"
+                    });
+                    widget.onChange = dojo.hitch(thisB, '_setTrackParameter',widget);
+                    var td = dom.create('td',{class:'screenshot-dialog-pane-input','colspan':4},row);
+                    widget.placeAt(td,'first');
+                }
+            } // end for param
+
+            acc.addChild(pane);
+        });
+
+        acc.placeAt(rPane);
+        acc.startup();
     },
 
     hide: function() {
@@ -272,6 +381,34 @@ return declare (ActionBarDialog,{
         }
     },
 
+    _setTrackParameter: function(input){
+        var tLabel = input._label;
+        var prop = input._prop;
+        // check label
+        if(!this.trackParameters.hasOwnProperty(tLabel)){
+            console.warn('Error: no track labeled '+tLabel);
+            return
+        }
+        // handle methylation
+        /*if(prop === 'methyl'){
+            if(this.trackParameters[tLabel].methyl.hasOwnProperty(input.value)){
+                this.trackParameters[tLabel].methyl[input.value] = input.checked;
+            }
+        }
+        // y-scale position
+        if(input.hasOwnProperty('checked') && input.checked){
+            if(this.trackParameters[tLabel].hasOwnProperty(prop)){
+                this.trackParameters[tLabel][prop] = input.value;
+            }
+        }*/
+        // number spinner type
+        else{
+            if(this.trackParameters[tLabel].hasOwnProperty(prop)){
+                this.trackParameters[tLabel][prop].value = input.value;
+            }
+        }
+    },
+
     _getInitialParameters: function(){
         // get browser parameterss
         var config = this.browser.config;
@@ -298,6 +435,58 @@ return declare (ActionBarDialog,{
         var quality = {value: 70, title: 'Render quality', min:0, max:100, delta:10}
 
        return { view:{trackSpacing, locOver, trackList, nav, menu, labels}, methylation:{CG:true, CHG:true, CHH:true}, output: {format, zoom, quality, width, height} }
+    },
+
+    _getTrackParameters: function(){
+        var thisB = this;
+        var out = {};
+        array.forEach(this.vTracks, function(track, i){
+           var tType = track.config.type;
+            // handle parameters by type
+            out[track.config.label] = thisB._handleTrackTypeParameters(i, tType, track.config);
+        });
+        return out;
+    },
+
+    _handleTrackTypeParameters(iter, tType, config){
+        var out = {key:config.key, trackNum: iter};
+        // DNA sequence has no options for now
+        if(/\b(Sequence)/.test( tType )){
+            lang.mixin(out,{opts:false});
+            return out;
+        }
+        // test methylation tracks
+       if(/\b(MethylPlot)/.test( tType )|| /\b(MethylPlot)/.test( tType )){
+            /*lang.mixin(out,{methyl:{CG: config.showCG, CHG: config.showCHG, CHH: config.showCHH}});*/
+            // also mixin the bigwig like features
+            lang.mixin(out, {ypos:{title: 'Y-scale position',  value:config.yScalePosition},
+                             height: {title: 'Track height', value:config.style.height, delta:10},
+                             min: {title: 'Min. score', value:config.min_score, delta:0.1},
+                             max: {title: 'Max. score', value:config.max_score, delta:0.1},
+                             quant:true});
+        }
+        // test bigwig
+        else if(/\b(XYPlot)/.test( tType ) || /\b(XYDensity)/.test( tType )){
+            lang.mixin(out, {ypos: {title: 'Y-scale position',  value:config.yScalePosition},
+                             height: {title: 'Track height', value:config.style.height, delta:10},
+                             min: {title: 'Min. score', value:config.min_score, delta:10},
+                             max: {title: 'Max. score', value:config.max_score, delta:10},
+                             quant:true});
+        }
+        // else get track height from maxHeight and set ypos = false
+        else{
+            lang.mixin(out, {height:{title: 'Track height', value:config.maxHeight, delta:10},
+                             ypos: false});
+        }
+        // Canvas/Alignments2 have maxHeight option and possibly histogram with min/max and height
+        // test for histograms
+        if(config.histograms !== undefined){
+            lang.mixin(out, {ypos: {title: 'Y-scale position',  value:config.yScalePosition},
+                             min: {title: 'Min. score', value:config.histograms.min, delta:10},
+                             max: {title: 'Max. score', value:config.histograms.max, delta:10},
+                             quant: false});
+        }
+        return out;
     },
 
     _getPhantomJSUrl: function(scParams, jsParams){

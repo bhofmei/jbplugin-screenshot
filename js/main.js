@@ -64,11 +64,13 @@ return declare( JBrowsePlugin,
             if(browser.config.queryParams.hasOwnProperty('screenshot')){
                 thisB.isScreenshot = true;
                 var encoded = browser.config.queryParams.screenshot;
-                var decoded = Util.decode(encoded);
+                var trackList = browser.config.queryParams.tracks;
+                var decoded = Util.decode(encoded,trackList);
                 // apply
                 thisB._applyScreenshotConfig(decoded);
                 browser.afterMilestone('loadConfig', function(){
- thisB._applyMethylationConfig(decoded.methylation);
+                    thisB._applyMethylationConfig( decoded.general.methylation );
+                    thisB._applyTracksConfig(decoded.tracks);
                 });
             }
         });
@@ -106,10 +108,11 @@ return declare( JBrowsePlugin,
     },
 
     _applyScreenshotConfig: function(params){
-        // params have basic, methylation, view, labels
+        // params have general and track-specific
+        // params.general have basic, methylation, view, labels
         // Note: this.browser.config gets overwritten with each mixin
-        lang.mixin(this.browser.config, params.basic);
-        lang.mixin(this.browser.config.view, params.view);
+        lang.mixin(this.browser.config, params.general.basic);
+        lang.mixin(this.browser.config.view, params.general.view);
     },
 
     _applyMethylationConfig: function(params){
@@ -136,6 +139,30 @@ return declare( JBrowsePlugin,
         if(trackType === undefined || trackType === null)
             return false;
         return ((/\b(MethylXYPlot)/.test( trackType )  || /\b(MethylPlot)/.test( trackType ) ));
+    },
+
+    _applyTracksConfig: function(params){
+        var thisB = this;
+        var tracks = lang.clone(thisB.browser.trackConfigsByName);
+        // loop through tracks
+        var t;
+        for (t in tracks){
+            //console.log(thisB.browser.trackConfigsByName[t]);
+            if(params.hasOwnProperty(t)){
+                // pull out histograms and/or style
+                var hist = params[t].histograms;
+                if(hist !== undefined){
+                    lang.mixin(thisB.browser.trackConfigsByName[t]['histograms'], hist);
+                    delete params[t].histograms;
+                }
+                var style = params[t].style;
+                if(style !== undefined){
+                    lang.mixin(thisB.browser.trackConfigsByName[t]['style'], style);
+                    delete params[t].style;
+                }
+                lang.mixin(thisB.browser.trackConfigsByName[t], params[t]);
+            }
+        }
     },
 
     _applyTrackLabelConfig: function(){
