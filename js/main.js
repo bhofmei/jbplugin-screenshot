@@ -77,7 +77,7 @@ return declare( JBrowsePlugin,
 
         browser.afterMilestone('initView',  function() {
             // create screenshot button (possibly tools menu)
-            console.log(browser);
+            //console.log(browser);
             var menuBar = browser.menuBar;
             function showScreenShotDialog(){
                 new ScreenShotDialog({
@@ -147,7 +147,7 @@ return declare( JBrowsePlugin,
         // loop through tracks
         var t;
         for (t in tracks){
-            console.log(thisB.browser.trackConfigsByName[t]);
+            //console.log(thisB.browser.trackConfigsByName[t]);
             if(params.hasOwnProperty(t)){
                 // pull out histograms and/or style
                 var hist = params[t].histograms;

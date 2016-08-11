@@ -50,7 +50,7 @@ return declare (ActionBarDialog,{
         this.vTracks = this.browser.view.visibleTracks();
         //console.log(this.vTracks);
         this.trackParameters = this._getTrackParameters();
-         console.log(this.trackParameters);
+        //console.log(this.trackParameters);
      },
      
      _fillActionBar: function( actionBar ){
@@ -68,8 +68,8 @@ return declare (ActionBarDialog,{
                 var jsParams = this.parameters.output;
                 // get the url
                 var url = this._getPhantomJSUrl(scParams, jsParams);
-                console.log(url);
-                //window.open(url);
+                //console.log(url);
+                window.open(url);
                 this.setCallback && this.setCallback( );
                 //this.hide();
             })
@@ -78,7 +78,7 @@ return declare (ActionBarDialog,{
         var cancel_button = new Button({
             label: "Cancel",
             onClick: dojo.hitch(this, function() {
-                console.log(this.trackParameters);
+                //console.log(this.trackParameters);
                 this.cancelCallback && this.cancelCallback();
                 this.hide();
             })

@@ -35,7 +35,7 @@ Util = {
         var trackList = tracks.split(',')
         var gSettings = this._decodeGeneralSettings(opts[0])
         var tSettings = this._decodeTrackSettings(opts.slice(1), trackList);
-        console.log(tSettings);
+        //console.log(tSettings);
         return {general:gSettings, tracks:tSettings};
     },
 
