@@ -14,7 +14,7 @@ Util = {
     // returns string with encode options for screenshot
         var gInputs = inputs.general;
         var tInputs = inputs.tracks;
-        console.log(tInputs);
+        //console.log(tInputs);
         return this._encodeGeneralSettings(gInputs) + this._endcodeTrackSettings(tInputs);
     },
 
@@ -36,7 +36,7 @@ Util = {
         var gSettings = this._decodeGeneralSettings(opts[0])
         var tSettings = this._decodeTrackSettings(opts.slice(1), trackList);
         console.log(tSettings);
-        return gSettings;
+        return {general:gSettings, tracks:tSettings};
     },
 
     _encodeGeneralSettings: function(params){
