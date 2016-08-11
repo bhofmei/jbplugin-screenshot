@@ -59,17 +59,17 @@ return declare (ActionBarDialog,{
             label: "Render",
             onClick: dojo.hitch(this, function() {
                 // screenshot parameters
-                console.log(this.trackParameters);
+                //console.log(this.trackParameters);
                 var gParams = this.parameters.view;
                 gParams['methylation']=this.parameters.methylation;
                 gParams['zoom'] = this.parameters.output.zoom
-                var scParams = {general: gParams};
+                var scParams = {general: gParams, tracks: this.trackParameters};
                 // js params
                 var jsParams = this.parameters.output;
                 // get the url
                 var url = this._getPhantomJSUrl(scParams, jsParams);
-                //console.log(url);
-                window.open(url);
+                console.log(url);
+                //window.open(url);
                 this.setCallback && this.setCallback( );
                 //this.hide();
             })
@@ -127,7 +127,7 @@ return declare (ActionBarDialog,{
         var mainPaneRight = mainPaneRightM.containerNode;*/
         thisB._paneTracks( mainPaneRight );
 
-        var paneFooter = dom.create('div',{class:'screenshot-dialog-pane-bottom-warning',innerHTML:'Local configuration changes will be ignored. Default configuration will be used unless specified in this dialog.<br>Rendering will open a new window.'});
+        var paneFooter = dom.create('div',{class:'screenshot-dialog-pane-bottom-warning', innerHTML:'Local configuration changes will be ignored. Default configuration will be used unless specified in this dialog.<br>Rendering will open a new window.'});
 
         this.set('content', [
             mainPaneLeft,
@@ -302,7 +302,7 @@ return declare (ActionBarDialog,{
                     } // end y-scale position
                 }
                 // methylation check boxes
-                else if(param==='methyl'){
+                /*else if(param==='methyl'){
                     // paramater data
                     data = tParams.methyl;
                     var row = dom.create('tr',{'id':'screenshot-dialog-row-'+label+'-methyl'},table);
@@ -322,7 +322,8 @@ return declare (ActionBarDialog,{
                         dom.create('label',{"for":'yscale-dialog-radio-'+label+'-'+m, innerHTML: m}, td);
                     }
 
-                } else if(data.hasOwnProperty('value')){
+                } */
+                else if(data.hasOwnProperty('value')){
                     // otherwise its a number spinner text box thing
                     var row = dom.create('tr',{'id':'screenshot-dialog-row-'+label+'-'+param},table);
                     dom.create('td',{'innerHTML':data.title,'class':'screenshot-dialog-pane-label'}, row);
@@ -389,7 +390,7 @@ return declare (ActionBarDialog,{
             return
         }
         // handle methylation
-        if(prop === 'methyl'){
+        /*if(prop === 'methyl'){
             if(this.trackParameters[tLabel].methyl.hasOwnProperty(input.value)){
                 this.trackParameters[tLabel].methyl[input.value] = input.checked;
             }
@@ -399,7 +400,7 @@ return declare (ActionBarDialog,{
             if(this.trackParameters[tLabel].hasOwnProperty(prop)){
                 this.trackParameters[tLabel][prop] = input.value;
             }
-        }
+        }*/
         // number spinner type
         else{
             if(this.trackParameters[tLabel].hasOwnProperty(prop)){
@@ -439,16 +440,16 @@ return declare (ActionBarDialog,{
     _getTrackParameters: function(){
         var thisB = this;
         var out = {};
-        array.forEach(this.vTracks, function(track){
+        array.forEach(this.vTracks, function(track, i){
            var tType = track.config.type;
             // handle parameters by type
-            out[track.config.label] = thisB._handleTrackTypeParameters(tType, track.config);
+            out[track.config.label] = thisB._handleTrackTypeParameters(i, tType, track.config);
         });
         return out;
     },
 
-    _handleTrackTypeParameters(tType, config){
-        var out = {key:config.key};
+    _handleTrackTypeParameters(iter, tType, config){
+        var out = {key:config.key, trackNum: iter};
         // DNA sequence has no options for now
         if(/\b(Sequence)/.test( tType )){
             lang.mixin(out,{opts:false});
@@ -456,9 +457,9 @@ return declare (ActionBarDialog,{
         }
         // test methylation tracks
        if(/\b(MethylPlot)/.test( tType )|| /\b(MethylPlot)/.test( tType )){
-            lang.mixin(out,{methyl:{CG: config.showCG, CHG: config.showCHG, CHH: config.showCHH}});
+            /*lang.mixin(out,{methyl:{CG: config.showCG, CHG: config.showCHG, CHH: config.showCHH}});*/
             // also mixin the bigwig like features
-            lang.mixin(out, {ypos:config.yScalePosition,
+            lang.mixin(out, {ypos:{title: 'Y-scale position',  value:config.yScalePosition},
                              height: {title: 'Track height', value:config.style.height, delta:10},
                              min: {title: 'Min. score', value:config.min_score, delta:0.1},
                              max: {title: 'Max. score', value:config.max_score, delta:0.1},
@@ -466,7 +467,7 @@ return declare (ActionBarDialog,{
         }
         // test bigwig
         else if(/\b(XYPlot)/.test( tType ) || /\b(XYDensity)/.test( tType )){
-            lang.mixin(out, {ypos:config.yScalePosition,
+            lang.mixin(out, {ypos: {title: 'Y-scale position',  value:config.yScalePosition},
                              height: {title: 'Track height', value:config.style.height, delta:10},
                              min: {title: 'Min. score', value:config.min_score, delta:10},
                              max: {title: 'Max. score', value:config.max_score, delta:10},
@@ -480,7 +481,7 @@ return declare (ActionBarDialog,{
         // Canvas/Alignments2 have maxHeight option and possibly histogram with min/max and height
         // test for histograms
         if(config.histograms !== undefined){
-            lang.mixin(out, {ypos: config.yScalePosition,
+            lang.mixin(out, {ypos: {title: 'Y-scale position',  value:config.yScalePosition},
                              min: {title: 'Min. score', value:config.histograms.min, delta:10},
                              max: {title: 'Max. score', value:config.histograms.max, delta:10},
                              quant: false});

@@ -13,7 +13,9 @@ Util = {
     encode: function(inputs){
     // returns string with encode options for screenshot
         var gInputs = inputs.general;
-        return this._encodeGeneralSettings(gInputs);
+        var tInputs = inputs.tracks;
+        console.log(tInputs);
+        return this._encodeGeneralSettings(gInputs) + this._endcodeTrackSettings(tInputs);
     },
 
     encodePhantomJSSettings: function(params){
@@ -46,6 +48,45 @@ Util = {
                 output += eLabels[param] + this._encodeBoolean(data.value);
         }
         return output;
+    },
+
+    _endcodeTrackSettings: function(tracks){
+        var output = '';
+        // go through object
+        var t, params;
+        for(t in tracks){
+            params = tracks[t];
+            // if we need to encode params
+            if (params.hasOwnProperty('opts') === false){
+                output += this._encodeTrack(params);
+            }
+        }
+        return(output);
+    },
+
+    _encodeTrack: function(params){
+        // q[0|1] quantitative, y[0|1|2|3] yscale none, center, left, right
+        // h# track height, i# min, x# max
+        var eLabels = {height: 'h', min: 'i', max: 'x', quant: 'q', ypos: 'y'};
+        var locDict = {'none': 0, 'center': 1, 'left': 2, 'right':3 };
+        var param, data;
+
+        var output = '~' + params.trackNum;
+        // loop through parameters
+        for(param in params){
+            data = params[param];
+            if(!(data === undefined || data.value === undefined || eLabels.hasOwnProperty(param)===false )){
+                output += eLabels[param]
+                // ypos
+                if (param === 'ypos')
+                    output += locDict[data.value];
+                else if(param === 'quant')
+                    output += this._encodeBoolean(data);
+                else
+                    output += data.value;
+            }
+        } // end param
+        return(output)
     },
 
     _encodeBoolean: function(input){
