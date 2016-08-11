@@ -28,9 +28,15 @@ Util = {
         return '?request='+outString;
     },
 
-    decode: function(inStr){
+    decode: function(inStr, tracks){
     // returns javascript object to be applied
-        return this._decodeGeneralSettings(inStr);
+        // split inStr
+        var opts = inStr.split('~');
+        var trackList = tracks.split(',')
+        var gSettings = this._decodeGeneralSettings(opts[0])
+        var tSettings = this._decodeTrackSettings(opts.slice(1), trackList);
+        console.log(tSettings);
+        return gSettings;
     },
 
     _encodeGeneralSettings: function(params){
@@ -75,13 +81,13 @@ Util = {
         // loop through parameters
         for(param in params){
             data = params[param];
-            if(!(data === undefined || data.value === undefined || eLabels.hasOwnProperty(param)===false )){
+            if(param==='quant')
+                output += eLabels[param] + this._encodeBoolean(data);
+            else if(!(data === undefined || data.value === undefined || eLabels.hasOwnProperty(param)===false )){
                 output += eLabels[param]
                 // ypos
                 if (param === 'ypos')
                     output += locDict[data.value];
-                else if(param === 'quant')
-                    output += this._encodeBoolean(data);
                 else
                     output += data.value;
             }
@@ -136,6 +142,72 @@ Util = {
             outProp.methylation['CHH'] = this._decodeBoolen(resultM[1].substring(2,3));
         }
         return outProp;
+    },
+
+    _decodeTrackSettings: function(input, trackLabels){
+        var thisB = this;
+        // input and trackLabels are both arrays -- iterate through input
+        var out = {};
+        array.forEach(input, function(parmStr){
+            var tInt = parseInt(parmStr.slice(0,1));
+            var tLabel = trackLabels[tInt];
+            parmStr = parmStr.slice(1);
+            out[tLabel] = {};
+            var isQuant = null;
+            // get quant
+            var resultQ = /q([0-1])/gi.exec(parmStr);
+            if (resultQ != null){
+                isQuant = thisB._decodeBoolen(resultQ[1]);
+                if(isQuant)
+                    out[tLabel]['style'] = {};
+                else
+                    out[tLabel]['histograms'] = {}
+
+            }
+            // get min
+            var resultI = /i(-?[0-9]+(\.[0-9])?)/gi.exec(parmStr);
+            //console.log(resultI);
+            if (resultI != null){
+            var min = parseFloat(resultI[1]);
+                if(isQuant)
+                    out[tLabel]['min_score'] = min;
+                else
+                    out[tLabel]['histograms']['min'] = min;
+            }
+            // get max
+            var resultX = /x(-?[0-9]+(\.[0-9])?)/gi.exec(parmStr);
+            //console.log(resultX);
+            if (resultX != null){
+            var max = parseFloat(resultX[1]);
+                if(isQuant)
+                    out[tLabel]['max_score'] = max;
+                else
+                    out[tLabel]['histograms']['max'] = max;
+            }
+            // get height
+            var resultH = /h([0-9]+)/gi.exec(parmStr);
+            //console.log(resultH);
+            if (resultH != null){
+                var height = parseInt(resultH[1]);
+                if(isQuant)
+                    out[tLabel]['style']['height'] = height;
+                else if(isQuant === false){
+                    out[tLabel]['maxHeight'] = height;
+                    out[tLabel]['histograms']['height'] = height;
+                } else {
+                    out[tLabel]['maxHeight'] = height;
+                }
+            }
+            // get ypos
+            var resultY = /y([0-3])/gi.exec(parmStr);
+            //console.log(resultY);
+            if (resultY != null){
+                var locList = ['none','center','left','right'];
+                var yposI = parseInt(resultY[1]);
+                out[tLabel]['yScalePosition'] = locList[yposI];
+            }
+        });
+        return out;
     }
 
 }

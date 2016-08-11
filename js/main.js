@@ -64,7 +64,8 @@ return declare( JBrowsePlugin,
             if(browser.config.queryParams.hasOwnProperty('screenshot')){
                 thisB.isScreenshot = true;
                 var encoded = browser.config.queryParams.screenshot;
-                var decoded = Util.decode(encoded);
+                var trackList = browser.config.queryParams.tracks;
+                var decoded = Util.decode(encoded,trackList);
                 // apply
                 thisB._applyScreenshotConfig(decoded);
                 browser.afterMilestone('loadConfig', function(){
