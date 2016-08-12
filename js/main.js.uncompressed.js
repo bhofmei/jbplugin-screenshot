@@ -63,8 +63,8 @@ return declare (ActionBarDialog,{
                 // screenshot parameters
                 //console.log(this.trackParameters);
                 var gParams = this.parameters.view;
-                gParams['methylation']=this.parameters.methylation;
-                gParams['zoom'] = this.parameters.output.zoom
+                gParams.methylation=this.parameters.methylation;
+                gParams.zoom = this.parameters.output.zoom
                 var scParams = {general: gParams, tracks: this.trackParameters};
                 // js params
                 var jsParams = this.parameters.output;
@@ -89,15 +89,15 @@ return declare (ActionBarDialog,{
     
     show: function( callback ) {
         var thisB = this;
-        dojo.addClass(this.domNode, 'screenshot-dialog')
+        dojo.addClass(this.domNode, 'screenshot-dialog');
 
         var mainPaneLeft = dom.create('div',
             {className: 'screenshot-dialog-pane',
-            'id':'screenshot-dialog-pane-left'});
+            id:'screenshot-dialog-pane-left'});
 
         var mainPaneLeftTop = new dijitContentPane({
             className: 'screenshot-dialog-pane-sub',
-            'id':'screenshot-dialog-pane-left-top',
+            id:'screenshot-dialog-pane-left-top',
             title:'General configuration options'
         });
         var mainPaneLeftT = mainPaneLeftTop.containerNode;
@@ -118,8 +118,7 @@ return declare (ActionBarDialog,{
 
        var mainPaneRight = dom.create('div',
             {className: 'screenshot-dialog-pane',
-            'id':'screenshot-dialog-pane-right',
-            className:'screenshot-dialog-pane'});
+            id:'screenshot-dialog-pane-right'});
 
         /*var mainPaneRightM = new dijitContentPane({
             className: 'screenshot-dialog-pane',
@@ -129,7 +128,7 @@ return declare (ActionBarDialog,{
         var mainPaneRight = mainPaneRightM.containerNode;*/
         thisB._paneTracks( mainPaneRight );
 
-        var paneFooter = dom.create('div',{'class':'screenshot-dialog-pane-bottom-warning', innerHTML:'Local configuration changes will be ignored. Default configuration will be used unless specified in this dialog.<br>Rendering will open a new window.'});
+        var paneFooter = dom.create('div',{className:'screenshot-dialog-pane-bottom-warning', innerHTML:'Local configuration changes will be ignored. Default configuration will be used unless specified in this dialog.<br>Rendering will open a new window.'});
 
         this.set('content', [
             mainPaneLeft,
@@ -149,7 +148,7 @@ return declare (ActionBarDialog,{
         // check box parameters -> location overview, tracklist, nav, menu bars
         for(param in viewParam){
             var data = viewParam[param];
-            var row = dom.create('tr',{'id':'screenshot-dialog-row-'+param},table);
+            var row = dom.create('tr',{id:'screenshot-dialog-row-'+param},table);
             dom.create('td',{'innerHTML':(param === 'labels' ? '' : data.title),'class':'screenshot-dialog-pane-label'}, row);
             var td = dom.create('td',{'class':'screenshot-dialog-pane-input'},row);
             var input;
@@ -157,7 +156,7 @@ return declare (ActionBarDialog,{
                 input = new dijitNumberSpinner({
                     id:'screenshot-dialog-'+param+'-spinner',
                     value: data.value,
-                    '_props':param,
+                    '_prop':param,
                     constraints: {min:0,max:40},
                     smallDelta:5,
                     intermediateChanges:true,
@@ -181,20 +180,20 @@ return declare (ActionBarDialog,{
             }
         } // end for param
         if(thisB.browser.plugins.hasOwnProperty('MethylationPlugin')){
-            var row = dom.create('tr',{'id':'screenshot-dialog-row-methyl'},table);
-            dom.create('td',{innerHTML:'Methylation','class':'screenshot-dialog-pane-label', 'colspan':2},row);
+            row = dom.create('tr',{id:'screenshot-dialog-row-methyl'},table);
+            dom.create('td',{innerHTML:'Methylation',className:'screenshot-dialog-pane-label', 'colspan':2},row);
             var row2 = dom.create('tr',{'id':'screenshot-dialog-row-methyl-boxes'},table);
             var methylD = dom.create('td',{'colspan':2},row2);
             var m;
             for (m in thisB.parameters.methylation){
                 var mbox = new dijitCheckBox({
                     id:'screenshot-dialog-methyl-'+m,
-                    'class':m+'-checkbox',
+                    className:m+'-checkbox',
                     '_prop':m,
                     checked: thisB.parameters.methylation[m]
                 });
                 mbox.onClick = dojo.hitch(thisB, '_setMethylation', mbox);
-                dom.create('span',{innerHTML:m,'class':'screenshot-dialog-opt-span'},methylD);
+                dom.create('span',{innerHTML:m,className:'screenshot-dialog-opt-span'}, methylD);
                 methylD.appendChild(mbox.domNode);
             }
         }
@@ -204,20 +203,20 @@ return declare (ActionBarDialog,{
         var thisB = this;
         dom.create('h2',{'innerHTML':'Output configuration options'}, obj);
         var tableB = dom.create('table',{'class':'screenshot-dialog-opt-table'},obj);
-        var param;
+        var param, data, row, row2;
         // output options -> format (PNG, JPEG, PDF), height, width
         var outParam = thisB.parameters.output;
         for(param in outParam){
-            var data = outParam[param];
+            data = outParam[param];
             if(param === 'format'){
-                var row = dom.create('tr',{'id':'screenshot-dialog-row-'+param,'colspan':2},tableB);
+                row = dom.create('tr',{'id':'screenshot-dialog-row-'+param,'colspan':2},tableB);
                 dom.create('td',{'innerHTML':data.title,'class':'screenshot-dialog-pane-label'}, row);
-                var row2 = dom.create('tr',{'class':'screenshot-dialog-pane-input'},tableB);
+                row2 = dom.create('tr',{'class':'screenshot-dialog-pane-input'},tableB);
                 var outD = dom.create('td',{'colspan':2},row2);
                 // 3 check boxes
                 //var formatTypes = ['PNG','JPG','PDF'];
                 var formatTypes = ['PNG','JPG'];
-                var formatTypeTitles = {'PNG':'transparent background','JPG':'white background', 'PDF':'contains svg-like objects'}
+                var formatTypeTitles = {'PNG':'transparent background','JPG':'white background', 'PDF':'contains svg-like objects'};
                 array.forEach(formatTypes, function(f){
                     var btn = new dijitRadioButton({
                         id: 'screenshot-dialog-output-'+f,
@@ -226,13 +225,13 @@ return declare (ActionBarDialog,{
                         '_prop': param
                     });
                     btn.onClick = dojo.hitch(thisB, '_setParameter', btn);
-                    dom.create('span',{innerHTML:f, className:'screenshot-dialog-opt-span',title:formatTypeTitles[f]},outD);
+                    dom.create('span',{innerHTML:f, className:'screenshot-dialog-opt-span', title:formatTypeTitles[f]}, outD);
                     outD.appendChild(btn.domNode);
                 });
             } else {
                 // number spinners
-                var data = outParam[param];
-                var row = dom.create('tr',{'id':'screenshot-dialog-row-'+param},tableB);
+                data = outParam[param];
+                row = dom.create('tr',{'id':'screenshot-dialog-row-'+param},tableB);
                 dom.create('td',{'innerHTML':data.title,'class':'screenshot-dialog-pane-label'}, row);
                 var spinD = dom.create('td',{'class':'screenshot-dialog-pane-input'},row);
                 // create slider for quality and spinner for other
@@ -264,7 +263,7 @@ return declare (ActionBarDialog,{
         // need to loop through the tracks and create content panes
         array.forEach(thisB.vTracks, function(track){
             // get parameters
-            label = track.config.label
+            label = track.config.label;
             tParams = thisB.trackParameters[label];
             pane = new dijitContentPane({
                 title: (tParams.key===undefined ? label : tParams.key ),
@@ -275,7 +274,7 @@ return declare (ActionBarDialog,{
             if(tParams.opts === false){
                 pane.set('content','No available options');
                 acc.addChild(pane);
-                return
+                return;
             }
             var table = dom.create('table',{'class':'screenshot-dialog-opt-table'}, obj);
             // loop through parameters
@@ -297,9 +296,9 @@ return declare (ActionBarDialog,{
                                 '_prop': 'ypos'
                         });
                         button.onClick = dojo.hitch(thisB, '_setTrackParameter', button);
-                        var td = dom.create('td',{'class':'screenshot-dialog-td-button'},row);
-                        button.placeAt(td,'first');
-                        dom.create('label',{"for":'yscale-dialog-radio-'+label+'-'+loc, innerHTML: loc}, td);
+                        var td = dom.create('td', {className:'screenshot-dialog-td-button'}, row);
+                        button.placeAt(td, 'first');
+                        dom.create('label', {"for":'yscale-dialog-radio-'+label+'-'+loc, innerHTML: loc}, td);
                     });
                     } // end y-scale position
                 }
@@ -338,8 +337,8 @@ return declare (ActionBarDialog,{
                         intermediateChanges:true,
                         style:"width:60px;"
                     });
-                    widget.onChange = dojo.hitch(thisB, '_setTrackParameter',widget);
-                    var td = dom.create('td',{'class':'screenshot-dialog-pane-input','colspan':4},row);
+                    widget.onChange = dojo.hitch(thisB, '_setTrackParameter', widget);
+                    var td = dom.create('td', {'class':'screenshot-dialog-pane-input', 'colspan':4}, row);
                     widget.placeAt(td,'first');
                 }
             } // end for param
@@ -436,7 +435,7 @@ return declare (ActionBarDialog,{
         var height = {value: 2400, title: 'Height (px)', min:100, max:10000, delta:100};
         var quality = {value: 70, title: 'Render quality', min:0, max:100, delta:10};
 
-       return { view:{trackSpacing:trackSpacing, locOver:locOver, trackList:trackList, nav:nav, menu:menu, labels:labels}, methylation:{CG:true, CHG:true, CHH:true}, output: {format:format, zoom:zoom, quality:quality, width:width, height:height} };
+       return { view:{trackSpacing: trackSpacing, locOver: locOver, trackList: trackList, nav: nav, menu: menu, labels: labels}, methylation:{CG:true, CHG:true, CHH:true}, output: {format: format, zoom: zoom, quality: quality, width: width, height: height} };
     },
 
     _getTrackParameters: function(){
@@ -1491,7 +1490,9 @@ Util = {
     encode: function(inputs){
     // returns string with encode options for screenshot
         var gInputs = inputs.general;
-        return this._encodeGeneralSettings(gInputs);
+        var tInputs = inputs.tracks;
+        //console.log(tInputs);
+        return this._encodeGeneralSettings(gInputs) + this._endcodeTrackSettings(tInputs);
     },
 
     encodePhantomJSSettings: function(params){
@@ -1504,9 +1505,15 @@ Util = {
         return '?request='+outString;
     },
 
-    decode: function(inStr){
+    decode: function(inStr, tracks){
     // returns javascript object to be applied
-        return this._decodeGeneralSettings(inStr);
+        // split inStr
+        var opts = inStr.split('~');
+        var trackList = tracks.split(',')
+        var gSettings = this._decodeGeneralSettings(opts[0])
+        var tSettings = this._decodeTrackSettings(opts.slice(1), trackList);
+        //console.log(tSettings);
+        return {general:gSettings, tracks:tSettings};
     },
 
     _encodeGeneralSettings: function(params){
@@ -1524,6 +1531,45 @@ Util = {
                 output += eLabels[param] + this._encodeBoolean(data.value);
         }
         return output;
+    },
+
+    _endcodeTrackSettings: function(tracks){
+        var output = '';
+        // go through object
+        var t, params;
+        for(t in tracks){
+            params = tracks[t];
+            // if we need to encode params
+            if (params.hasOwnProperty('opts') === false){
+                output += this._encodeTrack(params);
+            }
+        }
+        return(output);
+    },
+
+    _encodeTrack: function(params){
+        // q[0|1] quantitative, y[0|1|2|3] yscale none, center, left, right
+        // h# track height, i# min, x# max
+        var eLabels = {height: 'h', min: 'i', max: 'x', quant: 'q', ypos: 'y'};
+        var locDict = {'none': 0, 'center': 1, 'left': 2, 'right':3 };
+        var param, data;
+
+        var output = '~' + params.trackNum;
+        // loop through parameters
+        for(param in params){
+            data = params[param];
+            if(param==='quant')
+                output += eLabels[param] + this._encodeBoolean(data);
+            else if(!(data === undefined || data.value === undefined || eLabels.hasOwnProperty(param)===false )){
+                output += eLabels[param]
+                // ypos
+                if (param === 'ypos')
+                    output += locDict[data.value];
+                else
+                    output += data.value;
+            }
+        } // end param
+        return(output)
     },
 
     _encodeBoolean: function(input){
@@ -1573,6 +1619,72 @@ Util = {
             outProp.methylation['CHH'] = this._decodeBoolen(resultM[1].substring(2,3));
         }
         return outProp;
+    },
+
+    _decodeTrackSettings: function(input, trackLabels){
+        var thisB = this;
+        // input and trackLabels are both arrays -- iterate through input
+        var out = {};
+        array.forEach(input, function(parmStr){
+            var tInt = parseInt(parmStr.slice(0,1));
+            var tLabel = trackLabels[tInt];
+            parmStr = parmStr.slice(1);
+            out[tLabel] = {};
+            var isQuant = null;
+            // get quant
+            var resultQ = /q([0-1])/gi.exec(parmStr);
+            if (resultQ != null){
+                isQuant = thisB._decodeBoolen(resultQ[1]);
+                if(isQuant)
+                    out[tLabel]['style'] = {};
+                else
+                    out[tLabel]['histograms'] = {}
+
+            }
+            // get min
+            var resultI = /i(-?[0-9]+(\.[0-9])?)/gi.exec(parmStr);
+            //console.log(resultI);
+            if (resultI != null){
+            var min = parseFloat(resultI[1]);
+                if(isQuant)
+                    out[tLabel]['min_score'] = min;
+                else
+                    out[tLabel]['histograms']['min'] = min;
+            }
+            // get max
+            var resultX = /x(-?[0-9]+(\.[0-9])?)/gi.exec(parmStr);
+            //console.log(resultX);
+            if (resultX != null){
+            var max = parseFloat(resultX[1]);
+                if(isQuant)
+                    out[tLabel]['max_score'] = max;
+                else
+                    out[tLabel]['histograms']['max'] = max;
+            }
+            // get height
+            var resultH = /h([0-9]+)/gi.exec(parmStr);
+            //console.log(resultH);
+            if (resultH != null){
+                var height = parseInt(resultH[1]);
+                if(isQuant)
+                    out[tLabel]['style']['height'] = height;
+                else if(isQuant === false){
+                    out[tLabel]['maxHeight'] = height;
+                    out[tLabel]['histograms']['height'] = height;
+                } else {
+                    out[tLabel]['maxHeight'] = height;
+                }
+            }
+            // get ypos
+            var resultY = /y([0-3])/gi.exec(parmStr);
+            //console.log(resultY);
+            if (resultY != null){
+                var locList = ['none','center','left','right'];
+                var yposI = parseInt(resultY[1]);
+                out[tLabel]['yScalePosition'] = locList[yposI];
+            }
+        });
+        return out;
     }
 
 }
@@ -1603,6 +1715,29 @@ return declare( Component,
 });
 },
 'url:dijit/layout/templates/AccordionButton.html':"<div data-dojo-attach-event='ondijitclick:_onTitleClick' class='dijitAccordionTitle' role=\"presentation\">\n\t<div data-dojo-attach-point='titleNode,focusNode' data-dojo-attach-event='onkeydown:_onTitleKeyDown'\n\t\t\tclass='dijitAccordionTitleFocus' role=\"tab\" aria-expanded=\"false\"\n\t\t><span class='dijitInline dijitAccordionArrow' role=\"presentation\"></span\n\t\t><span class='arrowTextUp' role=\"presentation\">+</span\n\t\t><span class='arrowTextDown' role=\"presentation\">-</span\n\t\t><span role=\"presentation\" class=\"dijitInline dijitIcon\" data-dojo-attach-point=\"iconNode\"></span>\n\t\t<span role=\"presentation\" data-dojo-attach-point='titleTextNode, textDirNode' class='dijitAccordionText'></span>\n\t</div>\n</div>\n"}});
+require({cache:{
+'JBrowse/Plugin':function(){
+define("JBrowse/Plugin", [
+           'dojo/_base/declare',
+           'JBrowse/Component'
+       ],
+       function( declare, Component ) {
+return declare( Component,
+{
+    constructor: function( args ) {
+        this.name = args.name;
+        this.cssLoaded = args.cssLoaded;
+        this._finalizeConfig( args.config );
+    },
+
+    _defaultConfig: function() {
+        return {
+            baseUrl: '/plugins/'+this.name
+        };
+    }
+});
+});
+}}});
 define('ScreenShotPlugin/main',[ 
     'dojo/_base/declare',
     'dojo/_base/lang',
@@ -1646,11 +1781,13 @@ return declare( JBrowsePlugin,
             if(browser.config.queryParams.hasOwnProperty('screenshot')){
                 thisB.isScreenshot = true;
                 var encoded = browser.config.queryParams.screenshot;
-                var decoded = Util.decode(encoded);
+                var trackList = browser.config.queryParams.tracks;
+                var decoded = Util.decode(encoded,trackList);
                 // apply
                 thisB._applyScreenshotConfig(decoded);
                 browser.afterMilestone('loadConfig', function(){
- thisB._applyMethylationConfig(decoded.methylation);
+                    thisB._applyMethylationConfig( decoded.general.methylation );
+                    thisB._applyTracksConfig(decoded.tracks);
                 });
             }
         });
@@ -1688,10 +1825,11 @@ return declare( JBrowsePlugin,
     },
 
     _applyScreenshotConfig: function(params){
-        // params have basic, methylation, view, labels
+        // params have general and track-specific
+        // params.general have basic, methylation, view, labels
         // Note: this.browser.config gets overwritten with each mixin
-        lang.mixin(this.browser.config, params.basic);
-        lang.mixin(this.browser.config.view, params.view);
+        lang.mixin(this.browser.config, params.general.basic);
+        lang.mixin(this.browser.config.view, params.general.view);
     },
 
     _applyMethylationConfig: function(params){
@@ -1718,6 +1856,30 @@ return declare( JBrowsePlugin,
         if(trackType === undefined || trackType === null)
             return false;
         return ((/\b(MethylXYPlot)/.test( trackType )  || /\b(MethylPlot)/.test( trackType ) ));
+    },
+
+    _applyTracksConfig: function(params){
+        var thisB = this;
+        var tracks = lang.clone(thisB.browser.trackConfigsByName);
+        // loop through tracks
+        var t;
+        for (t in tracks){
+            //console.log(thisB.browser.trackConfigsByName[t]);
+            if(params.hasOwnProperty(t)){
+                // pull out histograms and/or style
+                var hist = params[t].histograms;
+                if(hist !== undefined){
+                    lang.mixin(thisB.browser.trackConfigsByName[t]['histograms'], hist);
+                    delete params[t].histograms;
+                }
+                var style = params[t].style;
+                if(style !== undefined){
+                    lang.mixin(thisB.browser.trackConfigsByName[t]['style'], style);
+                    delete params[t].style;
+                }
+                lang.mixin(thisB.browser.trackConfigsByName[t], params[t]);
+            }
+        }
     },
 
     _applyTrackLabelConfig: function(){

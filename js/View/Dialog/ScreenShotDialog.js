@@ -61,8 +61,8 @@ return declare (ActionBarDialog,{
                 // screenshot parameters
                 //console.log(this.trackParameters);
                 var gParams = this.parameters.view;
-                gParams['methylation']=this.parameters.methylation;
-                gParams['zoom'] = this.parameters.output.zoom
+                gParams.methylation=this.parameters.methylation;
+                gParams.zoom = this.parameters.output.zoom
                 var scParams = {general: gParams, tracks: this.trackParameters};
                 // js params
                 var jsParams = this.parameters.output;
@@ -87,15 +87,15 @@ return declare (ActionBarDialog,{
     
     show: function( callback ) {
         var thisB = this;
-        dojo.addClass(this.domNode, 'screenshot-dialog')
+        dojo.addClass(this.domNode, 'screenshot-dialog');
 
         var mainPaneLeft = dom.create('div',
             {className: 'screenshot-dialog-pane',
-            'id':'screenshot-dialog-pane-left'});
+            id:'screenshot-dialog-pane-left'});
 
         var mainPaneLeftTop = new dijitContentPane({
             className: 'screenshot-dialog-pane-sub',
-            'id':'screenshot-dialog-pane-left-top',
+            id:'screenshot-dialog-pane-left-top',
             title:'General configuration options'
         });
         var mainPaneLeftT = mainPaneLeftTop.containerNode;
@@ -116,8 +116,7 @@ return declare (ActionBarDialog,{
 
        var mainPaneRight = dom.create('div',
             {className: 'screenshot-dialog-pane',
-            'id':'screenshot-dialog-pane-right',
-            className:'screenshot-dialog-pane'});
+            id:'screenshot-dialog-pane-right'});
 
         /*var mainPaneRightM = new dijitContentPane({
             className: 'screenshot-dialog-pane',
@@ -127,7 +126,7 @@ return declare (ActionBarDialog,{
         var mainPaneRight = mainPaneRightM.containerNode;*/
         thisB._paneTracks( mainPaneRight );
 
-        var paneFooter = dom.create('div',{'class':'screenshot-dialog-pane-bottom-warning', innerHTML:'Local configuration changes will be ignored. Default configuration will be used unless specified in this dialog.<br>Rendering will open a new window.'});
+        var paneFooter = dom.create('div',{className:'screenshot-dialog-pane-bottom-warning', innerHTML:'Local configuration changes will be ignored. Default configuration will be used unless specified in this dialog.<br>Rendering will open a new window.'});
 
         this.set('content', [
             mainPaneLeft,
@@ -147,7 +146,7 @@ return declare (ActionBarDialog,{
         // check box parameters -> location overview, tracklist, nav, menu bars
         for(param in viewParam){
             var data = viewParam[param];
-            var row = dom.create('tr',{'id':'screenshot-dialog-row-'+param},table);
+            var row = dom.create('tr',{id:'screenshot-dialog-row-'+param},table);
             dom.create('td',{'innerHTML':(param === 'labels' ? '' : data.title),'class':'screenshot-dialog-pane-label'}, row);
             var td = dom.create('td',{'class':'screenshot-dialog-pane-input'},row);
             var input;
@@ -155,7 +154,7 @@ return declare (ActionBarDialog,{
                 input = new dijitNumberSpinner({
                     id:'screenshot-dialog-'+param+'-spinner',
                     value: data.value,
-                    '_props':param,
+                    '_prop':param,
                     constraints: {min:0,max:40},
                     smallDelta:5,
                     intermediateChanges:true,
@@ -179,20 +178,20 @@ return declare (ActionBarDialog,{
             }
         } // end for param
         if(thisB.browser.plugins.hasOwnProperty('MethylationPlugin')){
-            var row = dom.create('tr',{'id':'screenshot-dialog-row-methyl'},table);
-            dom.create('td',{innerHTML:'Methylation','class':'screenshot-dialog-pane-label', 'colspan':2},row);
+            row = dom.create('tr',{id:'screenshot-dialog-row-methyl'},table);
+            dom.create('td',{innerHTML:'Methylation',className:'screenshot-dialog-pane-label', 'colspan':2},row);
             var row2 = dom.create('tr',{'id':'screenshot-dialog-row-methyl-boxes'},table);
             var methylD = dom.create('td',{'colspan':2},row2);
             var m;
             for (m in thisB.parameters.methylation){
                 var mbox = new dijitCheckBox({
                     id:'screenshot-dialog-methyl-'+m,
-                    'class':m+'-checkbox',
+                    className:m+'-checkbox',
                     '_prop':m,
                     checked: thisB.parameters.methylation[m]
                 });
                 mbox.onClick = dojo.hitch(thisB, '_setMethylation', mbox);
-                dom.create('span',{innerHTML:m,'class':'screenshot-dialog-opt-span'},methylD);
+                dom.create('span',{innerHTML:m,className:'screenshot-dialog-opt-span'}, methylD);
                 methylD.appendChild(mbox.domNode);
             }
         }
@@ -202,20 +201,20 @@ return declare (ActionBarDialog,{
         var thisB = this;
         dom.create('h2',{'innerHTML':'Output configuration options'}, obj);
         var tableB = dom.create('table',{'class':'screenshot-dialog-opt-table'},obj);
-        var param;
+        var param, data, row, row2;
         // output options -> format (PNG, JPEG, PDF), height, width
         var outParam = thisB.parameters.output;
         for(param in outParam){
-            var data = outParam[param];
+            data = outParam[param];
             if(param === 'format'){
-                var row = dom.create('tr',{'id':'screenshot-dialog-row-'+param,'colspan':2},tableB);
+                row = dom.create('tr',{'id':'screenshot-dialog-row-'+param,'colspan':2},tableB);
                 dom.create('td',{'innerHTML':data.title,'class':'screenshot-dialog-pane-label'}, row);
-                var row2 = dom.create('tr',{'class':'screenshot-dialog-pane-input'},tableB);
+                row2 = dom.create('tr',{'class':'screenshot-dialog-pane-input'},tableB);
                 var outD = dom.create('td',{'colspan':2},row2);
                 // 3 check boxes
                 //var formatTypes = ['PNG','JPG','PDF'];
                 var formatTypes = ['PNG','JPG'];
-                var formatTypeTitles = {'PNG':'transparent background','JPG':'white background', 'PDF':'contains svg-like objects'}
+                var formatTypeTitles = {'PNG':'transparent background','JPG':'white background', 'PDF':'contains svg-like objects'};
                 array.forEach(formatTypes, function(f){
                     var btn = new dijitRadioButton({
                         id: 'screenshot-dialog-output-'+f,
@@ -224,13 +223,13 @@ return declare (ActionBarDialog,{
                         '_prop': param
                     });
                     btn.onClick = dojo.hitch(thisB, '_setParameter', btn);
-                    dom.create('span',{innerHTML:f, className:'screenshot-dialog-opt-span',title:formatTypeTitles[f]},outD);
+                    dom.create('span',{innerHTML:f, className:'screenshot-dialog-opt-span', title:formatTypeTitles[f]}, outD);
                     outD.appendChild(btn.domNode);
                 });
             } else {
                 // number spinners
-                var data = outParam[param];
-                var row = dom.create('tr',{'id':'screenshot-dialog-row-'+param},tableB);
+                data = outParam[param];
+                row = dom.create('tr',{'id':'screenshot-dialog-row-'+param},tableB);
                 dom.create('td',{'innerHTML':data.title,'class':'screenshot-dialog-pane-label'}, row);
                 var spinD = dom.create('td',{'class':'screenshot-dialog-pane-input'},row);
                 // create slider for quality and spinner for other
@@ -262,7 +261,7 @@ return declare (ActionBarDialog,{
         // need to loop through the tracks and create content panes
         array.forEach(thisB.vTracks, function(track){
             // get parameters
-            label = track.config.label
+            label = track.config.label;
             tParams = thisB.trackParameters[label];
             pane = new dijitContentPane({
                 title: (tParams.key===undefined ? label : tParams.key ),
@@ -273,7 +272,7 @@ return declare (ActionBarDialog,{
             if(tParams.opts === false){
                 pane.set('content','No available options');
                 acc.addChild(pane);
-                return
+                return;
             }
             var table = dom.create('table',{'class':'screenshot-dialog-opt-table'}, obj);
             // loop through parameters
@@ -295,9 +294,9 @@ return declare (ActionBarDialog,{
                                 '_prop': 'ypos'
                         });
                         button.onClick = dojo.hitch(thisB, '_setTrackParameter', button);
-                        var td = dom.create('td',{'class':'screenshot-dialog-td-button'},row);
-                        button.placeAt(td,'first');
-                        dom.create('label',{"for":'yscale-dialog-radio-'+label+'-'+loc, innerHTML: loc}, td);
+                        var td = dom.create('td', {className:'screenshot-dialog-td-button'}, row);
+                        button.placeAt(td, 'first');
+                        dom.create('label', {"for":'yscale-dialog-radio-'+label+'-'+loc, innerHTML: loc}, td);
                     });
                     } // end y-scale position
                 }
@@ -336,8 +335,8 @@ return declare (ActionBarDialog,{
                         intermediateChanges:true,
                         style:"width:60px;"
                     });
-                    widget.onChange = dojo.hitch(thisB, '_setTrackParameter',widget);
-                    var td = dom.create('td',{'class':'screenshot-dialog-pane-input','colspan':4},row);
+                    widget.onChange = dojo.hitch(thisB, '_setTrackParameter', widget);
+                    var td = dom.create('td', {'class':'screenshot-dialog-pane-input', 'colspan':4}, row);
                     widget.placeAt(td,'first');
                 }
             } // end for param
@@ -434,7 +433,7 @@ return declare (ActionBarDialog,{
         var height = {value: 2400, title: 'Height (px)', min:100, max:10000, delta:100};
         var quality = {value: 70, title: 'Render quality', min:0, max:100, delta:10};
 
-       return { view:{trackSpacing:trackSpacing, locOver:locOver, trackList:trackList, nav:nav, menu:menu, labels:labels}, methylation:{CG:true, CHG:true, CHH:true}, output: {format:format, zoom:zoom, quality:quality, width:width, height:height} };
+       return { view:{trackSpacing: trackSpacing, locOver: locOver, trackList: trackList, nav: nav, menu: menu, labels: labels}, methylation:{CG:true, CHG:true, CHH:true}, output: {format: format, zoom: zoom, quality: quality, width: width, height: height} };
     },
 
     _getTrackParameters: function(){
