@@ -1,3 +1,6 @@
+v0.1.0 - Aug 11, 2016
+- track-specific settings
+
 v0.0.4 - Aug 3, 2016
 - added render quality as output option
 - dialog box is reorganized
