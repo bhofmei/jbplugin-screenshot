@@ -1,149 +1,24 @@
-require({cache:{
-'JBrowse/Plugin':function(){
-define("JBrowse/Plugin", [
-           'dojo/_base/declare',
-           'JBrowse/Component'
-       ],
-       function( declare, Component ) {
-return declare( Component,
-{
-    constructor: function( args ) {
-        this.name = args.name;
-        this.cssLoaded = args.cssLoaded;
-        this._finalizeConfig( args.config );
-    },
-
-    _defaultConfig: function() {
-        return {
-            baseUrl: '/plugins/'+this.name
-        };
-    }
-});
-});
-}}});
-define('ScreenShotPlugin/main',[ 
-    'dojo/_base/declare',
-    'dojo/_base/lang',
-    'dojo/_base/array',
-    'dojo/dom',
-    "dojo/dom-attr",
-    'dijit/form/Button',
-    './View/Dialog/ScreenShotDialog',
-    './Util',
-    'JBrowse/Plugin',
-    "JBrowse/Browser"
-],
-function(
-    declare,
-    lang,
-    array,
-    dom,
-    domAttr,
-    dijitButton,
-    ScreenShotDialog,
-    Util,
-    JBrowsePlugin,
-    Browser
-){
- 
-return declare( JBrowsePlugin,
-{
-    constructor: function( args ) { 
-        var baseUrl = this._defaultConfig().baseUrl;
-        var browser = this.browser;
-        this.isScreenshot = false;
-
-        this.config.apiKey = 'a-demo-key-with-low-quota-per-ip-address';
-        // PhantomJS Username
-        if( args.config.apiKey !== undefined )
-            this.config.apiKey = args.config.apiKey;
-
-        var thisB = this;
-        browser.afterMilestone('initPlugins', function(){
-            // check for screenshot query parameters
-            if(browser.config.queryParams.hasOwnProperty('screenshot')){
-                thisB.isScreenshot = true;
-                var encoded = browser.config.queryParams.screenshot;
-                var decoded = Util.decode(encoded);
-                // apply
-                thisB._applyScreenshotConfig(decoded);
-                browser.afterMilestone('loadConfig', function(){
- thisB._applyMethylationConfig(decoded.methylation);
-                });
-            }
-        });
-
-        browser.afterMilestone('initView',  function() {
-            // create screenshot button (possibly tools menu)
-            //console.log(browser);
-            var menuBar = browser.menuBar;
-            function showScreenShotDialog(){
-                new ScreenShotDialog({
-                    requestUrl: thisB._getPhantomJSUrl(),
-                    browser: browser
-                }).show();
-            }
-
-            if( browser.config.show_menu && (thisB.isScreenshot === false) ){
-                var button = new dijitButton({
-            className: 'screenshot-button',
-            innerHTML: 'Screen Shot',
-            title: 'take screen shot of browser',
-            onClick: showScreenShotDialog
-        });
-                menuBar.appendChild( button.domNode );
-            }
-            // shortcut key
-            browser.setGlobalKeyboardShortcut('s', showScreenShotDialog);
-        });
-        browser.afterMilestone('completely initialized',function(){
-            //thisB._applyTrackLabelConfig();
-        })
-    }, // end constructor
-    
-    _getPhantomJSUrl: function(){
-        return 'https://phantomjscloud.com/api/browser/v2/' + this.config.apiKey + '/'
-    },
-
-    _applyScreenshotConfig: function(params){
-        // params have basic, methylation, view, labels
-        // Note: this.browser.config gets overwritten with each mixin
-        lang.mixin(this.browser.config, params.basic);
-        lang.mixin(this.browser.config.view, params.view);
-    },
-
-    _applyMethylationConfig: function(params){
-        var thisB = this;
-        //var methylation = thisB.decoded.methylation;
-        // check for methylation plugin
-        if(thisB.browser.plugins.hasOwnProperty('MethylationPlugin')){
-            var m,t;
-            var tracks = lang.clone(thisB.browser.trackConfigsByName);
-            for(m in params){
-                if(params[m] === false){
-                    var mix = {};
-                    mix['show'+m] = false;
-                    for(t in tracks){
-                        if(thisB._testMethylation(tracks[t].type)){
-                            lang.mixin(thisB.browser.trackConfigsByName[t], mix);
-                        }
-                    }
-                } // end if params[m] === false
-            } // end for m in params
-        } // end if MethylationPlugin
-    },
-    _testMethylation: function(trackType){
-        if(trackType === undefined || trackType === null)
-            return false;
-        return ((/\b(MethylXYPlot)/.test( trackType )  || /\b(MethylPlot)/.test( trackType ) ));
-    },
-
-    _applyTrackLabelConfig: function(){
-        var thisB = this;
-        if(thisB.browser.plugins.hasOwnProperty('HideTrackLabels')){
-            console.log('call')
-            thisB.browser.showTrackLabels((thisB.browser.config.show_tracklabels ? 'show' : 'hide'))
-        }
-    }
-});
-});
+//>>built
+require({cache:{"ScreenShotPlugin/View/Dialog/ScreenShotDialog":function(){define("ScreenShotPlugin/View/Dialog/ScreenShotDialog","dojo/_base/declare dojo/dom-construct dojo/_base/array dijit/focus dijit/form/CheckBox dijit/form/NumberSpinner dijit/form/RadioButton dijit/layout/ContentPane JBrowse/View/Dialog/WithActionBar dojo/on dijit/form/Button JBrowse/Model/Location ScreenShotPlugin/Util".split(" "),function(p,b,l,a,m,e,q,n,r,t,g,s,h){return p(r,{title:"Take screenshot",autofocus:!1,constructor:function(c){this.browser=
+c.browser;this.parameters=this._getInitialParameters();this.requestUrl=c.requestUrl;this.setCallback=c.setCallback||function(){};this.cancelCallback=c.cancelCallback||function(){}},_fillActionBar:function(c){dojo.addClass(c,"screenshot-dialog-actionbar");(new g({label:"Render",onClick:dojo.hitch(this,function(){var c=this.parameters.view;c.methylation=this.parameters.methylation;c.zoom=this.parameters.output.zoom;c=this._getPhantomJSUrl({general:c},this.parameters.output);window.open(c);this.setCallback&&
+this.setCallback()})})).placeAt(c);(new g({label:"Cancel",onClick:dojo.hitch(this,function(){this.cancelCallback&&this.cancelCallback();this.hide()})})).placeAt(c)},show:function(c){dojo.addClass(this.domNode,"screenshot-dialog");var k=b.create("div",{className:"screenshot-dialog-pane",id:"screenshot-dialog-pane-left"}),d=new n({className:"screenshot-dialog-pane-sub",id:"screenshot-dialog-pane-left-top",title:"General configuration options"});this._paneGen(d.containerNode);d.placeAt(k);d=new n({className:"screenshot-dialog-pane-sub",
+id:"screenshot-dialog-pane-left-bottom",title:"Output configuration options"});this._paneOut(d.containerNode);d.placeAt(k);d=new n({className:"screenshot-dialog-pane",id:"screenshot-dialog-pane-right",title:"Track-specific configuration options"});this._paneTracks(d.containerNode);var a=b.create("div",{className:"screenshot-dialog-pane-bottom-warning",innerHTML:"Local configuration changes will be ignored. Default configuration will be used unless specified in this dialog.\x3cbr\x3eRendering will open a new window."});
+this.set("content",[k,d.domNode,a]);this.inherited(arguments)},_paneGen:function(c){var k=this.parameters.view,d;b.create("h2",{innerHTML:"General configuration options"},c);c=b.create("table",{className:"screenshot-dialog-opt-table"},c);for(d in k){var a=k[d],f=b.create("tr",{id:"screenshot-dialog-row-"+d},c);b.create("td",{innerHTML:"labels"===d?"":a.title,"class":"screenshot-dialog-pane-label"},f);f=b.create("td",{className:"screenshot-dialog-pane-input"},f);a="trackSpacing"===d?new e({id:"screenshot-dialog-"+
+d+"-spinner",value:a.value,_prop:d,constraints:{min:0,max:40},smallDelta:5,intermediateChanges:!0,style:"width:50px;"}):"labels"===d?null:new m({id:"screenshot-dialog-opt-box-"+d,_prop:d,checked:a.value});null!==a&&(a.onClick=dojo.hitch(this,"_setParameter",a),a.placeAt(f,"first"))}if(this.browser.plugins.hasOwnProperty("MethylationPlugin")){f=b.create("tr",{id:"screenshot-dialog-row-methyl"},c);b.create("td",{innerHTML:"Methylation",className:"screenshot-dialog-pane-label",colspan:2},f);var k=b.create("tr",
+{id:"screenshot-dialog-row-methyl-boxes"},c),k=b.create("td",{colspan:2},k),g;for(g in this.parameters.methylation)d=new m({id:"screenshot-dialog-methyl-"+g,className:g+"-checkbox",_prop:g,checked:this.parameters.methylation[g]}),d.onClick=dojo.hitch(this,"_setMethylation",d),b.create("span",{innerHTML:g,className:"screenshot-dialog-opt-span"},k),k.appendChild(d.domNode)}},_paneOut:function(c){var a=this;b.create("h2",{innerHTML:"Output configuration options"},c);c=b.create("table",{"class":"screenshot-dialog-opt-table"},
+c);var d,g=a.parameters.output;for(d in g){var f=g[d];if("format"===d){var m=b.create("tr",{id:"screenshot-dialog-row-"+d,colspan:2},c);b.create("td",{innerHTML:f.title,"class":"screenshot-dialog-pane-label"},m);var f=b.create("tr",{"class":"screenshot-dialog-pane-input"},c),s=b.create("td",{colspan:2},f),h={PNG:"transparent background",JPG:"white background",PDF:"contains svg-like objects"};l.forEach(["PNG","JPG"],function(c){var e=new q({id:"screenshot-dialog-output-"+c,checked:c===a.parameters.output.format.value,
+value:c,_prop:d});e.onClick=dojo.hitch(a,"_setParameter",e);b.create("span",{innerHTML:c,className:"screenshot-dialog-opt-span",title:h[c]},s);s.appendChild(e.domNode)})}else f=g[d],m=b.create("tr",{id:"screenshot-dialog-row-"+d},c),b.create("td",{innerHTML:f.title,"class":"screenshot-dialog-pane-label"},m),m=b.create("td",{"class":"screenshot-dialog-pane-input"},m),f=new e({id:"screenshot-dialog-"+d+"-spinner",value:f.value,_prop:d,constraints:{min:f.min,max:f.max},smallDelta:f.delta,intermediateChanges:!0,
+style:"width:75px;"}),f.onChange=dojo.hitch(a,"_setParameter",f),f.placeAt(m,"first")}},_paneTracks:function(c){b.create("h2",{innerHTML:"Track-specific options"},c);b.create("p",{innerHTML:"Coming soon"},c)},hide:function(){this.inherited(arguments);window.setTimeout(dojo.hitch(this,"destroyRecursive"),500)},_setMethylation:function(c){this.parameters.methylation.hasOwnProperty(c._prop)&&(this.parameters.methylation[c._prop]=c.checked)},_setParameter:function(c){var a=c._prop;"format"===a?c.checked&&
+this.parameters.output.hasOwnProperty(a)&&(this.parameters.output[a].value=c.value):c.hasOwnProperty("checked")?this.parameters.view.hasOwnProperty(a)&&(this.parameters.view[a].value=!!c.checked):this.parameters.view.hasOwnProperty(a)?this.parameters.view[a].value=c.value:this.parameters.output.hasOwnProperty(a)&&(this.parameters.output[a].value=c.value)},_getInitialParameters:function(){var c=this.browser.config,a={value:c.highResolutionMode,title:"Zoom factor"};"number"!==typeof a.value&&(a.value=
+1);var d={value:20,title:"Track spacing"};void 0!==c.view&&void 0!==c.view.trackPadding&&(d.value=c.view.trackPadding);var b={value:c.show_overview,title:"Show location overview"},e={value:c.show_tracklist,title:"Show track list"},m={value:c.show_nav,title:"Show navigation bar"},c={value:c.show_menu,title:"Show menu bar"};a.min=0;a.max=10;a.delta=1;return{view:{trackSpacing:d,locOver:b,trackList:e,nav:m,menu:c,labels:{value:!0,title:"Show track labels"}},methylation:{CG:!0,CHG:!0,CHH:!0},output:{format:{value:"JPG",
+title:"Output format"},zoom:a,quality:{value:70,title:"Render quality",min:0,max:100,delta:10},width:{value:3300,title:"Width (px)",min:100,max:1E4,delta:100},height:{value:2400,title:"Height (px)",min:100,max:1E4,delta:100}}}},_getPhantomJSUrl:function(c,a){var d=this.browser.makeCurrentViewURL(),b=h.encode(c),d=(d+("\x26screenshot\x3d"+b)).replace(/\u0026/g,"%26");a.url=d;d=h.encodePhantomJSSettings(a);return this.requestUrl+d}})})},"ScreenShotPlugin/Util":function(){define("ScreenShotPlugin/Util",
+["dojo/_base/declare","dojo/_base/array","dojo/json"],function(p,b,l){return{encode:function(a){return this._encodeGeneralSettings(a.general)},encodePhantomJSSettings:function(a){a=l.stringify({url:a.url,renderType:a.format.value,renderSettings:{zoomFactor:a.zoom.value,viewport:{width:a.width.value,height:a.height.value}}});a=a.replace(/\"([^(\")"]+)\":/g,"$1:");return"?request\x3d"+a},decode:function(a){return this._decodeGeneralSettings(a)},_encodeGeneralSettings:function(a){var b="",e={zoom:"z",
+trackSpacing:"p",locOver:"o",trackList:"r",nav:"n",menu:"u",labels:"b",methylation:"m"},l;for(l in a)var n=a[l],b="methylation"===l?b+(e[l]+this._encodeBoolean(n.CG)+this._encodeBoolean(n.CHG)+this._encodeBoolean(n.CHH)):"zoom"===l||"trackSpacing"===l?b+(e[l]+n.value):b+(e[l]+this._encodeBoolean(n.value));return b},_encodeBoolean:function(a){return a?"1":"0"},_decodeBoolen:function(a){return"1"===a?!0:!1},_decodeGeneralSettings:function(a){var b={basic:{},view:{},methylation:{}},e=/z([0-9]+)/gi.exec(a);
+null!=e&&(b.basic.highResolutionMode=parseInt(e[1]));e=/o([0-1])/gi.exec(a);null!=e&&(b.basic.show_overview=this._decodeBoolen(e[1]));e=/r([0-1])/gi.exec(a);null!=e&&(b.basic.show_tracklist=this._decodeBoolen(e[1]));e=/n([0-1])/gi.exec(a);null!=e&&(b.basic.show_nav=this._decodeBoolen(e[1]));e=/u([0-1])/gi.exec(a);null!=e&&(b.basic.show_menu=this._decodeBoolen(e[1]));e=/b([0-1])/gi.exec(a);null!=e&&(b.basic.show_tracklabels=this._decodeBoolen(e[1]));e=/p([0-9]+)/gi.exec(a);null!=e&&(b.view.trackPadding=
+parseInt(e[1]));a=/m([0-9]+)/gi.exec(a);null!=a&&(b.methylation.CG=this._decodeBoolen(a[1].substring(0,1)),b.methylation.CHG=this._decodeBoolen(a[1].substring(1,2)),b.methylation.CHH=this._decodeBoolen(a[1].substring(2,3)));return b}}})},"JBrowse/Plugin":function(){define(["dojo/_base/declare","JBrowse/Component"],function(p,b){return p(b,{constructor:function(b){this.name=b.name;this.cssLoaded=b.cssLoaded;this._finalizeConfig(b.config)},_defaultConfig:function(){return{baseUrl:"/plugins/"+this.name}}})})}}});
+require({cache:{"JBrowse/Plugin":function(){define("JBrowse/Plugin",["dojo/_base/declare","JBrowse/Component"],function(p,b){return p(b,{constructor:function(b){this.name=b.name;this.cssLoaded=b.cssLoaded;this._finalizeConfig(b.config)},_defaultConfig:function(){return{baseUrl:"/plugins/"+this.name}}})})}}});
+define("ScreenShotPlugin/main","dojo/_base/declare dojo/_base/lang dojo/_base/array dojo/dom dojo/dom-attr dijit/form/Button ./View/Dialog/ScreenShotDialog ./Util JBrowse/Plugin JBrowse/Browser".split(" "),function(p,b,l,a,m,e,q,n,r,t){return p(r,{constructor:function(a){this._defaultConfig();var b=this.browser;this.isScreenshot=!1;this.config.apiKey="a-demo-key-with-low-quota-per-ip-address";void 0!==a.config.apiKey&&(this.config.apiKey=a.config.apiKey);var h=this;b.afterMilestone("initPlugins",
+function(){if(b.config.queryParams.hasOwnProperty("screenshot")){h.isScreenshot=!0;var a=n.decode(b.config.queryParams.screenshot);h._applyScreenshotConfig(a);b.afterMilestone("loadConfig",function(){h._applyMethylationConfig(a.methylation)})}});b.afterMilestone("initView",function(){function a(){(new q({requestUrl:h._getPhantomJSUrl(),browser:b})).show()}var g=b.menuBar;if(b.config.show_menu&&!1===h.isScreenshot){var d=new e({className:"screenshot-button",innerHTML:"Screen Shot",title:"take screen shot of browser",
+onClick:a});g.appendChild(d.domNode)}b.setGlobalKeyboardShortcut("s",a)});b.afterMilestone("completely initialized",function(){})},_getPhantomJSUrl:function(){return"https://phantomjscloud.com/api/browser/v2/"+this.config.apiKey+"/"},_applyScreenshotConfig:function(a){b.mixin(this.browser.config,a.basic);b.mixin(this.browser.config.view,a.view)},_applyMethylationConfig:function(a){if(this.browser.plugins.hasOwnProperty("MethylationPlugin")){var e,h,c=b.clone(this.browser.trackConfigsByName);for(e in a)if(!1===
+a[e]){var k={};k["show"+e]=!1;for(h in c)this._testMethylation(c[h].type)&&b.mixin(this.browser.trackConfigsByName[h],k)}}},_testMethylation:function(a){return void 0===a||null===a?!1:/\b(MethylXYPlot)/.test(a)||/\b(MethylPlot)/.test(a)},_applyTrackLabelConfig:function(){this.browser.plugins.hasOwnProperty("HideTrackLabels")&&this.browser.showTrackLabels(this.browser.config.show_tracklabels?"show":"hide")}})});
+//# sourceMappingURL=main.js.map
