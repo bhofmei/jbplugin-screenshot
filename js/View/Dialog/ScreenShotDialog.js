@@ -186,7 +186,7 @@ return declare (ActionBarDialog,{
             for (m in thisB.parameters.methylation){
                 var mbox = new dijitCheckBox({
                     id:'screenshot-dialog-methyl-'+m,
-                    className:m+'-checkbox',
+                    'class':m+'-checkbox',
                     '_prop':m,
                     checked: thisB.parameters.methylation[m]
                 });
