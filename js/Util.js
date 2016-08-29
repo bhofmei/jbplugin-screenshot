@@ -149,7 +149,10 @@ Util = {
         // input and trackLabels are both arrays -- iterate through input
         var out = {};
         array.forEach(input, function(parmStr){
-            var tInt = parseInt(parmStr.slice(0,1));
+            var resultT = /^[0-9]+/.exec(parmStr);
+            if( resultT === null)
+                return;
+            var tInt = parseInt(resultT[0]);
             var tLabel = trackLabels[tInt];
             parmStr = parmStr.slice(1);
             out[tLabel] = {};
