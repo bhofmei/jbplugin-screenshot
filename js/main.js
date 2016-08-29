@@ -1,55 +1,1871 @@
-//>>built
-require({cache:{"ScreenShotPlugin/View/Dialog/ScreenShotDialog":function(){define("ScreenShotPlugin/View/Dialog/ScreenShotDialog","dojo/_base/declare dojo/_base/lang dojo/dom-construct dojo/_base/array dijit/focus dijit/form/CheckBox dijit/form/NumberSpinner dijit/form/RadioButton dijit/layout/ContentPane dijit/layout/AccordionContainer JBrowse/View/Dialog/WithActionBar dojo/on dijit/form/Button JBrowse/Model/Location ScreenShotPlugin/Util".split(" "),function(p,k,e,b,n,f,g,l,h,r,d,q,s,v,a){return p(d,
-{title:"Take screenshot",autofocus:!1,constructor:function(c){this.browser=c.browser;this.parameters=this._getInitialParameters();this.requestUrl=c.requestUrl;this.setCallback=c.setCallback||function(){};this.cancelCallback=c.cancelCallback||function(){};this.vTracks=this.browser.view.visibleTracks();this.trackParameters=this._getTrackParameters()},_fillActionBar:function(c){dojo.addClass(c,"screenshot-dialog-actionbar");(new s({label:"Render",onClick:dojo.hitch(this,function(){var c=this.parameters.view;
-c.methylation=this.parameters.methylation;c.zoom=this.parameters.output.zoom;c=this._getPhantomJSUrl({general:c,tracks:this.trackParameters},this.parameters.output);window.open(c);this.setCallback&&this.setCallback()})})).placeAt(c);(new s({label:"Cancel",onClick:dojo.hitch(this,function(){this.cancelCallback&&this.cancelCallback();this.hide()})})).placeAt(c)},show:function(c){dojo.addClass(this.domNode,"screenshot-dialog");var a=e.create("div",{className:"screenshot-dialog-pane",id:"screenshot-dialog-pane-left"}),
-m=new h({className:"screenshot-dialog-pane-sub",id:"screenshot-dialog-pane-left-top",title:"General configuration options"});this._paneGen(m.containerNode);m.placeAt(a);m=new h({className:"screenshot-dialog-pane-sub",id:"screenshot-dialog-pane-left-bottom",title:"Output configuration options"});this._paneOut(m.containerNode);m.placeAt(a);m=e.create("div",{className:"screenshot-dialog-pane",id:"screenshot-dialog-pane-right"});this._paneTracks(m);var b=e.create("div",{className:"screenshot-dialog-pane-bottom-warning",
-innerHTML:"Local configuration changes will be ignored. Default configuration will be used unless specified in this dialog.\x3cbr\x3eRendering will open a new window."});this.set("content",[a,m,b]);this.inherited(arguments)},_paneGen:function(c){var a=this.parameters.view,m;e.create("h2",{innerHTML:"General configuration options"},c);c=e.create("table",{"class":"screenshot-dialog-opt-table"},c);for(m in a){var b=a[m],d=e.create("tr",{id:"screenshot-dialog-row-"+m},c);e.create("td",{innerHTML:"labels"===
-m?"":b.title,"class":"screenshot-dialog-pane-label"},d);d=e.create("td",{"class":"screenshot-dialog-pane-input"},d);b="trackSpacing"===m?new g({id:"screenshot-dialog-"+m+"-spinner",value:b.value,_prop:m,constraints:{min:0,max:40},smallDelta:5,intermediateChanges:!0,style:"width:50px;"}):"labels"===m?null:new f({id:"screenshot-dialog-opt-box-"+m,_prop:m,checked:b.value});null!==b&&(b.onClick=dojo.hitch(this,"_setParameter",b),b.placeAt(d,"first"))}if(this.browser.plugins.hasOwnProperty("MethylationPlugin")){d=
-e.create("tr",{id:"screenshot-dialog-row-methyl"},c);e.create("td",{innerHTML:"Methylation",className:"screenshot-dialog-pane-label",colspan:2},d);var a=e.create("tr",{id:"screenshot-dialog-row-methyl-boxes"},c),a=e.create("td",{colspan:2},a),l;for(l in this.parameters.methylation)m=new f({id:"screenshot-dialog-methyl-"+l,className:l+"-checkbox",_prop:l,checked:this.parameters.methylation[l]}),m.onClick=dojo.hitch(this,"_setMethylation",m),e.create("span",{innerHTML:l,className:"screenshot-dialog-opt-span"},
-a),a.appendChild(m.domNode)}},_paneOut:function(c){var a=this;e.create("h2",{innerHTML:"Output configuration options"},c);c=e.create("table",{"class":"screenshot-dialog-opt-table"},c);var m,d,f,h=a.parameters.output;for(m in h)if(d=h[m],"format"===m){f=e.create("tr",{id:"screenshot-dialog-row-"+m,colspan:2},c);e.create("td",{innerHTML:d.title,"class":"screenshot-dialog-pane-label"},f);d=e.create("tr",{"class":"screenshot-dialog-pane-input"},c);var n=e.create("td",{colspan:2},d),q={PNG:"transparent background",
-JPG:"white background",PDF:"contains svg-like objects"};b.forEach(["PNG","JPG"],function(c){var t=new l({id:"screenshot-dialog-output-"+c,checked:c===a.parameters.output.format.value,value:c,_prop:m});t.onClick=dojo.hitch(a,"_setParameter",t);e.create("span",{innerHTML:c,className:"screenshot-dialog-opt-span",title:q[c]},n);n.appendChild(t.domNode)})}else d=h[m],f=e.create("tr",{id:"screenshot-dialog-row-"+m},c),e.create("td",{innerHTML:d.title,"class":"screenshot-dialog-pane-label"},f),f=e.create("td",
-{"class":"screenshot-dialog-pane-input"},f),d=new g({id:"screenshot-dialog-"+m+"-spinner",value:d.value,_prop:m,constraints:{min:d.min,max:d.max},smallDelta:d.delta,intermediateChanges:!0,style:"width:75px;"}),d.onChange=dojo.hitch(a,"_setParameter",d),d.placeAt(f,"first")},_paneTracks:function(c){var a=this,d=["left","center","right","none"];e.create("h2",{innerHTML:"Track-specific configuration options"},c);var f=new r({id:"screenshot-dialog-pane-accordian"}),n,q,s,k,p;b.forEach(a.vTracks,function(c){n=
-c.config.label;q=a.trackParameters[n];s=new h({title:void 0===q.key?n:q.key,id:"screenshot-dialog-track-"+n});c=s.containerNode;if(!1===q.opts)s.set("content","No available options");else for(k in c=e.create("table",{"class":"screenshot-dialog-opt-table"},c),q)if(p=q[k],"ypos"===k){if(!1!==q.ypos){var u=e.create("tr",{id:"screenshot-dialog-row-"+n+"-ypos"},c);e.create("td",{innerHTML:"Y-scale position","class":"screenshot-dialog-pane-label"},u);b.forEach(d,function(c){var t=new l({name:"yscale-"+
-n,checked:c===q.ypos,id:"screenshot-dialog-radio-"+n+"-"+c,value:c,_label:n,_prop:"ypos"});t.onClick=dojo.hitch(a,"_setTrackParameter",t);var d=e.create("td",{className:"screenshot-dialog-td-button"},u);t.placeAt(d,"first");e.create("label",{"for":"yscale-dialog-radio-"+n+"-"+c,innerHTML:c},d)})}}else if(p.hasOwnProperty("value")){u=e.create("tr",{id:"screenshot-dialog-row-"+n+"-"+k},c);e.create("td",{innerHTML:p.title,"class":"screenshot-dialog-pane-label"},u);var x=new g({id:"screenshot-dialog-spinner-"+
-n+"-"+k,value:p.value,_prop:k,_label:n,smallDelta:p.delta,intermediateChanges:!0,style:"width:60px;"});x.onChange=dojo.hitch(a,"_setTrackParameter",x);var r=e.create("td",{"class":"screenshot-dialog-pane-input",colspan:4},u);x.placeAt(r,"first")}f.addChild(s)});f.placeAt(c);f.startup()},hide:function(){this.inherited(arguments);window.setTimeout(dojo.hitch(this,"destroyRecursive"),500)},_setMethylation:function(c){this.parameters.methylation.hasOwnProperty(c._prop)&&(this.parameters.methylation[c._prop]=
-c.checked)},_setParameter:function(c){var a=c._prop;"format"===a?c.checked&&this.parameters.output.hasOwnProperty(a)&&(this.parameters.output[a].value=c.value):c.hasOwnProperty("checked")?this.parameters.view.hasOwnProperty(a)&&(this.parameters.view[a].value=!!c.checked):this.parameters.view.hasOwnProperty(a)?this.parameters.view[a].value=c.value:this.parameters.output.hasOwnProperty(a)&&(this.parameters.output[a].value=c.value)},_setTrackParameter:function(c){var a=c._label,d=c._prop;this.trackParameters.hasOwnProperty(a)?
-this.trackParameters[a].hasOwnProperty(d)&&(this.trackParameters[a][d].value=c.value):console.warn("Error: no track labeled "+a)},_getInitialParameters:function(){var c=this.browser.config,a={value:c.highResolutionMode,title:"Zoom factor"};"number"!==typeof a.value&&(a.value=1);var d={value:20,title:"Track spacing"};void 0!==c.view&&void 0!==c.view.trackPadding&&(d.value=c.view.trackPadding);var b={value:c.show_overview,title:"Show location overview"},f={value:c.show_tracklist,title:"Show track list"},
-e={value:c.show_nav,title:"Show navigation bar"},c={value:c.show_menu,title:"Show menu bar"};a.min=0;a.max=10;a.delta=1;return{view:{trackSpacing:d,locOver:b,trackList:f,nav:e,menu:c,labels:{value:!0,title:"Show track labels"}},methylation:{CG:!0,CHG:!0,CHH:!0},output:{format:{value:"JPG",title:"Output format"},zoom:a,quality:{value:70,title:"Render quality",min:0,max:100,delta:10},width:{value:3300,title:"Width (px)",min:100,max:1E4,delta:100},height:{value:2400,title:"Height (px)",min:100,max:1E4,
-delta:100}}}},_getTrackParameters:function(){var c=this,a={};b.forEach(this.vTracks,function(d,b){a[d.config.label]=c._handleTrackTypeParameters(b,d.config.type,d.config)});return a},_handleTrackTypeParameters:function(a,d,b){a={key:b.key,trackNum:a};if(/\b(Sequence)/.test(d))return k.mixin(a,{opts:!1}),a;/\b(MethylPlot)/.test(d)||/\b(MethylPlot)/.test(d)?k.mixin(a,{ypos:{title:"Y-scale position",value:b.yScalePosition},height:{title:"Track height",value:b.style.height,delta:10},min:{title:"Min. score",
-value:b.min_score,delta:0.1},max:{title:"Max. score",value:b.max_score,delta:0.1},quant:!0}):/\b(XYPlot)/.test(d)||/\b(XYDensity)/.test(d)?k.mixin(a,{ypos:{title:"Y-scale position",value:b.yScalePosition},height:{title:"Track height",value:b.style.height,delta:10},min:{title:"Min. score",value:b.min_score,delta:10},max:{title:"Max. score",value:b.max_score,delta:10},quant:!0}):k.mixin(a,{height:{title:"Track height",value:b.maxHeight,delta:10},ypos:!1});void 0!==b.histograms&&k.mixin(a,{ypos:{title:"Y-scale position",
-value:b.yScalePosition},min:{title:"Min. score",value:b.histograms.min,delta:10},max:{title:"Max. score",value:b.histograms.max,delta:10},quant:!1});return a},_getPhantomJSUrl:function(c,d){var b=this.browser.makeCurrentViewURL(),f=a.encode(c),b=(b+("\x26screenshot\x3d"+f)).replace(/\u0026/g,"%26");d.url=b;b=a.encodePhantomJSSettings(d);return this.requestUrl+b}})})},"dijit/layout/AccordionContainer":function(){define("require dojo/_base/array dojo/_base/declare dojo/_base/fx dojo/dom dojo/dom-attr dojo/dom-class dojo/dom-construct dojo/dom-geometry dojo/keys dojo/_base/lang dojo/sniff dojo/topic ../focus ../_base/manager dojo/ready ../_Widget ../_Container ../_TemplatedMixin ../_CssStateMixin ./StackContainer ./ContentPane dojo/text!./templates/AccordionButton.html ../a11yclick".split(" "),
-function(p,k,e,b,n,f,g,l,h,r,d,q,s,v,a,c,y,m,A,z,B,D,C){s=e("dijit.layout._AccordionButton",[y,A,z],{templateString:C,label:"",_setLabelAttr:{node:"titleTextNode",type:"innerHTML"},title:"",_setTitleAttr:{node:"titleTextNode",type:"attribute",attribute:"title"},iconClassAttr:"",_setIconClassAttr:{node:"iconNode",type:"class"},baseClass:"dijitAccordionTitle",getParent:function(){return this.parent},buildRendering:function(){this.inherited(arguments);var a=this.id.replace(" ","_");f.set(this.titleTextNode,
-"id",a+"_title");this.focusNode.setAttribute("aria-labelledby",f.get(this.titleTextNode,"id"));n.setSelectable(this.domNode,!1)},getTitleHeight:function(){return h.getMarginSize(this.domNode).h},_onTitleClick:function(){this.getParent().selectChild(this.contentWidget,!0);v.focus(this.focusNode)},_onTitleKeyDown:function(a){return this.getParent()._onKeyDown(a,this.contentWidget)},_setSelectedAttr:function(a){this._set("selected",a);this.focusNode.setAttribute("aria-expanded",a?"true":"false");this.focusNode.setAttribute("aria-selected",
-a?"true":"false");this.focusNode.setAttribute("tabIndex",a?"0":"-1")}});q("dojo-bidi")&&s.extend({_setLabelAttr:function(a){this._set("label",a);f.set(this.titleTextNode,"innerHTML",a);this.applyTextDir(this.titleTextNode)},_setTitleAttr:function(a){this._set("title",a);f.set(this.titleTextNode,"title",a);this.applyTextDir(this.titleTextNode)}});var w=e("dijit.layout._AccordionInnerContainer"+(q("dojo-bidi")?"_NoBidi":""),[y,z],{baseClass:"dijitAccordionInnerContainer",isLayoutContainer:!0,buildRendering:function(){this.domNode=
-l.place("\x3cdiv class\x3d'"+this.baseClass+"' role\x3d'presentation'\x3e",this.contentWidget.domNode,"after");var a=this.contentWidget,c=d.isString(this.buttonWidget)?d.getObject(this.buttonWidget):this.buttonWidget;this.button=a._buttonWidget=(new c({contentWidget:a,label:a.title,title:a.tooltip,dir:a.dir,lang:a.lang,textDir:a.textDir||this.textDir,iconClass:a.iconClass,id:a.id+"_button",parent:this.parent})).placeAt(this.domNode);this.containerNode=l.place("\x3cdiv class\x3d'dijitAccordionChildWrapper' role\x3d'tabpanel' style\x3d'display:none'\x3e",
-this.domNode);this.containerNode.setAttribute("aria-labelledby",this.button.id);l.place(this.contentWidget.domNode,this.containerNode)},postCreate:function(){this.inherited(arguments);var a=this.button,c=this.contentWidget;this._contentWidgetWatches=[c.watch("title",d.hitch(this,function(c,d,b){a.set("label",b)})),c.watch("tooltip",d.hitch(this,function(c,d,b){a.set("title",b)})),c.watch("iconClass",d.hitch(this,function(c,d,b){a.set("iconClass",b)}))]},_setSelectedAttr:function(a){this._set("selected",
-a);this.button.set("selected",a);if(a&&(a=this.contentWidget,a.onSelected))a.onSelected()},startup:function(){this.contentWidget.startup()},destroy:function(){this.button.destroyRecursive();k.forEach(this._contentWidgetWatches||[],function(a){a.unwatch()});delete this.contentWidget._buttonWidget;delete this.contentWidget._wrapperWidget;this.inherited(arguments)},destroyDescendants:function(a){this.contentWidget.destroyRecursive(a)}});q("dojo-bidi")&&(w=e("dijit.layout._AccordionInnerContainer",w,
-{postCreate:function(){this.inherited(arguments);var a=this.button;this._contentWidgetWatches.push(this.contentWidget.watch("textDir",function(c,d,b){a.set("textDir",b)}))}}));e=e("dijit.layout.AccordionContainer",B,{duration:a.defaultDuration,buttonWidget:s,baseClass:"dijitAccordionContainer",buildRendering:function(){this.inherited(arguments);this.domNode.style.overflow="hidden";this.domNode.setAttribute("role","tablist")},startup:function(){this._started||(this.inherited(arguments),this.selectedChildWidget&&
-this.selectedChildWidget._wrapperWidget.set("selected",!0))},layout:function(){var a=this.selectedChildWidget;if(a){var c=a._wrapperWidget.domNode,d=h.getMarginExtents(c),c=h.getPadBorderExtents(c),b=a._wrapperWidget.containerNode,f=h.getMarginExtents(b),b=h.getPadBorderExtents(b),e=this._contentBox,n=0;k.forEach(this.getChildren(),function(c){c!=a&&(n+=h.getMarginSize(c._wrapperWidget.domNode).h)});this._verticalSpace=e.h-n-d.h-c.h-f.h-b.h-a._buttonWidget.getTitleHeight();this._containerContentBox=
-{h:this._verticalSpace,w:this._contentBox.w-d.w-c.w-f.w-b.w};a&&a.resize(this._containerContentBox)}},_setupChild:function(a){a._wrapperWidget=w({contentWidget:a,buttonWidget:this.buttonWidget,id:a.id+"_wrapper",dir:a.dir,lang:a.lang,textDir:a.textDir||this.textDir,parent:this});this.inherited(arguments);l.place(a.domNode,a._wrapper,"replace")},removeChild:function(a){a._wrapperWidget&&(l.place(a.domNode,a._wrapperWidget.domNode,"after"),a._wrapperWidget.destroy(),delete a._wrapperWidget);g.remove(a.domNode,
-"dijitHidden");this.inherited(arguments)},getChildren:function(){return k.map(this.inherited(arguments),function(a){return"dijit.layout._AccordionInnerContainer"==a.declaredClass?a.contentWidget:a},this)},destroy:function(){this._animation&&this._animation.stop();k.forEach(this.getChildren(),function(a){a._wrapperWidget?a._wrapperWidget.destroy():a.destroyRecursive()});this.inherited(arguments)},_showChild:function(a){a._wrapperWidget.containerNode.style.display="block";return this.inherited(arguments)},
-_hideChild:function(a){a._wrapperWidget.containerNode.style.display="none";this.inherited(arguments)},_transition:function(a,c,d){8>q("ie")&&(d=!1);this._animation&&(this._animation.stop(!0),delete this._animation);var f=this;if(a){a._wrapperWidget.set("selected",!0);var e=this._showChild(a);this.doLayout&&a.resize&&a.resize(this._containerContentBox)}c&&(c._wrapperWidget.set("selected",!1),d||this._hideChild(c));if(d){var n=a._wrapperWidget.containerNode,l=c._wrapperWidget.containerNode;d=a._wrapperWidget.containerNode;
-a=h.getMarginExtents(d);d=h.getPadBorderExtents(d);var g=a.h+d.h;l.style.height=f._verticalSpace-g+"px";this._animation=new b.Animation({node:n,duration:this.duration,curve:[1,this._verticalSpace-g-1],onAnimate:function(a){a=Math.floor(a);n.style.height=a+"px";l.style.height=f._verticalSpace-g-a+"px"},onEnd:function(){delete f._animation;n.style.height="auto";c._wrapperWidget.containerNode.style.display="none";l.style.height="auto";f._hideChild(c)}});this._animation.onStop=this._animation.onEnd;this._animation.play()}return e},
-_onKeyDown:function(a,c){if(!this.disabled&&!(a.altKey||!c&&!a.ctrlKey)){var d=a.keyCode;if(c&&(d==r.LEFT_ARROW||d==r.UP_ARROW)||a.ctrlKey&&d==r.PAGE_UP)this._adjacent(!1)._buttonWidget._onTitleClick(),a.stopPropagation(),a.preventDefault();else if(c&&(d==r.RIGHT_ARROW||d==r.DOWN_ARROW)||a.ctrlKey&&(d==r.PAGE_DOWN||d==r.TAB))this._adjacent(!0)._buttonWidget._onTitleClick(),a.stopPropagation(),a.preventDefault()}}});q("dijit-legacy-requires")&&c(0,function(){p(["dijit/layout/AccordionPane"])});e._InnerContainer=
-w;e._Button=s;return e})},"dijit/layout/StackContainer":function(){define("dojo/_base/array dojo/cookie dojo/_base/declare dojo/dom-class dojo/dom-construct dojo/has dojo/_base/lang dojo/on dojo/ready dojo/topic dojo/when ../registry ../_WidgetBase ./_LayoutWidget dojo/i18n!../nls/common".split(" "),function(p,k,e,b,n,f,g,l,h,r,d,q,s,v){f("dijit-legacy-requires")&&h(0,function(){require(["dijit/layout/StackController"])});e=e("dijit.layout.StackContainer",v,{doLayout:!0,persist:!1,baseClass:"dijitStackContainer",
-buildRendering:function(){this.inherited(arguments);b.add(this.domNode,"dijitLayoutContainer")},postCreate:function(){this.inherited(arguments);this.own(l(this.domNode,"keydown",g.hitch(this,"_onKeyDown")))},startup:function(){if(!this._started){var a=this.getChildren();p.forEach(a,this._setupChild,this);this.persist?this.selectedChildWidget=q.byId(k(this.id+"_selectedChild")):p.some(a,function(a){a.selected&&(this.selectedChildWidget=a);return a.selected},this);var c=this.selectedChildWidget;!c&&
-a[0]&&(c=this.selectedChildWidget=a[0],c.selected=!0);r.publish(this.id+"-startup",{children:a,selected:c,textDir:this.textDir});this.inherited(arguments)}},resize:function(){if(!this._hasBeenShown){this._hasBeenShown=!0;var a=this.selectedChildWidget;a&&this._showChild(a)}this.inherited(arguments)},_setupChild:function(a){var c=a.domNode,d=n.place("\x3cdiv role\x3d'tabpanel' class\x3d'"+this.baseClass+"ChildWrapper dijitHidden'\x3e",a.domNode,"replace"),b=a["aria-label"]||a.title||a.label;b&&d.setAttribute("aria-label",
-b);n.place(c,d);a._wrapper=d;this.inherited(arguments);"none"==c.style.display&&(c.style.display="block");a.domNode.title=""},addChild:function(a,c){this.inherited(arguments);this._started&&(r.publish(this.id+"-addChild",a,c),this.layout(),this.selectedChildWidget||this.selectChild(a))},removeChild:function(a){var c=p.indexOf(this.getChildren(),a);this.inherited(arguments);n.destroy(a._wrapper);delete a._wrapper;this._started&&r.publish(this.id+"-removeChild",a);if(!this._descendantsBeingDestroyed){if(this.selectedChildWidget===
-a&&(this.selectedChildWidget=void 0,this._started)){var d=this.getChildren();d.length&&this.selectChild(d[Math.max(c-1,0)])}this._started&&this.layout()}},selectChild:function(a,c){var b;a=q.byId(a);this.selectedChildWidget!=a&&(b=this._transition(a,this.selectedChildWidget,c),this._set("selectedChildWidget",a),r.publish(this.id+"-selectChild",a),this.persist&&k(this.id+"_selectedChild",this.selectedChildWidget.id));return d(b||!0)},_transition:function(a,c){c&&this._hideChild(c);var d=this._showChild(a);
-a.resize&&(this.doLayout?a.resize(this._containerContentBox||this._contentBox):a.resize());return d},_adjacent:function(a){var c=this.getChildren(),d=p.indexOf(c,this.selectedChildWidget),d=d+(a?1:c.length-1);return c[d%c.length]},forward:function(){return this.selectChild(this._adjacent(!0),!0)},back:function(){return this.selectChild(this._adjacent(!1),!0)},_onKeyDown:function(a){r.publish(this.id+"-containerKeyDown",{e:a,page:this})},layout:function(){var a=this.selectedChildWidget;a&&a.resize&&
-(this.doLayout?a.resize(this._containerContentBox||this._contentBox):a.resize())},_showChild:function(a){var c=this.getChildren();a.isFirstChild=a==c[0];a.isLastChild=a==c[c.length-1];a._set("selected",!0);a._wrapper&&b.replace(a._wrapper,"dijitVisible","dijitHidden");return a._onShow&&a._onShow()||!0},_hideChild:function(a){a._set("selected",!1);a._wrapper&&b.replace(a._wrapper,"dijitHidden","dijitVisible");a.onHide&&a.onHide()},closeChild:function(a){a.onClose&&a.onClose(this,a)&&(this.removeChild(a),
-a.destroyRecursive())},destroyDescendants:function(a){this._descendantsBeingDestroyed=!0;this.selectedChildWidget=void 0;p.forEach(this.getChildren(),function(c){a||this.removeChild(c);c.destroyRecursive(a)},this);this._descendantsBeingDestroyed=!1}});e.ChildWidgetProperties={selected:!1,disabled:!1,closable:!1,iconClass:"dijitNoIcon",showTitle:!0};g.extend(s,e.ChildWidgetProperties);return e})},"ScreenShotPlugin/Util":function(){define("ScreenShotPlugin/Util",["dojo/_base/declare","dojo/_base/array",
-"dojo/json"],function(p,k,e){return{encode:function(b){var e=b.tracks;return this._encodeGeneralSettings(b.general)+this._endcodeTrackSettings(e)},encodePhantomJSSettings:function(b){b=e.stringify({url:b.url,renderType:b.format.value,renderSettings:{zoomFactor:b.zoom.value,viewport:{width:b.width.value,height:b.height.value}}});b=b.replace(/\"([^(\")"]+)\":/g,"$1:");return"?request\x3d"+b},decode:function(b,e){var f=b.split("~"),g=e.split(","),l=this._decodeGeneralSettings(f[0]),f=this._decodeTrackSettings(f.slice(1),
-g);return{general:l,tracks:f}},_encodeGeneralSettings:function(b){var e="",f={zoom:"z",trackSpacing:"p",locOver:"o",trackList:"r",nav:"n",menu:"u",labels:"b",methylation:"m"},g;for(g in b)var l=b[g],e="methylation"===g?e+(f[g]+this._encodeBoolean(l.CG)+this._encodeBoolean(l.CHG)+this._encodeBoolean(l.CHH)):"zoom"===g||"trackSpacing"===g?e+(f[g]+l.value):e+(f[g]+this._encodeBoolean(l.value));return e},_endcodeTrackSettings:function(b){var e="",f,g;for(f in b)g=b[f],!1===g.hasOwnProperty("opts")&&(e+=
-this._encodeTrack(g));return e},_encodeTrack:function(b){var e={height:"h",min:"i",max:"x",quant:"q",ypos:"y"},f={none:0,center:1,left:2,right:3},g,l,h="~"+b.trackNum;for(g in b)l=b[g],"quant"===g?h+=e[g]+this._encodeBoolean(l):void 0===l||(void 0===l.value||!1===e.hasOwnProperty(g))||(h+=e[g],h="ypos"===g?h+f[l.value]:h+l.value);return h},_encodeBoolean:function(b){return b?"1":"0"},_decodeBoolen:function(b){return"1"===b?!0:!1},_decodeGeneralSettings:function(b){var e={basic:{},view:{},methylation:{}},
-f=/z([0-9]+)/gi.exec(b);null!=f&&(e.basic.highResolutionMode=parseInt(f[1]));f=/o([0-1])/gi.exec(b);null!=f&&(e.basic.show_overview=this._decodeBoolen(f[1]));f=/r([0-1])/gi.exec(b);null!=f&&(e.basic.show_tracklist=this._decodeBoolen(f[1]));f=/n([0-1])/gi.exec(b);null!=f&&(e.basic.show_nav=this._decodeBoolen(f[1]));f=/u([0-1])/gi.exec(b);null!=f&&(e.basic.show_menu=this._decodeBoolen(f[1]));f=/b([0-1])/gi.exec(b);null!=f&&(e.basic.show_tracklabels=this._decodeBoolen(f[1]));f=/p([0-9]+)/gi.exec(b);
-null!=f&&(e.view.trackPadding=parseInt(f[1]));b=/m([0-9]+)/gi.exec(b);null!=b&&(e.methylation.CG=this._decodeBoolen(b[1].substring(0,1)),e.methylation.CHG=this._decodeBoolen(b[1].substring(1,2)),e.methylation.CHH=this._decodeBoolen(b[1].substring(2,3)));return e},_decodeTrackSettings:function(b,e){var f=this,g={};k.forEach(b,function(b){var h=parseInt(b.slice(0,1)),h=e[h];b=b.slice(1);g[h]={};var k=null,d=/q([0-1])/gi.exec(b);null!=d&&((k=f._decodeBoolen(d[1]))?g[h].style={}:g[h].histograms={});d=
-/i(-?[0-9]+(\.[0-9])?)/gi.exec(b);null!=d&&(d=parseFloat(d[1]),k?g[h].min_score=d:g[h].histograms.min=d);d=/x(-?[0-9]+(\.[0-9])?)/gi.exec(b);null!=d&&(d=parseFloat(d[1]),k?g[h].max_score=d:g[h].histograms.max=d);d=/h([0-9]+)/gi.exec(b);null!=d&&(d=parseInt(d[1]),k?g[h].style.height=d:!1===k?(g[h].maxHeight=d,g[h].histograms.height=d):g[h].maxHeight=d);b=/y([0-3])/gi.exec(b);null!=b&&(b=parseInt(b[1]),g[h].yScalePosition=["none","center","left","right"][b])});return g}}})},"JBrowse/Plugin":function(){define(["dojo/_base/declare",
-"JBrowse/Component"],function(p,k){return p(k,{constructor:function(e){this.name=e.name;this.cssLoaded=e.cssLoaded;this._finalizeConfig(e.config)},_defaultConfig:function(){return{baseUrl:"/plugins/"+this.name}}})})},"url:dijit/layout/templates/AccordionButton.html":"\x3cdiv data-dojo-attach-event\x3d'ondijitclick:_onTitleClick' class\x3d'dijitAccordionTitle' role\x3d\"presentation\"\x3e\n\t\x3cdiv data-dojo-attach-point\x3d'titleNode,focusNode' data-dojo-attach-event\x3d'onkeydown:_onTitleKeyDown'\n\t\t\tclass\x3d'dijitAccordionTitleFocus' role\x3d\"tab\" aria-expanded\x3d\"false\"\n\t\t\x3e\x3cspan class\x3d'dijitInline dijitAccordionArrow' role\x3d\"presentation\"\x3e\x3c/span\n\t\t\x3e\x3cspan class\x3d'arrowTextUp' role\x3d\"presentation\"\x3e+\x3c/span\n\t\t\x3e\x3cspan class\x3d'arrowTextDown' role\x3d\"presentation\"\x3e-\x3c/span\n\t\t\x3e\x3cspan role\x3d\"presentation\" class\x3d\"dijitInline dijitIcon\" data-dojo-attach-point\x3d\"iconNode\"\x3e\x3c/span\x3e\n\t\t\x3cspan role\x3d\"presentation\" data-dojo-attach-point\x3d'titleTextNode, textDirNode' class\x3d'dijitAccordionText'\x3e\x3c/span\x3e\n\t\x3c/div\x3e\n\x3c/div\x3e\n"}});
-require({cache:{"JBrowse/Plugin":function(){define("JBrowse/Plugin",["dojo/_base/declare","JBrowse/Component"],function(p,k){return p(k,{constructor:function(e){this.name=e.name;this.cssLoaded=e.cssLoaded;this._finalizeConfig(e.config)},_defaultConfig:function(){return{baseUrl:"/plugins/"+this.name}}})})}}});
-define("ScreenShotPlugin/main","dojo/_base/declare dojo/_base/lang dojo/_base/array dojo/dom dojo/dom-attr dijit/form/Button ./View/Dialog/ScreenShotDialog ./Util JBrowse/Plugin JBrowse/Browser".split(" "),function(p,k,e,b,n,f,g,l,h,r){return p(h,{constructor:function(d){this._defaultConfig();var b=this.browser;this.isScreenshot=!1;this.config.apiKey="a-demo-key-with-low-quota-per-ip-address";void 0!==d.config.apiKey&&(this.config.apiKey=d.config.apiKey);var e=this;b.afterMilestone("initPlugins",
-function(){if(b.config.queryParams.hasOwnProperty("screenshot")){e.isScreenshot=!0;var d=l.decode(b.config.queryParams.screenshot,b.config.queryParams.tracks);e._applyScreenshotConfig(d);b.afterMilestone("loadConfig",function(){e._applyMethylationConfig(d.general.methylation);e._applyTracksConfig(d.tracks)})}});b.afterMilestone("initView",function(){function d(){(new g({requestUrl:e._getPhantomJSUrl(),browser:b})).show()}var a=b.menuBar;if(b.config.show_menu&&!1===e.isScreenshot){var c=new f({className:"screenshot-button",
-innerHTML:"Screen Shot",title:"take screen shot of browser",onClick:d});a.appendChild(c.domNode)}b.setGlobalKeyboardShortcut("s",d)});b.afterMilestone("completely initialized",function(){})},_getPhantomJSUrl:function(){return"https://phantomjscloud.com/api/browser/v2/"+this.config.apiKey+"/"},_applyScreenshotConfig:function(d){k.mixin(this.browser.config,d.general.basic);k.mixin(this.browser.config.view,d.general.view)},_applyMethylationConfig:function(d){if(this.browser.plugins.hasOwnProperty("MethylationPlugin")){var b,
-e,f=k.clone(this.browser.trackConfigsByName);for(b in d)if(!1===d[b]){var a={};a["show"+b]=!1;for(e in f)this._testMethylation(f[e].type)&&k.mixin(this.browser.trackConfigsByName[e],a)}}},_testMethylation:function(d){return void 0===d||null===d?!1:/\b(MethylXYPlot)/.test(d)||/\b(MethylPlot)/.test(d)},_applyTracksConfig:function(d){var b=k.clone(this.browser.trackConfigsByName),e;for(e in b)d.hasOwnProperty(e)&&(b=d[e].histograms,void 0!==b&&(k.mixin(this.browser.trackConfigsByName[e].histograms,b),
-delete d[e].histograms),b=d[e].style,void 0!==b&&(k.mixin(this.browser.trackConfigsByName[e].style,b),delete d[e].style),k.mixin(this.browser.trackConfigsByName[e],d[e]))},_applyTrackLabelConfig:function(){this.browser.plugins.hasOwnProperty("HideTrackLabels")&&this.browser.showTrackLabels(this.browser.config.show_tracklabels?"show":"hide")}})});
-//# sourceMappingURL=main.js.map
+require({cache:{
+'ScreenShotPlugin/View/Dialog/ScreenShotDialog':function(){
+define( "ScreenShotPlugin/View/Dialog/ScreenShotDialog", [
+    'dojo/_base/declare',
+    'dojo/_base/lang',
+    'dojo/dom-construct',
+    'dojo/_base/array',
+    'dijit/focus',
+    'dijit/form/CheckBox',
+    'dijit/form/NumberSpinner',
+    'dijit/form/RadioButton',
+    'dijit/layout/ContentPane',
+    'dijit/layout/AccordionContainer',
+    'JBrowse/View/Dialog/WithActionBar',
+    'dojo/on',
+    'dijit/form/Button',
+    'JBrowse/Model/Location',
+    'ScreenShotPlugin/Util'
+    ],
+function (
+    declare,
+    lang,
+    dom,
+    array,
+    focus,
+    dijitCheckBox,
+    dijitNumberSpinner,
+    dijitRadioButton,
+    dijitContentPane,
+    dijitAccordionContainer,
+    ActionBarDialog,
+    on,
+    Button,
+    Location,
+    Util
+) {
+
+return declare (ActionBarDialog,{
+    /**
+     * Dijit Dialog subclass to take a screenshot
+     */
+
+     title: 'Take screenshot',
+     autofocus: false,
+
+     constructor: function( args ){
+        this.browser = args.browser;
+        this.parameters = this._getInitialParameters();
+        this.requestUrl = args.requestUrl;
+        this.setCallback    = args.setCallback || function() {};
+        this.cancelCallback = args.cancelCallback || function() {};
+        this.vTracks = this.browser.view.visibleTracks();
+        //console.log(this.vTracks);
+        this.trackParameters = this._getTrackParameters();
+        //console.log(this.trackParameters);
+     },
+
+     _fillActionBar: function( actionBar ){
+        dojo.addClass(actionBar, 'screenshot-dialog-actionbar');
+        var ok_button = new Button({
+            label: "Render",
+            onClick: dojo.hitch(this, function() {
+                // screenshot parameters
+                //console.log(this.trackParameters);
+                var gParams = this.parameters.view;
+                gParams.methylation=this.parameters.methylation;
+                gParams.zoom = this.parameters.output.zoom
+                var scParams = {general: gParams, tracks: this.trackParameters};
+                // js params
+                var jsParams = this.parameters.output;
+                // get the url
+                var url = this._getPhantomJSUrl(scParams, jsParams);
+                //console.log(url);
+                window.open(url);
+                this.setCallback && this.setCallback( );
+                //this.hide();
+            })
+        }).placeAt(actionBar);
+
+        var cancel_button = new Button({
+            label: "Cancel",
+            onClick: dojo.hitch(this, function() {
+                //console.log(this.trackParameters);
+                this.cancelCallback && this.cancelCallback();
+                this.hide();
+            })
+        }).placeAt(actionBar);
+     },
+
+    show: function( callback ) {
+        var thisB = this;
+        dojo.addClass(this.domNode, 'screenshot-dialog');
+
+        var mainPaneLeft = dom.create('div',
+            {className: 'screenshot-dialog-pane',
+            id:'screenshot-dialog-pane-left'});
+
+        var mainPaneLeftTop = new dijitContentPane({
+            className: 'screenshot-dialog-pane-sub',
+            id:'screenshot-dialog-pane-left-top',
+            title:'General configuration options'
+        });
+        var mainPaneLeftT = mainPaneLeftTop.containerNode;
+        thisB._paneGen(mainPaneLeftT);
+        mainPaneLeftTop.placeAt(mainPaneLeft);
+
+
+        var mainPaneLeftBottom = new dijitContentPane({
+            className:'screenshot-dialog-pane-sub',
+            id:'screenshot-dialog-pane-left-bottom',
+            title:'Output configuration options'
+        });
+        var mainPaneLeftB = mainPaneLeftBottom.containerNode;
+        thisB._paneOut(mainPaneLeftB);
+        mainPaneLeftBottom.placeAt(mainPaneLeft);
+
+        // for tracks
+
+       var mainPaneRight = dom.create('div',
+            {className: 'screenshot-dialog-pane',
+            id:'screenshot-dialog-pane-right'});
+
+        /*var mainPaneRightM = new dijitContentPane({
+            className: 'screenshot-dialog-pane',
+            id: 'screenshot-dialog-pane-right',
+            title: 'Track-specific configuration options'
+        });
+        var mainPaneRight = mainPaneRightM.containerNode;*/
+        thisB._paneTracks( mainPaneRight );
+
+        var paneFooter = dom.create('div',{className:'screenshot-dialog-pane-bottom-warning', innerHTML:'Local configuration changes will be ignored. Default configuration will be used unless specified in this dialog.<br>Rendering will open a new window.'});
+
+        this.set('content', [
+            mainPaneLeft,
+            mainPaneRight,
+            paneFooter
+        ] );
+
+        this.inherited( arguments );
+    },
+
+    _paneGen: function(obj){
+        var thisB = this;
+        var viewParam = thisB.parameters.view;
+        var param;
+        dom.create('h2',{'innerHTML':'General configuration options'}, obj);
+        var table = dom.create('table',{'class':'screenshot-dialog-opt-table'}, obj);
+        // check box parameters -> location overview, tracklist, nav, menu bars
+        for(param in viewParam){
+            var data = viewParam[param];
+            var row = dom.create('tr',{id:'screenshot-dialog-row-'+param},table);
+            dom.create('td',{'innerHTML':(param === 'labels' ? '' : data.title),'class':'screenshot-dialog-pane-label'}, row);
+            var td = dom.create('td',{'class':'screenshot-dialog-pane-input'},row);
+            var input;
+            if(param === 'trackSpacing'){
+                input = new dijitNumberSpinner({
+                    id:'screenshot-dialog-'+param+'-spinner',
+                    value: data.value,
+                    '_prop':param,
+                    constraints: {min:0,max:40},
+                    smallDelta:5,
+                    intermediateChanges:true,
+                    style:"width:50px;"
+                });
+            }else{
+                //if(param === 'labels' && thisB.browser.plugins.hasOwnProperty('HideTrackLabels')===false){
+                if(param === 'labels'){
+                    input = null;
+                }else{
+                input = new dijitCheckBox({
+                    id:'screenshot-dialog-opt-box-'+param,
+                    '_prop': param,
+                    checked: data.value
+                });
+                }
+            }
+            if(input !== null){
+                input.onClick = dojo.hitch(thisB, '_setParameter', input);
+                input.placeAt(td,'first');
+            }
+        } // end for param
+        if(thisB.browser.plugins.hasOwnProperty('MethylationPlugin')){
+            row = dom.create('tr',{id:'screenshot-dialog-row-methyl'},table);
+            dom.create('td',{innerHTML:'Methylation',className:'screenshot-dialog-pane-label', 'colspan':2},row);
+            var row2 = dom.create('tr',{'id':'screenshot-dialog-row-methyl-boxes'},table);
+            var methylD = dom.create('td',{'colspan':2},row2);
+            var m;
+            for (m in thisB.parameters.methylation){
+                var mbox = new dijitCheckBox({
+                    id:'screenshot-dialog-methyl-'+m,
+                    className:m+'-checkbox',
+                    '_prop':m,
+                    checked: thisB.parameters.methylation[m]
+                });
+                mbox.onClick = dojo.hitch(thisB, '_setMethylation', mbox);
+                dom.create('span',{innerHTML:m,className:'screenshot-dialog-opt-span'}, methylD);
+                methylD.appendChild(mbox.domNode);
+            }
+        }
+    },
+
+    _paneOut: function(obj){
+        var thisB = this;
+        dom.create('h2',{'innerHTML':'Output configuration options'}, obj);
+        var tableB = dom.create('table',{'class':'screenshot-dialog-opt-table'},obj);
+        var param, data, row, row2;
+        // output options -> format (PNG, JPEG, PDF), height, width
+        var outParam = thisB.parameters.output;
+        for(param in outParam){
+            data = outParam[param];
+            if(param === 'format'){
+                row = dom.create('tr',{'id':'screenshot-dialog-row-'+param,'colspan':2},tableB);
+                dom.create('td',{'innerHTML':data.title,'class':'screenshot-dialog-pane-label'}, row);
+                row2 = dom.create('tr',{'class':'screenshot-dialog-pane-input'},tableB);
+                var outD = dom.create('td',{'colspan':2},row2);
+                // 3 check boxes
+                //var formatTypes = ['PNG','JPG','PDF'];
+                var formatTypes = ['PNG','JPG'];
+                var formatTypeTitles = {'PNG':'transparent background','JPG':'white background', 'PDF':'contains svg-like objects'};
+                array.forEach(formatTypes, function(f){
+                    var btn = new dijitRadioButton({
+                        id: 'screenshot-dialog-output-'+f,
+                        checked: f === thisB.parameters.output.format.value,
+                        value: f,
+                        '_prop': param
+                    });
+                    btn.onClick = dojo.hitch(thisB, '_setParameter', btn);
+                    dom.create('span',{innerHTML:f, className:'screenshot-dialog-opt-span', title:formatTypeTitles[f]}, outD);
+                    outD.appendChild(btn.domNode);
+                });
+            } else {
+                // number spinners
+                data = outParam[param];
+                row = dom.create('tr',{'id':'screenshot-dialog-row-'+param},tableB);
+                dom.create('td',{'innerHTML':data.title,'class':'screenshot-dialog-pane-label'}, row);
+                var spinD = dom.create('td',{'class':'screenshot-dialog-pane-input'},row);
+                // create slider for quality and spinner for other
+                var widget = new dijitNumberSpinner({
+                        id:'screenshot-dialog-'+param+'-spinner',
+                        value: data.value,
+                        '_prop':param,
+                        //constraints: (param === 'zoom' ? {min:1,max:10} : {min:100,max:10000,pattern:'###0'}),
+                        constraints: {min: data.min, max: data.max},
+                        smallDelta:data.delta,
+                        intermediateChanges:true,
+                        style:"width:75px;"
+                });
+                widget.onChange = dojo.hitch(thisB, '_setParameter',widget);
+                widget.placeAt(spinD,'first');
+            }
+        }
+    },
+
+    _paneTracks: function(rPane){
+        var thisB = this;
+        var locationList = ['left','center','right','none'];
+        dom.create('h2',{'innerHTML':'Track-specific configuration options'}, rPane);
+
+        var acc = new dijitAccordionContainer({
+            id:'screenshot-dialog-pane-accordian'
+        });
+        var label, tParams, pane, param, data;
+        // need to loop through the tracks and create content panes
+        array.forEach(thisB.vTracks, function(track){
+            // get parameters
+            label = track.config.label;
+            tParams = thisB.trackParameters[label];
+            pane = new dijitContentPane({
+                title: (tParams.key===undefined ? label : tParams.key ),
+                id: 'screenshot-dialog-track-'+label
+            });
+            var obj = pane.containerNode;
+
+            if(tParams.opts === false){
+                pane.set('content','No available options');
+                acc.addChild(pane);
+                return;
+            }
+            var table = dom.create('table',{'class':'screenshot-dialog-opt-table'}, obj);
+            // loop through parameters
+            for(param in tParams){
+                data = tParams[param];
+                // yscale is radio boxes
+                if(param === 'ypos'){
+                    // yscale position radio boxes
+                    if(tParams.ypos !== false){
+                        var row = dom.create('tr',{'id':'screenshot-dialog-row-'+label+'-ypos'},table);
+                        dom.create('td',{'innerHTML':'Y-scale position','class':'screenshot-dialog-pane-label'}, row);
+                        array.forEach(locationList, function(loc){
+                            var button = new dijitRadioButton({
+                                name:'yscale-'+label,
+                                checked: loc === tParams.ypos,
+                                id:'screenshot-dialog-radio-'+label+'-'+loc,
+                                value: loc,
+                                '_label': label,
+                                '_prop': 'ypos'
+                        });
+                        button.onClick = dojo.hitch(thisB, '_setTrackParameter', button);
+                        var td = dom.create('td', {className:'screenshot-dialog-td-button'}, row);
+                        button.placeAt(td, 'first');
+                        dom.create('label', {"for":'yscale-dialog-radio-'+label+'-'+loc, innerHTML: loc}, td);
+                    });
+                    } // end y-scale position
+                }
+                // methylation check boxes
+                /*else if(param==='methyl'){
+                    // paramater data
+                    data = tParams.methyl;
+                    var row = dom.create('tr',{'id':'screenshot-dialog-row-'+label+'-methyl'},table);
+                    dom.create('td',{'innerHTML':'Methylation','class':'screenshot-dialog-pane-label'}, row);
+                    for(var m in data){
+                        var box = new dijitCheckBox({
+                                checked: tParams.methyl[m],
+                                id:'screenshot-dialog-radio-'+label+'-'+m,
+                                value: m,
+                                class: m+'-checkbox',
+                                _label: label,
+                                _prop: 'methyl'
+                        });
+                        box.onClick = dojo.hitch(thisB, '_setTrackParameter', box);
+                        var td = dom.create('td',{class:'screenshot-dialog-pane-input'},row);
+                        box.placeAt(td,'first');
+                        dom.create('label',{"for":'yscale-dialog-radio-'+label+'-'+m, innerHTML: m}, td);
+                    }
+
+                } */
+                else if(data.hasOwnProperty('value')){
+                    // otherwise its a number spinner text box thing
+                    var row = dom.create('tr',{'id':'screenshot-dialog-row-'+label+'-'+param},table);
+                    dom.create('td',{'innerHTML':data.title,'class':'screenshot-dialog-pane-label'}, row);
+                    var widget = new dijitNumberSpinner({
+                        id:'screenshot-dialog-spinner-'+label+'-'+param,
+                        value: data.value,
+                        '_prop':param,
+                        '_label': label,
+                        smallDelta:data.delta,
+                        intermediateChanges:true,
+                        style:"width:60px;"
+                    });
+                    widget.onChange = dojo.hitch(thisB, '_setTrackParameter', widget);
+                    var td = dom.create('td', {'class':'screenshot-dialog-pane-input', 'colspan':4}, row);
+                    widget.placeAt(td,'first');
+                }
+            } // end for param
+
+            acc.addChild(pane);
+        });
+
+        acc.placeAt(rPane);
+        acc.startup();
+    },
+
+    hide: function() {
+        this.inherited(arguments);
+        window.setTimeout( dojo.hitch( this, 'destroyRecursive' ), 500 );
+    },
+
+    _setMethylation: function(box){
+        if(this.parameters.methylation.hasOwnProperty(box._prop)){
+            this.parameters.methylation[box._prop] = box.checked;
+        }
+    },
+
+    _setParameter: function(input){
+        var prop = input._prop;
+        // format radio box parameter
+        if(prop === 'format'){
+            if(input.checked && this.parameters.output.hasOwnProperty(prop))
+                this.parameters.output[prop].value = input.value;
+        }
+        // check box parameters
+        else if(input.hasOwnProperty('checked')){
+            if(this.parameters.view.hasOwnProperty(prop))
+                this.parameters.view[prop].value = !! input.checked;
+        }
+        // else spinner or slider
+        else{
+            if(this.parameters.view.hasOwnProperty(prop))
+                this.parameters.view[prop].value = input.value;
+            else if(this.parameters.output.hasOwnProperty(prop))
+                this.parameters.output[prop].value = input.value;
+        }
+    },
+
+    _setTrackParameter: function(input){
+        var tLabel = input._label;
+        var prop = input._prop;
+        // check label
+        if(!this.trackParameters.hasOwnProperty(tLabel)){
+            console.warn('Error: no track labeled '+tLabel);
+            return
+        }
+        // handle methylation
+        /*if(prop === 'methyl'){
+            if(this.trackParameters[tLabel].methyl.hasOwnProperty(input.value)){
+                this.trackParameters[tLabel].methyl[input.value] = input.checked;
+            }
+        }
+        // y-scale position
+        if(input.hasOwnProperty('checked') && input.checked){
+            if(this.trackParameters[tLabel].hasOwnProperty(prop)){
+                this.trackParameters[tLabel][prop] = input.value;
+            }
+        }*/
+        // number spinner type
+        else{
+            if(this.trackParameters[tLabel].hasOwnProperty(prop)){
+                this.trackParameters[tLabel][prop].value = input.value;
+            }
+        }
+    },
+
+    _getInitialParameters: function(){
+        // get browser parameterss
+        var config = this.browser.config;
+        // spinner -> zoom and trackSpacing
+        var zoom = { value: config.highResolutionMode, title: 'Zoom factor'};
+        if (typeof zoom.value !== 'number')
+            zoom.value = 1
+        var trackSpacing = {value: 20, title: 'Track spacing'};
+        if(config.view !== undefined && config.view.trackPadding !== undefined)
+            trackSpacing.value = config.view.trackPadding;
+        // check boxes -> location overview, tracklist, nav, menu bars, track labels
+        var locOver = { value: config.show_overview, title:'Show location overview' };
+        var trackList = { value: config.show_tracklist, title:'Show track list' };
+        var nav = { value: config.show_nav, title:'Show navigation bar' };
+        var menu = { value: config.show_menu, title:'Show menu bar' };
+        var labels = {value:true, title:'Show track labels'};
+        // output parameters
+        zoom['min'] = 0;
+        zoom['max'] = 10;
+        zoom['delta'] = 1;
+        var format = {value: 'JPG', title: 'Output format'};
+        var width = {value: 3300, title: 'Width (px)', min:100, max:10000, delta:100};
+        var height = {value: 2400, title: 'Height (px)', min:100, max:10000, delta:100};
+        var quality = {value: 70, title: 'Render quality', min:0, max:100, delta:10};
+
+       return { view:{trackSpacing: trackSpacing, locOver: locOver, trackList: trackList, nav: nav, menu: menu, labels: labels}, methylation:{CG:true, CHG:true, CHH:true}, output: {format: format, zoom: zoom, quality: quality, width: width, height: height} };
+    },
+
+    _getTrackParameters: function(){
+        var thisB = this;
+        var out = {};
+        array.forEach(this.vTracks, function(track, i){
+           var tType = track.config.type;
+            // handle parameters by type
+            out[track.config.label] = thisB._handleTrackTypeParameters(i, tType, track.config);
+        });
+        return out;
+    },
+
+    _handleTrackTypeParameters: function(iter, tType, config){
+        var out = {key:config.key, trackNum: iter};
+        // DNA sequence has no options for now
+        if(/\b(Sequence)/.test( tType )){
+            lang.mixin(out,{opts:false});
+            return out;
+        }
+        // test methylation tracks
+       if(/\b(MethylPlot)/.test( tType )|| /\b(MethylPlot)/.test( tType )){
+            /*lang.mixin(out,{methyl:{CG: config.showCG, CHG: config.showCHG, CHH: config.showCHH}});*/
+            // also mixin the bigwig like features
+            lang.mixin(out, {ypos:{title: 'Y-scale position',  value:config.yScalePosition},
+                             height: {title: 'Track height', value:config.style.height, delta:10},
+                             min: {title: 'Min. score', value:config.min_score, delta:0.1},
+                             max: {title: 'Max. score', value:config.max_score, delta:0.1},
+                             quant:true});
+        }
+        // test bigwig
+        else if(/\b(XYPlot)/.test( tType ) || /\b(XYDensity)/.test( tType )){
+            lang.mixin(out, {ypos: {title: 'Y-scale position',  value:config.yScalePosition},
+                             height: {title: 'Track height', value:config.style.height, delta:10},
+                             min: {title: 'Min. score', value:config.min_score, delta:10},
+                             max: {title: 'Max. score', value:config.max_score, delta:10},
+                             quant:true});
+        }
+        // else get track height from maxHeight and set ypos = false
+        else{
+            lang.mixin(out, {height:{title: 'Track height', value:config.maxHeight, delta:10},
+                             ypos: false});
+        }
+        // Canvas/Alignments2 have maxHeight option and possibly histogram with min/max and height
+        // test for histograms
+        if(config.histograms !== undefined){
+            lang.mixin(out, {ypos: {title: 'Y-scale position',  value:config.yScalePosition},
+                             min: {title: 'Min. score', value:config.histograms.min, delta:10},
+                             max: {title: 'Max. score', value:config.histograms.max, delta:10},
+                             quant: false});
+        }
+        return out;
+    },
+
+    _getPhantomJSUrl: function(scParams, jsParams){
+        // get current url
+        var currentUrl = this.browser.makeCurrentViewURL();
+        //var currentUrl = 'http://epigenome.genetics.uga.edu/JBrowse/?data=eutrema&loc=scaffold_1%3A8767030..14194216&tracks=DNA%2Cgenes%2Crepeats%2Ces_h3_1.bw_coverage%2Crna_reads%2Ces_h3k56ac.bw_coverage&highlight=';
+        // encode scParams
+        var scEncode = Util.encode(scParams);
+        currentUrl += '&screenshot='+scEncode;
+        currentUrl = currentUrl.replace(/\u0026/g,'%26');
+        // encode jsParams
+        jsParams['url'] = currentUrl;
+        var jsEncode = Util.encodePhantomJSSettings(jsParams);
+        // put it all together
+        return this.requestUrl + jsEncode;
+    }
+});
+});
+
+},
+'dijit/layout/AccordionContainer':function(){
+define([
+	"require",
+	"dojo/_base/array", // array.forEach array.map
+	"dojo/_base/declare", // declare
+	"dojo/_base/fx", // fx.Animation
+	"dojo/dom", // dom.setSelectable
+	"dojo/dom-attr", // domAttr.attr
+	"dojo/dom-class", // domClass.remove
+	"dojo/dom-construct", // domConstruct.place
+	"dojo/dom-geometry",
+	"dojo/keys", // keys
+	"dojo/_base/lang", // lang.getObject lang.hitch
+	"dojo/sniff", // has("ie") has("dijit-legacy-requires")
+	"dojo/topic", // publish
+	"../focus", // focus.focus()
+	"../_base/manager", // manager.defaultDuration
+	"dojo/ready",
+	"../_Widget",
+	"../_Container",
+	"../_TemplatedMixin",
+	"../_CssStateMixin",
+	"./StackContainer",
+	"./ContentPane",
+	"dojo/text!./templates/AccordionButton.html",
+	"../a11yclick" // AccordionButton template uses ondijitclick; not for keyboard, but for responsive touch.
+], function(require, array, declare, fx, dom, domAttr, domClass, domConstruct, domGeometry, keys, lang, has, topic,
+			focus, manager, ready, _Widget, _Container, _TemplatedMixin, _CssStateMixin, StackContainer, ContentPane, template){
+
+	// module:
+	//		dijit/layout/AccordionContainer
+
+
+	// Design notes:
+	//
+	// An AccordionContainer is a StackContainer, but each child (typically ContentPane)
+	// is wrapped in a _AccordionInnerContainer.   This is hidden from the caller.
+	//
+	// The resulting markup will look like:
+	//
+	//	<div class=dijitAccordionContainer>
+	//		<div class=dijitAccordionInnerContainer>	(one pane)
+	//				<div class=dijitAccordionTitle>		(title bar) ... </div>
+	//				<div class=dijtAccordionChildWrapper>   (content pane) </div>
+	//		</div>
+	//	</div>
+	//
+	// Normally the dijtAccordionChildWrapper is hidden for all but one child (the shown
+	// child), so the space for the content pane is all the title bars + the one dijtAccordionChildWrapper,
+	// which on claro has a 1px border plus a 2px bottom margin.
+	//
+	// During animation there are two dijtAccordionChildWrapper's shown, so we need
+	// to compensate for that.
+
+	var AccordionButton = declare("dijit.layout._AccordionButton", [_Widget, _TemplatedMixin, _CssStateMixin], {
+		// summary:
+		//		The title bar to click to open up an accordion pane.
+		//		Internal widget used by AccordionContainer.
+		// tags:
+		//		private
+
+		templateString: template,
+
+		// label: String
+		//		Title of the pane
+		label: "",
+		_setLabelAttr: {node: "titleTextNode", type: "innerHTML" },
+
+		// title: String
+		//		Tooltip that appears on hover
+		title: "",
+		_setTitleAttr: {node: "titleTextNode", type: "attribute", attribute: "title"},
+
+		// iconClassAttr: String
+		//		CSS class for icon to left of label
+		iconClassAttr: "",
+		_setIconClassAttr: { node: "iconNode", type: "class" },
+
+		baseClass: "dijitAccordionTitle",
+
+		getParent: function(){
+			// summary:
+			//		Returns the AccordionContainer parent.
+			// tags:
+			//		private
+			return this.parent;
+		},
+
+		buildRendering: function(){
+			this.inherited(arguments);
+			var titleTextNodeId = this.id.replace(' ', '_');
+			domAttr.set(this.titleTextNode, "id", titleTextNodeId + "_title");
+			this.focusNode.setAttribute("aria-labelledby", domAttr.get(this.titleTextNode, "id"));
+			dom.setSelectable(this.domNode, false);
+		},
+
+		getTitleHeight: function(){
+			// summary:
+			//		Returns the height of the title dom node.
+			return domGeometry.getMarginSize(this.domNode).h;	// Integer
+		},
+
+		// TODO: maybe the parent should set these methods directly rather than forcing the code
+		// into the button widget?
+		_onTitleClick: function(){
+			// summary:
+			//		Callback when someone clicks my title.
+			var parent = this.getParent();
+			parent.selectChild(this.contentWidget, true);
+			focus.focus(this.focusNode);
+		},
+
+		_onTitleKeyDown: function(/*Event*/ evt){
+			return this.getParent()._onKeyDown(evt, this.contentWidget);
+		},
+
+		_setSelectedAttr: function(/*Boolean*/ isSelected){
+			this._set("selected", isSelected);
+			this.focusNode.setAttribute("aria-expanded", isSelected ? "true" : "false");
+			this.focusNode.setAttribute("aria-selected", isSelected ? "true" : "false");
+			this.focusNode.setAttribute("tabIndex", isSelected ? "0" : "-1");
+		}
+	});
+
+	if(has("dojo-bidi")){
+		AccordionButton.extend({
+			_setLabelAttr: function(label){
+				this._set("label", label);
+				domAttr.set(this.titleTextNode, "innerHTML", label);
+				this.applyTextDir(this.titleTextNode);
+			},
+
+			_setTitleAttr: function(title){
+				this._set("title", title);
+				domAttr.set(this.titleTextNode, "title", title);
+				this.applyTextDir(this.titleTextNode);
+			}
+		});
+	}
+
+	var AccordionInnerContainer = declare("dijit.layout._AccordionInnerContainer" + (has("dojo-bidi") ? "_NoBidi" : ""), [_Widget, _CssStateMixin], {
+		// summary:
+		//		Internal widget placed as direct child of AccordionContainer.containerNode.
+		//		When other widgets are added as children to an AccordionContainer they are wrapped in
+		//		this widget.
+
+		/*=====
+		 // buttonWidget: Function|String
+		 //		Class to use to instantiate title
+		 //		(Wish we didn't have a separate widget for just the title but maintaining it
+		 //		for backwards compatibility, is it worth it?)
+		 buttonWidget: null,
+		 =====*/
+
+		/*=====
+		 // contentWidget: dijit/_WidgetBase
+		 //		Pointer to the real child widget
+		 contentWidget: null,
+		 =====*/
+
+		baseClass: "dijitAccordionInnerContainer",
+
+		// tell nested layout widget that we will take care of sizing
+		isLayoutContainer: true,
+
+		buildRendering: function(){
+			// Builds a template like:
+			//	<div class=dijitAccordionInnerContainer>
+			//		Button
+			//		<div class=dijitAccordionChildWrapper>
+			//			ContentPane
+			//		</div>
+			//	</div>
+
+			// Create wrapper div, placed where the child is now
+			this.domNode = domConstruct.place("<div class='" + this.baseClass +
+				"' role='presentation'>", this.contentWidget.domNode, "after");
+
+			// wrapper div's first child is the button widget (ie, the title bar)
+			var child = this.contentWidget,
+				cls = lang.isString(this.buttonWidget) ? lang.getObject(this.buttonWidget) : this.buttonWidget;
+			this.button = child._buttonWidget = (new cls({
+				contentWidget: child,
+				label: child.title,
+				title: child.tooltip,
+				dir: child.dir,
+				lang: child.lang,
+				textDir: child.textDir || this.textDir,
+				iconClass: child.iconClass,
+				id: child.id + "_button",
+				parent: this.parent
+			})).placeAt(this.domNode);
+
+			// and then the actual content widget (changing it from prior-sibling to last-child),
+			// wrapped by a <div class=dijitAccordionChildWrapper>
+			this.containerNode = domConstruct.place("<div class='dijitAccordionChildWrapper' role='tabpanel' style='display:none'>", this.domNode);
+			this.containerNode.setAttribute("aria-labelledby", this.button.id);
+
+			domConstruct.place(this.contentWidget.domNode, this.containerNode);
+		},
+
+		postCreate: function(){
+			this.inherited(arguments);
+
+			// Map changes in content widget's title etc. to changes in the button
+			var button = this.button,
+				cw = this.contentWidget;
+			this._contentWidgetWatches = [
+				cw.watch('title', lang.hitch(this, function(name, oldValue, newValue){
+					button.set("label", newValue);
+				})),
+				cw.watch('tooltip', lang.hitch(this, function(name, oldValue, newValue){
+					button.set("title", newValue);
+				})),
+				cw.watch('iconClass', lang.hitch(this, function(name, oldValue, newValue){
+					button.set("iconClass", newValue);
+				}))
+			];
+		},
+
+		_setSelectedAttr: function(/*Boolean*/ isSelected){
+			this._set("selected", isSelected);
+			this.button.set("selected", isSelected);
+			if(isSelected){
+				var cw = this.contentWidget;
+				if(cw.onSelected){
+					cw.onSelected();
+				}
+			}
+		},
+
+		startup: function(){
+			// Called by _Container.addChild()
+			this.contentWidget.startup();
+		},
+
+		destroy: function(){
+			this.button.destroyRecursive();
+
+			array.forEach(this._contentWidgetWatches || [], function(w){
+				w.unwatch();
+			});
+
+			delete this.contentWidget._buttonWidget;
+			delete this.contentWidget._wrapperWidget;
+
+			this.inherited(arguments);
+		},
+
+		destroyDescendants: function(/*Boolean*/ preserveDom){
+			// since getChildren isn't working for me, have to code this manually
+			this.contentWidget.destroyRecursive(preserveDom);
+		}
+	});
+
+	if(has("dojo-bidi")){
+		AccordionInnerContainer = declare("dijit.layout._AccordionInnerContainer", AccordionInnerContainer, {
+			postCreate: function(){
+				this.inherited(arguments);
+
+				// Map changes in content widget's textdir to changes in the button
+				var button = this.button;
+				this._contentWidgetWatches.push(
+					this.contentWidget.watch("textDir", function(name, oldValue, newValue){
+						button.set("textDir", newValue);
+					})
+				);
+			}
+		});
+	}
+
+	var AccordionContainer = declare("dijit.layout.AccordionContainer", StackContainer, {
+		// summary:
+		//		Holds a set of panes where every pane's title is visible, but only one pane's content is visible at a time,
+		//		and switching between panes is visualized by sliding the other panes up/down.
+		// example:
+		//	|	<div data-dojo-type="dijit/layout/AccordionContainer">
+		//	|		<div data-dojo-type="dijit/layout/ContentPane" title="pane 1">
+		//	|		</div>
+		//	|		<div data-dojo-type="dijit/layout/ContentPane" title="pane 2">
+		//	|			<p>This is some text</p>
+		//	|		</div>
+		//	|	</div>
+
+		// duration: Integer
+		//		Amount of time (in ms) it takes to slide panes
+		duration: manager.defaultDuration,
+
+		// buttonWidget: [const] String
+		//		The name of the widget used to display the title of each pane
+		buttonWidget: AccordionButton,
+
+		/*=====
+		 // _verticalSpace: Number
+		 //		Pixels of space available for the open pane
+		 //		(my content box size minus the cumulative size of all the title bars)
+		 _verticalSpace: 0,
+		 =====*/
+		baseClass: "dijitAccordionContainer",
+
+		buildRendering: function(){
+			this.inherited(arguments);
+			this.domNode.style.overflow = "hidden";		// TODO: put this in dijit.css
+			this.domNode.setAttribute("role", "tablist");
+		},
+
+		startup: function(){
+			if(this._started){
+				return;
+			}
+			this.inherited(arguments);
+			if(this.selectedChildWidget){
+				this.selectedChildWidget._wrapperWidget.set("selected", true);
+			}
+		},
+
+		layout: function(){
+			// Implement _LayoutWidget.layout() virtual method.
+			// Set the height of the open pane based on what room remains.
+
+			var openPane = this.selectedChildWidget;
+
+			if(!openPane){
+				return;
+			}
+
+			// space taken up by title, plus wrapper div (with border/margin) for open pane
+			var wrapperDomNode = openPane._wrapperWidget.domNode,
+				wrapperDomNodeMargin = domGeometry.getMarginExtents(wrapperDomNode),
+				wrapperDomNodePadBorder = domGeometry.getPadBorderExtents(wrapperDomNode),
+				wrapperContainerNode = openPane._wrapperWidget.containerNode,
+				wrapperContainerNodeMargin = domGeometry.getMarginExtents(wrapperContainerNode),
+				wrapperContainerNodePadBorder = domGeometry.getPadBorderExtents(wrapperContainerNode),
+				mySize = this._contentBox;
+
+			// get cumulative height of all the unselected title bars
+			var totalCollapsedHeight = 0;
+			array.forEach(this.getChildren(), function(child){
+				if(child != openPane){
+					// Using domGeometry.getMarginSize() rather than domGeometry.position() since claro has 1px bottom margin
+					// to separate accordion panes.  Not sure that works perfectly, it's probably putting a 1px
+					// margin below the bottom pane (even though we don't want one).
+					totalCollapsedHeight += domGeometry.getMarginSize(child._wrapperWidget.domNode).h;
+				}
+			});
+			this._verticalSpace = mySize.h - totalCollapsedHeight - wrapperDomNodeMargin.h
+				- wrapperDomNodePadBorder.h - wrapperContainerNodeMargin.h - wrapperContainerNodePadBorder.h
+				- openPane._buttonWidget.getTitleHeight();
+
+			// Memo size to make displayed child
+			this._containerContentBox = {
+				h: this._verticalSpace,
+				w: this._contentBox.w - wrapperDomNodeMargin.w - wrapperDomNodePadBorder.w
+					- wrapperContainerNodeMargin.w - wrapperContainerNodePadBorder.w
+			};
+
+			if(openPane){
+				openPane.resize(this._containerContentBox);
+			}
+		},
+
+		_setupChild: function(child){
+			// Overrides _LayoutWidget._setupChild().
+			// Put wrapper widget around the child widget, showing title
+
+			child._wrapperWidget = AccordionInnerContainer({
+				contentWidget: child,
+				buttonWidget: this.buttonWidget,
+				id: child.id + "_wrapper",
+				dir: child.dir,
+				lang: child.lang,
+				textDir: child.textDir || this.textDir,
+				parent: this
+			});
+
+			this.inherited(arguments);
+
+			// Since we are wrapping children in AccordionInnerContainer, replace the default
+			// wrapper that we created in StackContainer.
+			domConstruct.place(child.domNode, child._wrapper, "replace");
+		},
+
+		removeChild: function(child){
+			// Overrides _LayoutWidget.removeChild().
+
+			// Destroy wrapper widget first, before StackContainer.getChildren() call.
+			// Replace wrapper widget with true child widget (ContentPane etc.).
+			// This step only happens if the AccordionContainer has been started; otherwise there's no wrapper.
+			// (TODO: since StackContainer destroys child._wrapper, maybe it can do this step too?)
+			if(child._wrapperWidget){
+				domConstruct.place(child.domNode, child._wrapperWidget.domNode, "after");
+				child._wrapperWidget.destroy();
+				delete child._wrapperWidget;
+			}
+
+			domClass.remove(child.domNode, "dijitHidden");
+
+			this.inherited(arguments);
+		},
+
+		getChildren: function(){
+			// Overrides _Container.getChildren() to return content panes rather than internal AccordionInnerContainer panes
+			return array.map(this.inherited(arguments), function(child){
+				return child.declaredClass == "dijit.layout._AccordionInnerContainer" ? child.contentWidget : child;
+			}, this);
+		},
+
+		destroy: function(){
+			if(this._animation){
+				this._animation.stop();
+			}
+			array.forEach(this.getChildren(), function(child){
+				// If AccordionContainer has been started, then each child has a wrapper widget which
+				// also needs to be destroyed.
+				if(child._wrapperWidget){
+					child._wrapperWidget.destroy();
+				}else{
+					child.destroyRecursive();
+				}
+			});
+			this.inherited(arguments);
+		},
+
+		_showChild: function(child){
+			// Override StackContainer._showChild() to set visibility of _wrapperWidget.containerNode
+			child._wrapperWidget.containerNode.style.display = "block";
+			return this.inherited(arguments);
+		},
+
+		_hideChild: function(child){
+			// Override StackContainer._showChild() to set visibility of _wrapperWidget.containerNode
+			child._wrapperWidget.containerNode.style.display = "none";
+			this.inherited(arguments);
+		},
+
+		_transition: function(/*dijit/_WidgetBase?*/ newWidget, /*dijit/_WidgetBase?*/ oldWidget, /*Boolean*/ animate){
+			// Overrides StackContainer._transition() to provide sliding of title bars etc.
+
+			if(has("ie") < 8){
+				// workaround animation bugs by not animating; not worth supporting animation for IE6 & 7
+				animate = false;
+			}
+
+			if(this._animation){
+				// there's an in-progress animation.  speedily end it so we can do the newly requested one
+				this._animation.stop(true);
+				delete this._animation;
+			}
+
+			var self = this;
+
+			if(newWidget){
+				newWidget._wrapperWidget.set("selected", true);
+
+				var d = this._showChild(newWidget);	// prepare widget to be slid in
+
+				// Size the new widget, in case this is the first time it's being shown,
+				// or I have been resized since the last time it was shown.
+				// Note that page must be visible for resizing to work.
+				if(this.doLayout && newWidget.resize){
+					newWidget.resize(this._containerContentBox);
+				}
+			}
+
+			if(oldWidget){
+				oldWidget._wrapperWidget.set("selected", false);
+				if(!animate){
+					this._hideChild(oldWidget);
+				}
+			}
+
+			if(animate){
+				var newContents = newWidget._wrapperWidget.containerNode,
+					oldContents = oldWidget._wrapperWidget.containerNode;
+
+				// During the animation we will be showing two dijitAccordionChildWrapper nodes at once,
+				// which on claro takes up 4px extra space (compared to stable AccordionContainer).
+				// Have to compensate for that by immediately shrinking the pane being closed.
+				var wrapperContainerNode = newWidget._wrapperWidget.containerNode,
+					wrapperContainerNodeMargin = domGeometry.getMarginExtents(wrapperContainerNode),
+					wrapperContainerNodePadBorder = domGeometry.getPadBorderExtents(wrapperContainerNode),
+					animationHeightOverhead = wrapperContainerNodeMargin.h + wrapperContainerNodePadBorder.h;
+
+				oldContents.style.height = (self._verticalSpace - animationHeightOverhead) + "px";
+
+				this._animation = new fx.Animation({
+					node: newContents,
+					duration: this.duration,
+					curve: [1, this._verticalSpace - animationHeightOverhead - 1],
+					onAnimate: function(value){
+						value = Math.floor(value);	// avoid fractional values
+						newContents.style.height = value + "px";
+						oldContents.style.height = (self._verticalSpace - animationHeightOverhead - value) + "px";
+					},
+					onEnd: function(){
+						delete self._animation;
+						newContents.style.height = "auto";
+						oldWidget._wrapperWidget.containerNode.style.display = "none";
+						oldContents.style.height = "auto";
+						self._hideChild(oldWidget);
+					}
+				});
+				this._animation.onStop = this._animation.onEnd;
+				this._animation.play();
+			}
+
+			return d;	// If child has an href, promise that fires when the widget has finished loading
+		},
+
+		// note: we are treating the container as controller here
+		_onKeyDown: function(/*Event*/ e, /*dijit/_WidgetBase*/ fromTitle){
+			// summary:
+			//		Handle keydown events
+			// description:
+			//		This is called from a handler on AccordionContainer.domNode
+			//		(setup in StackContainer), and is also called directly from
+			//		the click handler for accordion labels
+			if(this.disabled || e.altKey || !(fromTitle || e.ctrlKey)){
+				return;
+			}
+			var c = e.keyCode;
+			if((fromTitle && (c == keys.LEFT_ARROW || c == keys.UP_ARROW)) ||
+				(e.ctrlKey && c == keys.PAGE_UP)){
+				this._adjacent(false)._buttonWidget._onTitleClick();
+				e.stopPropagation();
+				e.preventDefault();
+			}else if((fromTitle && (c == keys.RIGHT_ARROW || c == keys.DOWN_ARROW)) ||
+				(e.ctrlKey && (c == keys.PAGE_DOWN || c == keys.TAB))){
+				this._adjacent(true)._buttonWidget._onTitleClick();
+				e.stopPropagation();
+				e.preventDefault();
+			}
+		}
+	});
+
+	// Back compat w/1.6, remove for 2.0
+	if(has("dijit-legacy-requires")){
+		ready(0, function(){
+			var requires = ["dijit/layout/AccordionPane"];
+			require(requires);	// use indirection so modules not rolled into a build
+		});
+	}
+
+	// For monkey patching
+	AccordionContainer._InnerContainer = AccordionInnerContainer;
+	AccordionContainer._Button = AccordionButton;
+
+	return AccordionContainer;
+});
+
+},
+'dijit/layout/StackContainer':function(){
+define([
+	"dojo/_base/array", // array.forEach array.indexOf array.some
+	"dojo/cookie", // cookie
+	"dojo/_base/declare", // declare
+	"dojo/dom-class", // domClass.add domClass.replace
+	"dojo/dom-construct",
+	"dojo/has", // has("dijit-legacy-requires")
+	"dojo/_base/lang", // lang.extend
+	"dojo/on",
+	"dojo/ready",
+	"dojo/topic", // publish
+	"dojo/when",
+	"../registry", // registry.byId
+	"../_WidgetBase",
+	"./_LayoutWidget",
+	"dojo/i18n!../nls/common"
+], function(array, cookie, declare, domClass, domConstruct, has, lang, on, ready, topic, when, registry, _WidgetBase, _LayoutWidget){
+
+	// module:
+	//		dijit/layout/StackContainer
+
+	// Back compat w/1.6, remove for 2.0
+	if(has("dijit-legacy-requires")){
+		ready(0, function(){
+			var requires = ["dijit/layout/StackController"];
+			require(requires);	// use indirection so modules not rolled into a build
+		});
+	}
+
+	var StackContainer = declare("dijit.layout.StackContainer", _LayoutWidget, {
+		// summary:
+		//		A container that has multiple children, but shows only
+		//		one child at a time
+		//
+		// description:
+		//		A container for widgets (ContentPanes, for example) That displays
+		//		only one Widget at a time.
+		//
+		//		Publishes topics [widgetId]-addChild, [widgetId]-removeChild, and [widgetId]-selectChild
+		//
+		//		Can be base class for container, Wizard, Show, etc.
+		//
+		//		See `StackContainer.ChildWidgetProperties` for details on the properties that can be set on
+		//		children of a `StackContainer`.
+
+		// doLayout: Boolean
+		//		If true, change the size of my currently displayed child to match my size
+		doLayout: true,
+
+		// persist: Boolean
+		//		Remembers the selected child across sessions
+		persist: false,
+
+		baseClass: "dijitStackContainer",
+
+		/*=====
+		// selectedChildWidget: [readonly] dijit._Widget
+		//		References the currently selected child widget, if any.
+		//		Adjust selected child with selectChild() method.
+		selectedChildWidget: null,
+		=====*/
+
+		buildRendering: function(){
+			this.inherited(arguments);
+			domClass.add(this.domNode, "dijitLayoutContainer");
+		},
+
+		postCreate: function(){
+			this.inherited(arguments);
+			this.own(
+				on(this.domNode, "keydown", lang.hitch(this, "_onKeyDown"))
+			);
+		},
+
+		startup: function(){
+			if(this._started){
+				return;
+			}
+
+			var children = this.getChildren();
+
+			// Setup each page panel to be initially hidden
+			array.forEach(children, this._setupChild, this);
+
+			// Figure out which child to initially display, defaulting to first one
+			if(this.persist){
+				this.selectedChildWidget = registry.byId(cookie(this.id + "_selectedChild"));
+			}else{
+				array.some(children, function(child){
+					if(child.selected){
+						this.selectedChildWidget = child;
+					}
+					return child.selected;
+				}, this);
+			}
+			var selected = this.selectedChildWidget;
+			if(!selected && children[0]){
+				selected = this.selectedChildWidget = children[0];
+				selected.selected = true;
+			}
+
+			// Publish information about myself so any StackControllers can initialize.
+			// This needs to happen before this.inherited(arguments) so that for
+			// TabContainer, this._contentBox doesn't include the space for the tab labels.
+			topic.publish(this.id + "-startup", {children: children, selected: selected, textDir: this.textDir});
+
+			// Startup each child widget, and do initial layout like setting this._contentBox,
+			// then calls this.resize() which does the initial sizing on the selected child.
+			this.inherited(arguments);
+		},
+
+		resize: function(){
+			// Overrides _LayoutWidget.resize()
+			// Resize is called when we are first made visible (it's called from startup()
+			// if we are initially visible). If this is the first time we've been made
+			// visible then show our first child.
+			if(!this._hasBeenShown){
+				this._hasBeenShown = true;
+				var selected = this.selectedChildWidget;
+				if(selected){
+					this._showChild(selected);
+				}
+			}
+			this.inherited(arguments);
+		},
+
+		_setupChild: function(/*dijit/_WidgetBase*/ child){
+			// Overrides _LayoutWidget._setupChild()
+
+			// For aria support, wrap child widget in a <div role="tabpanel">
+			var childNode = child.domNode,
+				wrapper = domConstruct.place(
+					"<div role='tabpanel' class='" + this.baseClass + "ChildWrapper dijitHidden'>",
+					child.domNode,
+					"replace"),
+				label = child["aria-label"] || child.title || child.label;
+			if(label){
+				// setAttribute() escapes special chars, and if() statement avoids setting aria-label="undefined"
+				wrapper.setAttribute("aria-label", label);
+			}
+			domConstruct.place(childNode, wrapper);
+			child._wrapper = wrapper;	// to set the aria-labelledby in StackController
+
+			this.inherited(arguments);
+
+			// child may have style="display: none" (at least our test cases do), so remove that
+			if(childNode.style.display == "none"){
+				childNode.style.display = "block";
+			}
+
+			// remove the title attribute so it doesn't show up when i hover over a node
+			child.domNode.title = "";
+		},
+
+		addChild: function(/*dijit/_WidgetBase*/ child, /*Integer?*/ insertIndex){
+			// Overrides _Container.addChild() to do layout and publish events
+
+			this.inherited(arguments);
+
+			if(this._started){
+				topic.publish(this.id + "-addChild", child, insertIndex);	// publish
+
+				// in case the tab titles have overflowed from one line to two lines
+				// (or, if this if first child, from zero lines to one line)
+				// TODO: w/ScrollingTabController this is no longer necessary, although
+				// ScrollTabController.resize() does need to get called to show/hide
+				// the navigation buttons as appropriate, but that's handled in ScrollingTabController.onAddChild().
+				// If this is updated to not layout [except for initial child added / last child removed], update
+				// "childless startup" test in StackContainer.html to check for no resize event after second addChild()
+				this.layout();
+
+				// if this is the first child, then select it
+				if(!this.selectedChildWidget){
+					this.selectChild(child);
+				}
+			}
+		},
+
+		removeChild: function(/*dijit/_WidgetBase*/ page){
+			// Overrides _Container.removeChild() to do layout and publish events
+
+			var idx = array.indexOf(this.getChildren(), page);
+
+			this.inherited(arguments);
+
+			// Remove the child widget wrapper we use to set aria roles.  This won't affect the page itself since it's
+			// already been detached from page._wrapper via the this.inherited(arguments) call above.
+			domConstruct.destroy(page._wrapper);
+			delete page._wrapper;
+
+			if(this._started){
+				// This will notify any tablists to remove a button; do this first because it may affect sizing.
+				topic.publish(this.id + "-removeChild", page);
+			}
+
+			// If all our children are being destroyed than don't run the code below (to select another page),
+			// because we are deleting every page one by one
+			if(this._descendantsBeingDestroyed){
+				return;
+			}
+
+			// Select new page to display, also updating TabController to show the respective tab.
+			// Do this before layout call because it can affect the height of the TabController.
+			if(this.selectedChildWidget === page){
+				this.selectedChildWidget = undefined;
+				if(this._started){
+					var children = this.getChildren();
+					if(children.length){
+						this.selectChild(children[Math.max(idx - 1, 0)]);
+					}
+				}
+			}
+
+			if(this._started){
+				// In case the tab titles now take up one line instead of two lines
+				// (note though that ScrollingTabController never overflows to multiple lines),
+				// or the height has changed slightly because of addition/removal of tab which close icon
+				this.layout();
+			}
+		},
+
+		selectChild: function(/*dijit/_WidgetBase|String*/ page, /*Boolean*/ animate){
+			// summary:
+			//		Show the given widget (which must be one of my children)
+			// page:
+			//		Reference to child widget or id of child widget
+
+			var d;
+
+			page = registry.byId(page);
+
+			if(this.selectedChildWidget != page){
+				// Deselect old page and select new one
+				d = this._transition(page, this.selectedChildWidget, animate);
+				this._set("selectedChildWidget", page);
+				topic.publish(this.id + "-selectChild", page);	// publish
+
+				if(this.persist){
+					cookie(this.id + "_selectedChild", this.selectedChildWidget.id);
+				}
+			}
+
+			// d may be null, or a scalar like true.  Return a promise in all cases
+			return when(d || true);		// Promise
+		},
+
+		_transition: function(newWidget, oldWidget /*===== ,  animate =====*/){
+			// summary:
+			//		Hide the old widget and display the new widget.
+			//		Subclasses should override this.
+			// newWidget: dijit/_WidgetBase
+			//		The newly selected widget.
+			// oldWidget: dijit/_WidgetBase
+			//		The previously selected widget.
+			// animate: Boolean
+			//		Used by AccordionContainer to turn on/off slide effect.
+			// tags:
+			//		protected extension
+			if(oldWidget){
+				this._hideChild(oldWidget);
+			}
+			var d = this._showChild(newWidget);
+
+			// Size the new widget, in case this is the first time it's being shown,
+			// or I have been resized since the last time it was shown.
+			// Note that page must be visible for resizing to work.
+			if(newWidget.resize){
+				if(this.doLayout){
+					newWidget.resize(this._containerContentBox || this._contentBox);
+				}else{
+					// the child should pick it's own size but we still need to call resize()
+					// (with no arguments) to let the widget lay itself out
+					newWidget.resize();
+				}
+			}
+
+			return d;	// If child has an href, promise that fires when the child's href finishes loading
+		},
+
+		_adjacent: function(/*Boolean*/ forward){
+			// summary:
+			//		Gets the next/previous child widget in this container from the current selection.
+
+			// TODO: remove for 2.0 if this isn't being used.   Otherwise, fix to skip disabled tabs.
+
+			var children = this.getChildren();
+			var index = array.indexOf(children, this.selectedChildWidget);
+			index += forward ? 1 : children.length - 1;
+			return children[ index % children.length ]; // dijit/_WidgetBase
+		},
+
+		forward: function(){
+			// summary:
+			//		Advance to next page.
+			return this.selectChild(this._adjacent(true), true);
+		},
+
+		back: function(){
+			// summary:
+			//		Go back to previous page.
+			return this.selectChild(this._adjacent(false), true);
+		},
+
+		_onKeyDown: function(e){
+			topic.publish(this.id + "-containerKeyDown", { e: e, page: this});	// publish
+		},
+
+		layout: function(){
+			// Implement _LayoutWidget.layout() virtual method.
+			var child = this.selectedChildWidget;
+			if(child && child.resize){
+				if(this.doLayout){
+					child.resize(this._containerContentBox || this._contentBox);
+				}else{
+					child.resize();
+				}
+			}
+		},
+
+		_showChild: function(/*dijit/_WidgetBase*/ page){
+			// summary:
+			//		Show the specified child by changing it's CSS, and call _onShow()/onShow() so
+			//		it can do any updates it needs regarding loading href's etc.
+			// returns:
+			//		Promise that fires when page has finished showing, or true if there's no href
+			var children = this.getChildren();
+			page.isFirstChild = (page == children[0]);
+			page.isLastChild = (page == children[children.length - 1]);
+			page._set("selected", true);
+
+			if(page._wrapper){	// false if not started yet
+				domClass.replace(page._wrapper, "dijitVisible", "dijitHidden");
+			}
+
+			return (page._onShow && page._onShow()) || true;
+		},
+
+		_hideChild: function(/*dijit/_WidgetBase*/ page){
+			// summary:
+			//		Hide the specified child by changing it's CSS, and call _onHide() so
+			//		it's notified.
+			page._set("selected", false);
+
+			if(page._wrapper){	// false if not started yet
+				domClass.replace(page._wrapper, "dijitHidden", "dijitVisible");
+			}
+
+			page.onHide && page.onHide();
+		},
+
+		closeChild: function(/*dijit/_WidgetBase*/ page){
+			// summary:
+			//		Callback when user clicks the [X] to remove a page.
+			//		If onClose() returns true then remove and destroy the child.
+			// tags:
+			//		private
+			var remove = page.onClose && page.onClose(this, page);
+			if(remove){
+				this.removeChild(page);
+				// makes sure we can clean up executeScripts in ContentPane onUnLoad
+				page.destroyRecursive();
+			}
+		},
+
+		destroyDescendants: function(/*Boolean*/ preserveDom){
+			this._descendantsBeingDestroyed = true;
+			this.selectedChildWidget = undefined;
+			array.forEach(this.getChildren(), function(child){
+				if(!preserveDom){
+					this.removeChild(child);
+				}
+				child.destroyRecursive(preserveDom);
+			}, this);
+			this._descendantsBeingDestroyed = false;
+		}
+	});
+
+	StackContainer.ChildWidgetProperties = {
+		// summary:
+		//		These properties can be specified for the children of a StackContainer.
+
+		// selected: Boolean
+		//		Specifies that this widget should be the initially displayed pane.
+		//		Note: to change the selected child use `dijit/layout/StackContainer.selectChild`
+		selected: false,
+
+		// disabled: Boolean
+		//		Specifies that the button to select this pane should be disabled.
+		//		Doesn't affect programmatic selection of the pane, nor does it deselect the pane if it is currently selected.
+		disabled: false,
+
+		// closable: Boolean
+		//		True if user can close (destroy) this child, such as (for example) clicking the X on the tab.
+		closable: false,
+
+		// iconClass: String
+		//		CSS Class specifying icon to use in label associated with this pane.
+		iconClass: "dijitNoIcon",
+
+		// showTitle: Boolean
+		//		When true, display title of this widget as tab label etc., rather than just using
+		//		icon specified in iconClass
+		showTitle: true
+	};
+
+	// Since any widget can be specified as a StackContainer child, mix them
+	// into the base widget class.  (This is a hack, but it's effective.)
+	// This is for the benefit of the parser.   Remove for 2.0.  Also, hide from doc viewer.
+	lang.extend(_WidgetBase, /*===== {} || =====*/ StackContainer.ChildWidgetProperties);
+
+	return StackContainer;
+});
+
+},
+'ScreenShotPlugin/Util':function(){
+define( "ScreenShotPlugin/Util", [
+    'dojo/_base/declare',
+    'dojo/_base/array',
+    'dojo/json'
+    ],
+function (
+    declare,
+    array,
+    json
+) {
+var Util;
+Util = {
+    encode: function(inputs){
+    // returns string with encode options for screenshot
+        var gInputs = inputs.general;
+        var tInputs = inputs.tracks;
+        //console.log(tInputs);
+        return this._encodeGeneralSettings(gInputs) + this._endcodeTrackSettings(tInputs);
+    },
+
+    encodePhantomJSSettings: function(params){
+        // params include url, format, height, width, zoom
+        // ?request={url:"http://www.highcharts.com/demo/pie-donut",renderType:"jpg",renderSettings:{zoomFactor:2,viewport:{width:100,height:500}}}
+        var outDict = {url: params.url, renderType: params.format.value, renderSettings: {
+            zoomFactor: params.zoom.value, viewport: {width:params.width.value, height: params.height.value}}};
+        var outString = json.stringify(outDict);
+        outString = outString.replace(/\"([^(\")"]+)\":/g,"$1:");
+        return '?request='+outString;
+    },
+
+    decode: function(inStr, tracks){
+    // returns javascript object to be applied
+        // split inStr
+        var opts = inStr.split('~');
+        var trackList = tracks.split(',')
+        var gSettings = this._decodeGeneralSettings(opts[0])
+        var tSettings = this._decodeTrackSettings(opts.slice(1), trackList);
+        //console.log(tSettings);
+        return {general:gSettings, tracks:tSettings};
+    },
+
+    _encodeGeneralSettings: function(params){
+        // locOver, menu, methylation, nav, trackList, trackSpacing, labels, zoom
+        var output = '';
+        var eLabels = { zoom:'z', trackSpacing:'p', locOver: 'o', trackList:'r', nav:'n', menu:'u', labels:'b', methylation:'m'};
+        var param;
+        for(param in params){
+            var data = params[param];
+            if(param==='methylation')
+                output += eLabels[param] + this._encodeBoolean(data.CG) + this._encodeBoolean(data.CHG) + this._encodeBoolean(data.CHH);
+            else if((param==='zoom')||(param==='trackSpacing'))
+                output += eLabels[param] + data.value;
+            else
+                output += eLabels[param] + this._encodeBoolean(data.value);
+        }
+        return output;
+    },
+
+    _endcodeTrackSettings: function(tracks){
+        var output = '';
+        // go through object
+        var t, params;
+        for(t in tracks){
+            params = tracks[t];
+            // if we need to encode params
+            if (params.hasOwnProperty('opts') === false){
+                output += this._encodeTrack(params);
+            }
+        }
+        return(output);
+    },
+
+    _encodeTrack: function(params){
+        // q[0|1] quantitative, y[0|1|2|3] yscale none, center, left, right
+        // h# track height, i# min, x# max
+        var eLabels = {height: 'h', min: 'i', max: 'x', quant: 'q', ypos: 'y'};
+        var locDict = {'none': 0, 'center': 1, 'left': 2, 'right':3 };
+        var param, data;
+
+        var output = '~' + params.trackNum;
+        // loop through parameters
+        for(param in params){
+            data = params[param];
+            if(param==='quant')
+                output += eLabels[param] + this._encodeBoolean(data);
+            else if(!(data === undefined || data.value === undefined || eLabels.hasOwnProperty(param)===false )){
+                output += eLabels[param]
+                // ypos
+                if (param === 'ypos')
+                    output += locDict[data.value];
+                else
+                    output += data.value;
+            }
+        } // end param
+        return(output)
+    },
+
+    _encodeBoolean: function(input){
+        return (input ? '1' : '0');
+    },
+
+    _decodeBoolen: function(input){
+        return(input==='1' ? true : false)
+    },
+
+    _decodeGeneralSettings: function (input){
+        var outProp = {basic:{}, view:{},methylation:{}};
+        // zoom
+        var resultZ = /z([0-9]+)/gi.exec(input);
+        if (resultZ != null)
+            outProp.basic['highResolutionMode'] = parseInt(resultZ[1]);
+        // overview
+        var resultO = /o([0-1])/gi.exec(input);
+        if (resultO != null)
+            outProp.basic['show_overview'] = this._decodeBoolen(resultO[1]);
+        // tracklist
+        var resultR = /r([0-1])/gi.exec(input);
+        if (resultR != null)
+            outProp.basic['show_tracklist'] = this._decodeBoolen(resultR[1]);
+        // navigation
+        var resultN = /n([0-1])/gi.exec(input);
+        if (resultN != null)
+            outProp.basic['show_nav'] = this._decodeBoolen(resultN[1]);
+        // menu
+        var resultU = /u([0-1])/gi.exec(input);
+        if (resultU != null)
+            outProp.basic['show_menu'] = this._decodeBoolen(resultU[1]);
+        // labels
+        var resultB = /b([0-1])/gi.exec(input);
+        if (resultB != null)
+            outProp.basic['show_tracklabels'] = this._decodeBoolen(resultB[1]);
+
+        // track padding
+        var resultP = /p([0-9]+)/gi.exec(input);
+        if (resultP != null)
+            outProp.view['trackPadding'] = parseInt(resultP[1]);
+        // methylation
+        var resultM = /m([0-9]+)/gi.exec(input);
+        if (resultM != null){
+            outProp.methylation['CG'] = this._decodeBoolen(resultM[1].substring(0,1));
+            outProp.methylation['CHG'] = this._decodeBoolen(resultM[1].substring(1,2));
+            outProp.methylation['CHH'] = this._decodeBoolen(resultM[1].substring(2,3));
+        }
+        return outProp;
+    },
+
+    _decodeTrackSettings: function(input, trackLabels){
+        var thisB = this;
+        // input and trackLabels are both arrays -- iterate through input
+        var out = {};
+        array.forEach(input, function(parmStr){
+            var tInt = parseInt(parmStr.slice(0,1));
+            var tLabel = trackLabels[tInt];
+            parmStr = parmStr.slice(1);
+            out[tLabel] = {};
+            var isQuant = null;
+            // get quant
+            var resultQ = /q([0-1])/gi.exec(parmStr);
+            if (resultQ != null){
+                isQuant = thisB._decodeBoolen(resultQ[1]);
+                if(isQuant)
+                    out[tLabel]['style'] = {};
+                else
+                    out[tLabel]['histograms'] = {}
+
+            }
+            // get min
+            var resultI = /i(-?[0-9]+(\.[0-9])?)/gi.exec(parmStr);
+            //console.log(resultI);
+            if (resultI != null){
+            var min = parseFloat(resultI[1]);
+                if(isQuant)
+                    out[tLabel]['min_score'] = min;
+                else
+                    out[tLabel]['histograms']['min'] = min;
+            }
+            // get max
+            var resultX = /x(-?[0-9]+(\.[0-9])?)/gi.exec(parmStr);
+            //console.log(resultX);
+            if (resultX != null){
+            var max = parseFloat(resultX[1]);
+                if(isQuant)
+                    out[tLabel]['max_score'] = max;
+                else
+                    out[tLabel]['histograms']['max'] = max;
+            }
+            // get height
+            var resultH = /h([0-9]+)/gi.exec(parmStr);
+            //console.log(resultH);
+            if (resultH != null){
+                var height = parseInt(resultH[1]);
+                if(isQuant)
+                    out[tLabel]['style']['height'] = height;
+                else if(isQuant === false){
+                    out[tLabel]['maxHeight'] = height;
+                    out[tLabel]['histograms']['height'] = height;
+                } else {
+                    out[tLabel]['maxHeight'] = height;
+                }
+            }
+            // get ypos
+            var resultY = /y([0-3])/gi.exec(parmStr);
+            //console.log(resultY);
+            if (resultY != null){
+                var locList = ['none','center','left','right'];
+                var yposI = parseInt(resultY[1]);
+                out[tLabel]['yScalePosition'] = locList[yposI];
+            }
+        });
+        return out;
+    }
+
+}
+    return Util
+});
+
+},
+'JBrowse/Plugin':function(){
+define([
+           'dojo/_base/declare',
+           'JBrowse/Component'
+       ],
+       function( declare, Component ) {
+return declare( Component,
+{
+    constructor: function( args ) {
+        this.name = args.name;
+        this.cssLoaded = args.cssLoaded;
+        this._finalizeConfig( args.config );
+    },
+
+    _defaultConfig: function() {
+        return {
+            baseUrl: '/plugins/'+this.name
+        };
+    }
+});
+});
+},
+'url:dijit/layout/templates/AccordionButton.html':"<div data-dojo-attach-event='ondijitclick:_onTitleClick' class='dijitAccordionTitle' role=\"presentation\">\n\t<div data-dojo-attach-point='titleNode,focusNode' data-dojo-attach-event='onkeydown:_onTitleKeyDown'\n\t\t\tclass='dijitAccordionTitleFocus' role=\"tab\" aria-expanded=\"false\"\n\t\t><span class='dijitInline dijitAccordionArrow' role=\"presentation\"></span\n\t\t><span class='arrowTextUp' role=\"presentation\">+</span\n\t\t><span class='arrowTextDown' role=\"presentation\">-</span\n\t\t><span role=\"presentation\" class=\"dijitInline dijitIcon\" data-dojo-attach-point=\"iconNode\"></span>\n\t\t<span role=\"presentation\" data-dojo-attach-point='titleTextNode, textDirNode' class='dijitAccordionText'></span>\n\t</div>\n</div>\n"}});
+define('ScreenShotPlugin/main',[
+    'dojo/_base/declare',
+    'dojo/_base/lang',
+    'dojo/_base/array',
+    'dojo/dom',
+    "dojo/dom-attr",
+    'dijit/form/Button',
+    './View/Dialog/ScreenShotDialog',
+    './Util',
+    'JBrowse/Plugin',
+    "JBrowse/Browser"
+],
+function(
+    declare,
+    lang,
+    array,
+    dom,
+    domAttr,
+    dijitButton,
+    ScreenShotDialog,
+    Util,
+    JBrowsePlugin,
+    Browser
+){
+
+return declare( JBrowsePlugin,
+{
+    constructor: function( args ) {
+        var baseUrl = this._defaultConfig().baseUrl;
+        var browser = this.browser;
+        this.isScreenshot = false;
+
+        this.config.apiKey = 'a-demo-key-with-low-quota-per-ip-address';
+        // PhantomJS Username
+        if( args.config.apiKey !== undefined )
+            this.config.apiKey = args.config.apiKey;
+
+        var thisB = this;
+        console.log(browser.config);
+        browser.afterMilestone('initPlugins', function(){
+            // check for screenshot query parameters
+            if(browser.config.queryParams.hasOwnProperty('screenshot')){
+                thisB.isScreenshot = true;
+                var encoded = browser.config.queryParams.screenshot;
+                var trackList = browser.config.queryParams.tracks;
+                var decoded = Util.decode(encoded,trackList);
+                // apply
+                thisB._applyScreenshotConfig(decoded);
+                browser.afterMilestone('loadConfig', function(){
+                    thisB._applyMethylationConfig( decoded.general.methylation );
+                    thisB._applyTracksConfig(decoded.tracks);
+                });
+            }
+        });
+
+        browser.afterMilestone('initView',  function() {
+            // create screenshot button (possibly tools menu)
+            //console.log(browser);
+            var menuBar = browser.menuBar;
+            function showScreenShotDialog(){
+                new ScreenShotDialog({
+                    requestUrl: thisB._getPhantomJSUrl(),
+                    browser: browser
+                }).show();
+            }
+
+            if( browser.config.show_menu && (thisB.isScreenshot === false) ){
+                var button = new dijitButton({
+            className: 'screenshot-button',
+            innerHTML: 'Screen Shot',
+            title: 'take screen shot of browser',
+            onClick: showScreenShotDialog
+        });
+                menuBar.appendChild( button.domNode );
+            }
+            // shortcut key
+            browser.setGlobalKeyboardShortcut('s', showScreenShotDialog);
+        });
+        browser.afterMilestone('completely initialized',function(){
+            //thisB._applyTrackLabelConfig();
+        })
+    }, // end constructor
+
+    _getPhantomJSUrl: function(){
+        return 'https://phantomjscloud.com/api/browser/v2/' + this.config.apiKey + '/'
+    },
+
+    _applyScreenshotConfig: function(params){
+        // params have general and track-specific
+        // params.general have basic, methylation, view, labels
+        // Note: this.browser.config gets overwritten with each mixin
+        lang.mixin(this.browser.config, params.general.basic);
+        lang.mixin(this.browser.config.view, params.general.view);
+    },
+
+    _applyMethylationConfig: function(params){
+        var thisB = this;
+        //var methylation = thisB.decoded.methylation;
+        // check for methylation plugin
+        if(thisB.browser.plugins.hasOwnProperty('MethylationPlugin')){
+            var m,t;
+            var tracks = lang.clone(thisB.browser.trackConfigsByName);
+            for(m in params){
+                if(params[m] === false){
+                    var mix = {};
+                    mix['show'+m] = false;
+                    for(t in tracks){
+                        if(thisB._testMethylation(tracks[t].type)){
+                            lang.mixin(thisB.browser.trackConfigsByName[t], mix);
+                        }
+                    }
+                } // end if params[m] === false
+            } // end for m in params
+        } // end if MethylationPlugin
+    },
+    _testMethylation: function(trackType){
+        if(trackType === undefined || trackType === null)
+            return false;
+        return ((/\b(MethylXYPlot)/.test( trackType )  || /\b(MethylPlot)/.test( trackType ) ));
+    },
+
+    _applyTracksConfig: function(params){
+        var thisB = this;
+        var tracks = lang.clone(thisB.browser.trackConfigsByName);
+        // loop through tracks
+        var t;
+        for (t in tracks){
+            //console.log(thisB.browser.trackConfigsByName[t]);
+            if(params.hasOwnProperty(t)){
+                // pull out histograms and/or style
+                var hist = params[t].histograms;
+                if(hist !== undefined){
+                    lang.mixin(thisB.browser.trackConfigsByName[t]['histograms'], hist);
+                    delete params[t].histograms;
+                }
+                var style = params[t].style;
+                if(style !== undefined){
+                    lang.mixin(thisB.browser.trackConfigsByName[t]['style'], style);
+                    delete params[t].style;
+                }
+                lang.mixin(thisB.browser.trackConfigsByName[t], params[t]);
+            }
+        }
+    },
+
+    _applyTrackLabelConfig: function(){
+        var thisB = this;
+        if(thisB.browser.plugins.hasOwnProperty('HideTrackLabels')){
+            console.log('call')
+            thisB.browser.showTrackLabels((thisB.browser.config.show_tracklabels ? 'show' : 'hide'))
+        }
+    }
+});
+});
