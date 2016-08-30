@@ -52,7 +52,8 @@ return declare (ActionBarDialog,{
         this.vTracks = this.browser.view.visibleTracks();
         //console.log(this.vTracks);
         this.trackParameters = this._getTrackParameters();
-        //console.log(this.trackParameters);
+        this.configs = args.config || {};
+         console.log(this.configs);
      },
      
      _fillActionBar: function( actionBar ){
@@ -179,7 +180,9 @@ return declare (ActionBarDialog,{
                 input.placeAt(td,'first');
             }
         } // end for param
-        if(thisB.browser.plugins.hasOwnProperty('MethylationPlugin')){
+        if(thisB.browser.plugins.hasOwnProperty(thisB.configs.methylPlugin)){
+            var mData = thisB.browser.plugins[thisB.configs.methylPlugin].config;
+            console.log(mData);
             row = dom.create('tr',{id:'screenshot-dialog-row-methyl'},table);
             dom.create('td',{innerHTML:'Methylation',className:'screenshot-dialog-pane-label', 'colspan':2},row);
             var row2 = dom.create('tr',{'id':'screenshot-dialog-row-methyl-boxes'},table);
@@ -188,7 +191,8 @@ return declare (ActionBarDialog,{
             for (m in thisB.parameters.methylation){
                 var mbox = new dijitCheckBox({
                     id:'screenshot-dialog-methyl-'+m,
-                    'class':m+'-checkbox',
+                    //'class':m+'-checkbox',
+                    style:'background-image:url('+mData.baseUrl.slice(1)+'/img/checkmark-'+m+'.png'+');',
                     '_prop':m,
                     checked: thisB.parameters.methylation[m]
                 });

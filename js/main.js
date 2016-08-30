@@ -1025,6 +1025,11 @@ return declare( JBrowsePlugin,
         if( args.config.apiKey !== undefined )
             this.config.apiKey = args.config.apiKey;
 
+        // other plugins
+        this.config.methylPlugin = 'MethylationPlugin'
+        if( args.config.methylPlugin !== undefined )
+            this.config.methylPlugin = args.methylPlugin
+
         var thisB = this;
         browser.afterMilestone('initPlugins', function(){
             // check for screenshot query parameters
@@ -1050,7 +1055,8 @@ return declare( JBrowsePlugin,
             function showScreenShotDialog(){
                 new ScreenShotDialog({
                     requestUrl: thisB._getPhantomJSUrl(),
-                    browser: browser
+                    browser: browser,
+                    config: thisB.config
                 }).show();
             }
 
