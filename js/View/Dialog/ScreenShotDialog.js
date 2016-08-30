@@ -53,7 +53,6 @@ return declare (ActionBarDialog,{
         //console.log(this.vTracks);
         this.trackParameters = this._getTrackParameters();
         this.configs = args.config || {};
-         console.log(this.configs);
      },
      
      _fillActionBar: function( actionBar ){
@@ -182,7 +181,6 @@ return declare (ActionBarDialog,{
         } // end for param
         if(thisB.browser.plugins.hasOwnProperty(thisB.configs.methylPlugin)){
             var mData = thisB.browser.plugins[thisB.configs.methylPlugin].config;
-            console.log(mData);
             row = dom.create('tr',{id:'screenshot-dialog-row-methyl'},table);
             dom.create('td',{innerHTML:'Methylation',className:'screenshot-dialog-pane-label', 'colspan':2},row);
             var row2 = dom.create('tr',{'id':'screenshot-dialog-row-methyl-boxes'},table);
