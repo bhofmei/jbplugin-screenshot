@@ -49,19 +49,8 @@ div.screenshot-dialog-pane h2 {
   padding-top: 5px;
 }
 /* methylation checkboxes */
-div#screenshot-dialog-pane-left div.dijit.dijitReset.dijitInline.dijitCheckBox {
+div#screenshot-dialog-pane-top div.dijit.dijitReset.dijitInline.dijitCheckBox {
   margin-left: 2px;
-}
-div.dijit.dijitReset.dijitInline.CG-checkbox.dijitCheckBox {
-  margin-right: 2px;
-  background-image: url("../../MethylationPlugin/img/checkmark-cg.png");
-}
-div.dijit.dijitReset.dijitInline.CHG-checkbox.dijitCheckBox {
-  margin-right: 2px;
-  background-image: url("../../MethylationPlugin/img/checkmark-chg.png");
-}
-div.dijit.dijitReset.dijitInline.CHH-checkbox.dijitCheckBox {
-  background-image: url("../../MethylationPlugin/img/checkmark-chh.png");
 }
 .screenshot-dialog-opt-span {
   margin-left: 3px;
