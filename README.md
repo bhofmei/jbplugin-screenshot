@@ -59,6 +59,8 @@ Future support will be added for SmallRNAPlugin and SeqViewPlugin by the same au
 In jbrowse_conf.json, the plugin ID is found as `"plugins":{"ID":{"location":"..."}}`
 
 ##Future Improvements
+- Support for SeqViewsPlugin
+- For canvas features style tracks, allow for normal vs compact vs collapsed
 - Add PDF format as output type
 - Hide track labels
 - Convert canvas features to HTML features for better SVG editting
