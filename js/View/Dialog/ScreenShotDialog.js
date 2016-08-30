@@ -3,15 +3,16 @@ define( "ScreenShotPlugin/View/Dialog/ScreenShotDialog", [
     'dojo/_base/lang',
     'dojo/dom-construct',
     'dojo/_base/array',
+    'dojo/on',
     'dijit/focus',
     'dijit/form/CheckBox',
     'dijit/form/NumberSpinner',
     'dijit/form/RadioButton',
     'dijit/layout/ContentPane',
     'dijit/layout/AccordionContainer',
-    'JBrowse/View/Dialog/WithActionBar',
-    'dojo/on',
+    'dijit/layout/TabContainer',
     'dijit/form/Button',
+    'JBrowse/View/Dialog/WithActionBar',
     'JBrowse/Model/Location',
     'ScreenShotPlugin/Util'
     ],
@@ -20,15 +21,16 @@ function (
     lang,
     dom,
     array,
+    on,
     focus,
     dijitCheckBox,
     dijitNumberSpinner,
     dijitRadioButton,
     dijitContentPane,
     dijitAccordionContainer,
-    ActionBarDialog,
-    on,
+    dijitTabContainer,
     Button,
+    ActionBarDialog,
     Location,
     Util
 ) {
@@ -89,34 +91,34 @@ return declare (ActionBarDialog,{
         var thisB = this;
         dojo.addClass(this.domNode, 'screenshot-dialog');
 
-        var mainPaneLeft = dom.create('div',
+        var mainPaneTop = dom.create('div',
             {className: 'screenshot-dialog-pane',
-            id:'screenshot-dialog-pane-left'});
+            id:'screenshot-dialog-pane-top'});
 
-        var mainPaneLeftTop = new dijitContentPane({
+        var mainPaneTopLeft = new dijitContentPane({
             className: 'screenshot-dialog-pane-sub',
-            id:'screenshot-dialog-pane-left-top',
+            id:'screenshot-dialog-pane-top-left',
             title:'General configuration options'
         });
-        var mainPaneLeftT = mainPaneLeftTop.containerNode;
-        thisB._paneGen(mainPaneLeftT);
-        mainPaneLeftTop.placeAt(mainPaneLeft);
+        var mainPaneTopL = mainPaneTopLeft.containerNode;
+        thisB._paneGen(mainPaneTopL);
+        mainPaneTopLeft.placeAt(mainPaneTop);
 
 
-        var mainPaneLeftBottom = new dijitContentPane({
+        var mainPaneTopRight = new dijitContentPane({
             className:'screenshot-dialog-pane-sub',
-            id:'screenshot-dialog-pane-left-bottom',
+            id:'screenshot-dialog-pane-top-right',
             title:'Output configuration options'
         });
-        var mainPaneLeftB = mainPaneLeftBottom.containerNode;
-        thisB._paneOut(mainPaneLeftB);
-        mainPaneLeftBottom.placeAt(mainPaneLeft);
+        var mainPaneTopR = mainPaneTopRight.containerNode;
+        thisB._paneOut(mainPaneTopR);
+        mainPaneTopRight.placeAt(mainPaneTop);
 
         // for tracks
 
-       var mainPaneRight = dom.create('div',
+       var mainPaneBottom = dom.create('div',
             {className: 'screenshot-dialog-pane',
-            id:'screenshot-dialog-pane-right'});
+            id:'screenshot-dialog-pane-bottom'});
 
         /*var mainPaneRightM = new dijitContentPane({
             className: 'screenshot-dialog-pane',
@@ -124,13 +126,13 @@ return declare (ActionBarDialog,{
             title: 'Track-specific configuration options'
         });
         var mainPaneRight = mainPaneRightM.containerNode;*/
-        thisB._paneTracks( mainPaneRight );
+        thisB._paneTracks( mainPaneBottom );
 
         var paneFooter = dom.create('div',{className:'screenshot-dialog-pane-bottom-warning', innerHTML:'Local configuration changes will be ignored. Default configuration will be used unless specified in this dialog.<br>Rendering will open a new window.'});
 
         this.set('content', [
-            mainPaneLeft,
-            mainPaneRight,
+            mainPaneTop,
+            mainPaneBottom,
             paneFooter
         ] );
 
@@ -254,8 +256,8 @@ return declare (ActionBarDialog,{
         var locationList = ['left','center','right','none'];
         dom.create('h2',{'innerHTML':'Track-specific configuration options'}, rPane);
 
-        var acc = new dijitAccordionContainer({
-            id:'screenshot-dialog-pane-accordian'
+        var tab = new dijitTabContainer({
+            id:'screenshot-dialog-pane-tab'
         });
         var label, tParams, pane, param, data;
         // need to loop through the tracks and create content panes
@@ -263,17 +265,19 @@ return declare (ActionBarDialog,{
             // get parameters
             label = track.config.label;
             tParams = thisB.trackParameters[label];
+            var trackTitle = (tParams.key===undefined ? label : tParams.key )
             pane = new dijitContentPane({
-                title: (tParams.key===undefined ? label : tParams.key ),
+                title: trackTitle,
                 id: 'screenshot-dialog-track-'+label
             });
             var obj = pane.containerNode;
 
             if(tParams.opts === false){
                 pane.set('content','No available options');
-                acc.addChild(pane);
+                tab.addChild(pane);
                 return;
             }
+            //dom.create('h3',{innerHTML:trackTitle},obj);
             var table = dom.create('table',{'class':'screenshot-dialog-opt-table'}, obj);
             // loop through parameters
             for(param in tParams){
@@ -341,11 +345,11 @@ return declare (ActionBarDialog,{
                 }
             } // end for param
 
-            acc.addChild(pane);
+            tab.addChild(pane);
         });
 
-        acc.placeAt(rPane);
-        acc.startup();
+        tab.placeAt(rPane);
+        tab.startup();
     },
 
     hide: function() {
