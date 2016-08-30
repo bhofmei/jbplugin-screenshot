@@ -1,3 +1,11 @@
+v0.1.3 - Aug 30, 2016
+- added methylPlugin configuration parameter to correctly handle MethylationPlugin
+- fixed path to methylation plugin for checkboxes to work properly
+
+v0.1.2 - Aug 30, 2016
+- rearranged dialog so track-specific settings are at the bottom
+- track specific setting uses tab container instead of accordian since accordian had problems with more than 8-ish tracks
+
 v0.1.1 - Aug 29, 2016
 - fixed issue with track specific setting where settings for tracks 10+ were ignored
 
