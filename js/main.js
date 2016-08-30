@@ -1879,7 +1879,7 @@ return declare( JBrowsePlugin,
         var thisB = this;
         //var methylation = thisB.decoded.methylation;
         // check for methylation plugin
-        if(thisB.browser.plugins.hasOwnProperty('MethylationPlugin')){
+        if(thisB.browser.plugins.hasOwnProperty(thisB.config.methylPlugin)){
             var m,t;
             var tracks = lang.clone(thisB.browser.trackConfigsByName);
             for(m in params){
