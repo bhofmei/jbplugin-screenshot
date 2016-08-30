@@ -185,14 +185,16 @@ return declare (ActionBarDialog,{
             dom.create('td',{innerHTML:'Methylation',className:'screenshot-dialog-pane-label', 'colspan':2},row);
             var row2 = dom.create('tr',{'id':'screenshot-dialog-row-methyl-boxes'},table);
             var methylD = dom.create('td',{'colspan':2},row2);
+            // methylation types - animal vs plants
+            var mTypes = (mData.isAnimal ? {CG:true,CH:true} : thisB.parameters.methylation);
             var m;
-            for (m in thisB.parameters.methylation){
+            for (m in mTypes){
                 var mbox = new dijitCheckBox({
                     id:'screenshot-dialog-methyl-'+m,
                     //'class':m+'-checkbox',
                     style:'background-image:url('+mData.baseUrl.slice(1)+'/img/checkmark-'+m+'.png'+');',
                     '_prop':m,
-                    checked: thisB.parameters.methylation[m]
+                    checked: (m === 'CH' ? (thisB.parameters.methylation.CHG && thisB.parameters.methylation.CHH): thisB.parameters.methylation[m])
                 });
                 mbox.onClick = dojo.hitch(thisB, '_setMethylation', mbox);
                 dom.create('span',{innerHTML:m,className:'screenshot-dialog-opt-span'}, methylD);
@@ -360,7 +362,11 @@ return declare (ActionBarDialog,{
     },
 
     _setMethylation: function(box){
-        if(this.parameters.methylation.hasOwnProperty(box._prop)){
+        if(box._prop == 'CH'){
+            this.parameters.methylation.CHG = box.checked;
+            this.parameters.methylation.CHH = box.checked;
+        }
+        else if(this.parameters.methylation.hasOwnProperty(box._prop)){
             this.parameters.methylation[box._prop] = box.checked;
         }
     },
