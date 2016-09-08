@@ -470,16 +470,15 @@ return declare (ActionBarDialog,{
        if(/\b(MethylPlot)/.test( tType )|| /\b(MethylPlot)/.test( tType )){
             /*lang.mixin(out,{methyl:{CG: config.showCG, CHG: config.showCHG, CHH: config.showCHH}});*/
             // also mixin the bigwig like features
-            lang.mixin(out, {ypos:{title: 'Y-scale position',  value:config.yScalePosition},
-                             height: {title: 'Track height', value:config.style.height, delta:10},
+            lang.mixin(out, {height: {title: 'Track height', value:config.style.height, delta:10},
+                             ypos:{title: 'Y-scale position',  value:config.yScalePosition},
                              min: {title: 'Min. score', value:config.min_score, delta:0.1},
                              max: {title: 'Max. score', value:config.max_score, delta:0.1},
                              quant:true});
         }
         // test bigwig
-        else if(/\b(XYPlot)/.test( tType ) || /\b(XYDensity)/.test( tType )){
-            lang.mixin(out, {ypos: {title: 'Y-scale position',  value:config.yScalePosition},
-                             height: {title: 'Track height', value:config.style.height, delta:10},
+        else if(/\b(XYPlot)/.test( tType ) || /\b(XYDensity)/.test( tType ) || /XYPlot$/.test(tType) ){
+            lang.mixin(out, {height: {title: 'Track height', value:config.style.height, delta:10},ypos: {title: 'Y-scale position',  value:config.yScalePosition},
                              min: {title: 'Min. score', value:config.min_score, delta:10},
                              max: {title: 'Max. score', value:config.max_score, delta:10},
                              quant:true});
