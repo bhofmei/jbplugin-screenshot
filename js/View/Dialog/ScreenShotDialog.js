@@ -52,6 +52,7 @@ return declare (ActionBarDialog,{
         this.vTracks = this.browser.view.visibleTracks();
         //console.log(this.vTracks);
         this.trackParameters = this._getTrackParameters();
+        console.log(this.trackParameters);
         this.configs = args.config || {};
      },
      
@@ -291,11 +292,11 @@ return declare (ActionBarDialog,{
                     // yscale position radio boxes
                     if(tParams.ypos !== false){
                         var row = dom.create('tr',{'id':'screenshot-dialog-row-'+label+'-ypos'},table);
-                        dom.create('td',{'innerHTML':'Y-scale position','class':'screenshot-dialog-pane-label'}, row);
+                        dom.create('td',{'innerHTML':data.title,'class':'screenshot-dialog-pane-label'}, row);
                         array.forEach(locationList, function(loc){
                             var button = new dijitRadioButton({
                                 name:'yscale-'+label,
-                                checked: loc === tParams.ypos,
+                                checked: loc === data.value,
                                 id:'screenshot-dialog-radio-'+label+'-'+loc,
                                 value: loc,
                                 '_label': label,
