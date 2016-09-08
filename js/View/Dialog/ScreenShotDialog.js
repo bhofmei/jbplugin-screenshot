@@ -52,7 +52,6 @@ return declare (ActionBarDialog,{
         this.vTracks = this.browser.view.visibleTracks();
         //console.log(this.vTracks);
         this.trackParameters = this._getTrackParameters();
-        console.log(this.trackParameters);
         this.configs = args.config || {};
      },
      

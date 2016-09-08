@@ -1,5 +1,9 @@
 # Release Notes
 
+v1.0.5 - Sept 8, 2016
+- fixed issue with track-specific y-scale radio buttons not correctly checked when dialog is open
+- improved check for XYPlots which includes StrandedXYPlots from StrandedPlotPlugin
+
 v1.0.4 - Aug 30, 2016
 - animal methylation coloring
 
