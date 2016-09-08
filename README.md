@@ -15,6 +15,7 @@ For JBrowse 1.11.6+ in the _JBrowse/plugins_ folder, type:
 `git clone https://github.com/bhofmei/jbplugin-screenshot.git ScreenShotPlugin`
 
 ##Activate
+
 Add this to jbrowse.conf:
 ```
 [plugins.ScreenShotPlugin]
@@ -28,12 +29,25 @@ If that doesn't work, add this to jbrowse_conf.json:
 }
 ```
 
-**Important**:  
-For this plugin to work properly, a change needs to be made to the ``index.html`` file.  The line which parses query parameters, about line 50, currently reads
-   ``var queryParams = ioQuery.queryToObject( window.location.search.slice(1) );``
+###PhantomJS Cloud Accounts
+This plugin will work directly out of the box with PhantomJS Cloud. PhantomJS Clous offers a "demo" version of its services where each IP address is limited to 100 requests per day.
+If this is insufficient, you can create a free account with PhantomJS Cloud which allows 500 requests per day to that account. See [PhantomJS Cloud](https://phantomjscloud.com/pricing.html) for more information.
 
-Change this to   
-   `var queryParams = ioQuery.queryToObject( decodeURIComponent(window.location.search.slice(1) ) );`
+If you do have your own account with PhantomJS, include your user API key when activating the plugin.
+
+For jbrowse.conf
+```
+[plugins.ScreenShotPlugin]
+location = plugins/ScreenShotPlugin
+apiKey = <insert_apu_key>
+```
+For jbrowse_conf.json
+```
+"plugins" : {
+    "ScreenShotPlugin" : { "location" : "plugins/ScreenShotPlugin",
+                            "apiKey": "<insert_api_key>"}
+}
+```
     
 ##Use
 Click the "Screen shot" button in the browser. A dialog box will open with options for the screenshot. You can also press the `s` key as a shortcut to open the dialog box.
@@ -44,7 +58,7 @@ When increasing the zoom factor, you will likely need to increase the height and
 
 ##Support for Additional Plugins
 This plugin includes support for the [MethylationPlugin](https://github.com/bhofmei/jbplugin-methylation).  
-If the plugin ID* is anything except `MethylationPlugin`, the ID will need to be specified. 
+If the plugin ID<sup>1</sup> is anything except `MethylationPlugin`, the ID will need to be specified. 
 
 For jbrowse.conf
 ```
@@ -55,7 +69,7 @@ For jbrowse.conf
 
 Future support will be added for SmallRNAPlugin and SeqViewPlugin by the same author.
 
-*For jbrowse.conf, the plugin ID is found as `[ plugins.ID]` for each plugin.  
+<sup>1</sup>For jbrowse.conf, the plugin ID is found as `[ plugins.ID]` for each plugin.  
 In jbrowse_conf.json, the plugin ID is found as `"plugins":{"ID":{"location":"..."}}`
 
 ##Future Improvements
