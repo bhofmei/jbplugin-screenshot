@@ -73,8 +73,12 @@ Util = {
     _encodeTrack: function(params){
         // q[0|1] quantitative, y[0|1|2|3] yscale none, center, left, right
         // h# track height, i# min, x# max
-        var eLabels = {height: 'h', min: 'i', max: 'x', quant: 'q', ypos: 'y'};
-        var locDict = {'none': 0, 'center': 1, 'left': 2, 'right':3 };
+        // d[0|1|2] display mode normal, compact, collapse
+        // f[0|1|2] display style default, features, histograms
+        var eLabels = {height: 'h', min: 'i', max: 'x', quant: 'q', ypos: 'y', mode: 'd', style: 'f'};
+        var optsDict = {ypos:{'none': 0, 'center': 1, 'left': 2, 'right':3 },
+                        mode: {'normal':0,'compact':1,'collapsed':2},
+                        style: {'default':0,'features':1,'histograms':2}};
         var param, data;
 
         var output = '~' + params.trackNum;
@@ -85,9 +89,9 @@ Util = {
                 output += eLabels[param] + this._encodeBoolean(data);
             else if(!(data === undefined || data.value === undefined || eLabels.hasOwnProperty(param)===false )){
                 output += eLabels[param]
-                // ypos
-                if (param === 'ypos')
-                    output += locDict[data.value];
+                // ypos, mode, style
+                if (param in {ypos:1, mode:1, style:1})
+                    output +=  optsDict[param][data.value];
                 else
                     output += data.value;
             }
@@ -208,6 +212,22 @@ Util = {
                 var locList = ['none','center','left','right'];
                 var yposI = parseInt(resultY[1]);
                 out[tLabel]['yScalePosition'] = locList[yposI];
+            }
+            // get mode
+            var resultD = /d([0-2])/gi.exec(parmStr);
+            //console.log(resultY);
+            if (resultD != null){
+                var modeList = ['normal','compact','collapsed'];
+                var modeI = parseInt(resultD[1]);
+                out[tLabel]['displayMode'] = modeList[modeI];
+            }
+            // get style
+            var resultF = /f([0-2])/gi.exec(parmStr);
+            //console.log(resultY);
+            if (resultF != null){
+                var styleList = ['default','features','histograms'];
+                var styleI = parseInt(resultF[1]);
+                out[tLabel]['displayStyle'] = styleList[styleI];
             }
         });
         return out;

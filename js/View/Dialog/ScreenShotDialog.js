@@ -53,7 +53,7 @@ return declare (ActionBarDialog,{
         //console.log(this.vTracks);
         this.configs = args.config || {};
         this.trackParameters = this._getTrackParameters();
-        console.log(this.trackParameters);
+        //console.log(this.trackParameters);
      },
      
      _fillActionBar: function( actionBar ){
@@ -477,7 +477,7 @@ return declare (ActionBarDialog,{
             // check for SeqViews plugin
             var newM = {mode:{title:'Display mode',value:config.displayMode}};
             if(this.configs.seqViewsPlugin){
-                lang.mixin(newM,{style:{title:'Display style',value:(config.displayStyle===undefined ? 'default' : config.displayStyle)}});
+                lang.mixin(newM,{style:{title:'Feature style',value:(config.displayStyle===undefined ? 'default' : config.displayStyle)}});
             }
             lang.mixin(out,newM);
         }
