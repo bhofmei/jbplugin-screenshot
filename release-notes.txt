@@ -1,5 +1,9 @@
 # Release Notes
-v1.1.9 - Sept 12, 2016
+
+v1.1.1 - Sept 12, 2016
+- bug fix for SeqViewsPlugin configuration
+
+v1.1.0 - Sept 12, 2016
 - for canvas-feature type tracks, now can specificy display mode (normal, compact, collapsed)
 - when SeqViewsPlugin is activated, can also specificy display style (default, features, histograms)
 
