@@ -1824,6 +1824,11 @@ return declare( JBrowsePlugin,
 
         var thisB = this;
         browser.afterMilestone('initPlugins', function(){
+            // this is a true or false value since we don't actually need the path
+            // just need to know if it exists
+            thisB.config.seqViewsPlugin = browser.plugins.hasOwnProperty('SeqViewsPlugin');
+            if (args.seqViewsPlugin !== undefined)
+                thisB.config.seqViewsPlugin = args.seqViewsPlugin;
             // check for screenshot query parameters
             console.log(browser);
             if(browser.config.queryParams.hasOwnProperty('screenshot')){
