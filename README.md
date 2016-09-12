@@ -18,14 +18,14 @@ For JBrowse 1.11.6+ in the _JBrowse/plugins_ folder, type:
 
 Add this to jbrowse.conf:
 ```
-[plugins.ScreenShotPlugin]
-location = plugins/ScreenShotPlugin
+    [plugins.ScreenShotPlugin]
+    location = plugins/ScreenShotPlugin
 ```
 
 If that doesn't work, add this to jbrowse_conf.json:
 ```
-"plugins" : {
-    "ScreenShotPlugin" : { "location" : "plugins/ScreenShotPlugin" }
+    "plugins" : {
+        "ScreenShotPlugin" : { "location" : "plugins/ScreenShotPlugin" }
 }
 ```
 
@@ -37,16 +37,16 @@ If you do have your own account with PhantomJS, include your user API key when a
 
 For jbrowse.conf
 ```
-[plugins.ScreenShotPlugin]
-location = plugins/ScreenShotPlugin
-apiKey = <insert_apu_key>
+    [plugins.ScreenShotPlugin]
+    location = plugins/ScreenShotPlugin
+    apiKey = <insert_api_key>
 ```
 For jbrowse_conf.json
 ```
-"plugins" : {
-    "ScreenShotPlugin" : { "location" : "plugins/ScreenShotPlugin",
-                            "apiKey": "<insert_api_key>"}
-}
+    "plugins" : {
+        "ScreenShotPlugin" : { "location" : "plugins/ScreenShotPlugin",
+                            "apiKey": "<insert_api_key>" }
+    }
 ```
     
 ##Use
@@ -68,7 +68,7 @@ For jbrowse.conf
     methylPlugin = <methylation_plugin_id>
 ```
 
-Future support will be added for SmallRNAPlugin and SeqViewPlugin by the same author.
+Future support will be added for SmallRNAPlugin by the same author.
 
 <sup>1</sup>For jbrowse.conf, the plugin ID is found as `[ plugins.ID]` for each plugin.  
 In jbrowse_conf.json, the plugin ID is found as `"plugins":{"ID":{"location":"..."}}`
@@ -80,16 +80,14 @@ It will automatically look for a plugin with the plugin ID `SeqViewsPlugin`. If 
 
 In jbrowse.conf,
 ```
-[plugins.ScreenShotPlugin]
-...
-seqViewsPlugin = true
+    [plugins.ScreenShotPlugin]
+    ...
+    seqViewsPlugin = true
 ```
 
 Optionally, you can specify `seqViewsPlugin = false` if you do not want to include support for it.
 
 ##Future Improvements
-- Support for SeqViewsPlugin
-- For canvas features style tracks, allow for normal vs compact vs collapsed
 - Add PDF format as output type
 - Hide track labels
 - Convert canvas features to HTML features for better SVG editting
