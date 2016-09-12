@@ -51,8 +51,9 @@ return declare (ActionBarDialog,{
         this.cancelCallback = args.cancelCallback || function() {};
         this.vTracks = this.browser.view.visibleTracks();
         //console.log(this.vTracks);
-        this.trackParameters = this._getTrackParameters();
         this.configs = args.config || {};
+        this.trackParameters = this._getTrackParameters();
+        console.log(this.trackParameters);
      },
      
      _fillActionBar: function( actionBar ){
@@ -258,6 +259,9 @@ return declare (ActionBarDialog,{
     _paneTracks: function(rPane){
         var thisB = this;
         var locationList = ['left','center','right','none'];
+        var modeList = ['normal','compact','collapsed'];
+        var styleList = ['default','features','histograms'];
+        var optDict= {'ypos':locationList, 'mode':modeList, 'style':styleList};
         dom.create('h2',{'innerHTML':'Track-specific configuration options'}, rPane);
 
         var tab = new dijitTabContainer({
@@ -287,49 +291,29 @@ return declare (ActionBarDialog,{
             for(param in tParams){
                 data = tParams[param];
                 // yscale is radio boxes
-                if(param === 'ypos'){
+                if(param in {'ypos':1, 'mode':1,'style':1}){
+                    // list of options to use
+                    var optList = optDict[param];
                     // yscale position radio boxes
-                    if(tParams.ypos !== false){
-                        var row = dom.create('tr',{'id':'screenshot-dialog-row-'+label+'-ypos'},table);
+                    if(data !== false){
+                        var row = dom.create('tr',{'id':'screenshot-dialog-row-'+label+'-'+param},table);
                         dom.create('td',{'innerHTML':data.title,'class':'screenshot-dialog-pane-label'}, row);
-                        array.forEach(locationList, function(loc){
+                        array.forEach(optList, function(opt){
                             var button = new dijitRadioButton({
-                                name:'yscale-'+label,
-                                checked: loc === data.value,
-                                id:'screenshot-dialog-radio-'+label+'-'+loc,
-                                value: loc,
+                                name:param+'-'+label,
+                                checked: opt === data.value,
+                                id:'screenshot-dialog-radio-'+label+'-'+opt,
+                                value: opt,
                                 '_label': label,
-                                '_prop': 'ypos'
+                                '_prop': param
                         });
                         button.onClick = dojo.hitch(thisB, '_setTrackParameter', button);
                         var td = dom.create('td', {className:'screenshot-dialog-td-button'}, row);
                         button.placeAt(td, 'first');
-                        dom.create('label', {"for":'yscale-dialog-radio-'+label+'-'+loc, innerHTML: loc}, td);
+                        dom.create('label', {"for":'screenshot-dialog-radio-'+label+'-'+opt, innerHTML: opt}, td);
                     });
                     } // end y-scale position
                 }
-                // methylation check boxes
-                /*else if(param==='methyl'){
-                    // paramater data
-                    data = tParams.methyl;
-                    var row = dom.create('tr',{'id':'screenshot-dialog-row-'+label+'-methyl'},table);
-                    dom.create('td',{'innerHTML':'Methylation','class':'screenshot-dialog-pane-label'}, row);
-                    for(var m in data){
-                        var box = new dijitCheckBox({
-                                checked: tParams.methyl[m],
-                                id:'screenshot-dialog-radio-'+label+'-'+m,
-                                value: m,
-                                class: m+'-checkbox',
-                                _label: label,
-                                _prop: 'methyl'
-                        });
-                        box.onClick = dojo.hitch(thisB, '_setTrackParameter', box);
-                        var td = dom.create('td',{class:'screenshot-dialog-pane-input'},row);
-                        box.placeAt(td,'first');
-                        dom.create('label',{"for":'yscale-dialog-radio-'+label+'-'+m, innerHTML: m}, td);
-                    }
-
-                } */
                 else if(data.hasOwnProperty('value')){
                     // otherwise its a number spinner text box thing
                     var row = dom.create('tr',{'id':'screenshot-dialog-row-'+label+'-'+param},table);
@@ -400,18 +384,6 @@ return declare (ActionBarDialog,{
             console.warn('Error: no track labeled '+tLabel);
             return
         }
-        // handle methylation
-        /*if(prop === 'methyl'){
-            if(this.trackParameters[tLabel].methyl.hasOwnProperty(input.value)){
-                this.trackParameters[tLabel].methyl[input.value] = input.checked;
-            }
-        }
-        // y-scale position
-        if(input.hasOwnProperty('checked') && input.checked){
-            if(this.trackParameters[tLabel].hasOwnProperty(prop)){
-                this.trackParameters[tLabel][prop] = input.value;
-            }
-        }*/
         // number spinner type
         else{
             if(this.trackParameters[tLabel].hasOwnProperty(prop)){
@@ -453,8 +425,12 @@ return declare (ActionBarDialog,{
         var out = {};
         array.forEach(this.vTracks, function(track, i){
            var tType = track.config.type;
+            var tConfig = track.config;
+            // due to weirdness with displayMode, update config.mixin if necessary
             // handle parameters by type
-            out[track.config.label] = thisB._handleTrackTypeParameters(i, tType, track.config);
+            if (track.hasOwnProperty('displayMode'))
+                tConfig.displayMode = track.displayMode;
+            out[track.config.label] = thisB._handleTrackTypeParameters(i, tType, tConfig);
         });
         return out;
     },
@@ -472,13 +448,13 @@ return declare (ActionBarDialog,{
             // also mixin the bigwig like features
             lang.mixin(out, {height: {title: 'Track height', value:config.style.height, delta:10},
                              ypos:{title: 'Y-scale position',  value:config.yScalePosition},
-                             min: {title: 'Min. score', value:config.min_score, delta:0.1},
+                            min: {title: 'Min. score', value:config.min_score, delta:0.1},
                              max: {title: 'Max. score', value:config.max_score, delta:0.1},
                              quant:true});
         }
         // test bigwig
         else if(/\b(XYPlot)/.test( tType ) || /\b(XYDensity)/.test( tType ) || /XYPlot$/.test(tType) ){
-            lang.mixin(out, {height: {title: 'Track height', value:config.style.height, delta:10},ypos: {title: 'Y-scale position',  value:config.yScalePosition},
+            lang.mixin(out, {height: {title: 'Track height', value:config.style.height, delta:10}, ypos: {title: 'Y-scale position',  value:config.yScalePosition},
                              min: {title: 'Min. score', value:config.min_score, delta:10},
                              max: {title: 'Max. score', value:config.max_score, delta:10},
                              quant:true});
@@ -495,6 +471,15 @@ return declare (ActionBarDialog,{
                              min: {title: 'Min. score', value:config.histograms.min, delta:10},
                              max: {title: 'Max. score', value:config.histograms.max, delta:10},
                              quant: false});
+        }
+        // test canvas features and alignments
+        if(/CanvasFeatures$/.test(tType) || /Alignments2$/.test(tType)){
+            // check for SeqViews plugin
+            var newM = {mode:{title:'Display mode',value:config.displayMode}};
+            if(this.configs.seqViewsPlugin){
+                lang.mixin(newM,{style:{title:'Display style',value:(config.displayStyle===undefined ? 'default' : config.displayStyle)}});
+            }
+            lang.mixin(out,newM);
         }
         return out;
     },
