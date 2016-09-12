@@ -1825,7 +1825,7 @@ return declare( JBrowsePlugin,
         var thisB = this;
         browser.afterMilestone('initPlugins', function(){
             // check for screenshot query parameters
-            //console.log(browser);
+            console.log(browser);
             if(browser.config.queryParams.hasOwnProperty('screenshot')){
                 thisB.isScreenshot = true;
                 var encoded = browser.config.queryParams.screenshot;
