@@ -1814,7 +1814,13 @@ return declare( JBrowsePlugin,
         // other plugins
         this.config.methylPlugin = 'MethylationPlugin'
         if( args.config.methylPlugin !== undefined )
-            this.config.methylPlugin = args.methylPlugin
+            this.config.methylPlugin = args.methylPlugin;
+
+        // this is a true or false value since we don't actually need the path
+        // just need to know if it exists
+        this.config.seqViewsPlugin = browser.plugins.hasOwnProperty('SeqViewsPlugin');
+        if (args.seqViewsPlugin !== undefined)
+            this.config.seqViewsPlugin = args.seqViewsPlugin;
 
         var thisB = this;
         browser.afterMilestone('initPlugins', function(){

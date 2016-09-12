@@ -57,6 +57,7 @@ When increasing the zoom factor, you will likely need to increase the height and
 **Note:** Due to the nature of URL-encoded screenshots, default track configurations will be used unless overriden by settings selected in this dialog box. Locally added tracks, such as combination tracks, will not be included.
 
 ##Support for Additional Plugins
+###Methylation Plugin
 This plugin includes support for the [MethylationPlugin](https://github.com/bhofmei/jbplugin-methylation).  
 If the plugin ID<sup>1</sup> is anything except `MethylationPlugin`, the ID will need to be specified. 
 
@@ -71,6 +72,20 @@ Future support will be added for SmallRNAPlugin and SeqViewPlugin by the same au
 
 <sup>1</sup>For jbrowse.conf, the plugin ID is found as `[ plugins.ID]` for each plugin.  
 In jbrowse_conf.json, the plugin ID is found as `"plugins":{"ID":{"location":"..."}}`
+
+###SeqViewsPlugin
+This plugin only needs to know if the SeqViews Plugin is activated.
+
+It will automatically look for a plugin with the plugin ID `SeqViewsPlugin`. If the SeqViews Plugin has been activate but with a different plugin ID, indicate that `seqViewsPlugin = true`.
+
+In jbrowse.conf,
+```
+[plugins.ScreenShotPlugin]
+...
+seqViewsPlugin = true
+```
+
+Optionally, you can specify `seqViewsPlugin = false` if you do not want to include support for it.
 
 ##Future Improvements
 - Support for SeqViewsPlugin
