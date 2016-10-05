@@ -60,7 +60,7 @@ return declare (ActionBarDialog,{
         dojo.addClass(actionBar, 'screenshot-dialog-actionbar');
         var ok_button = new Button({
             label: "Render",
-            onClick: dojo.hitch(this, function() {
+            onClick: lang.hitch(this, function() {
                 // screenshot parameters
                 //console.log(this.trackParameters);
                 var gParams = this.parameters.view;
@@ -80,7 +80,7 @@ return declare (ActionBarDialog,{
 
         var cancel_button = new Button({
             label: "Cancel",
-            onClick: dojo.hitch(this, function() {
+            onClick: lang.hitch(this, function() {
                 //console.log(this.trackParameters);
                 this.cancelCallback && this.cancelCallback();
                 this.hide();
@@ -176,7 +176,7 @@ return declare (ActionBarDialog,{
                 }
             }
             if(input !== null){
-                input.onClick = dojo.hitch(thisB, '_setParameter', input);
+                input.onClick = lang.hitch(thisB, '_setParameter', input);
                 input.placeAt(td,'first');
             }
         } // end for param
@@ -197,7 +197,7 @@ return declare (ActionBarDialog,{
                     '_prop':m,
                     checked: (m === 'CH' ? (thisB.parameters.methylation.CHG && thisB.parameters.methylation.CHH): thisB.parameters.methylation[m])
                 });
-                mbox.onClick = dojo.hitch(thisB, '_setMethylation', mbox);
+                mbox.onClick = lang.hitch(thisB, '_setMethylation', mbox);
                 dom.create('span',{innerHTML:m,className:'screenshot-dialog-opt-span'}, methylD);
                 methylD.appendChild(mbox.domNode);
             }
@@ -219,8 +219,8 @@ return declare (ActionBarDialog,{
                 row2 = dom.create('tr',{'class':'screenshot-dialog-pane-input'},tableB);
                 var outD = dom.create('td',{'colspan':2},row2);
                 // 3 check boxes
-                //var formatTypes = ['PNG','JPG','PDF'];
-                var formatTypes = ['PNG','JPG'];
+                var formatTypes = ['PNG','JPG','PDF'];
+                //var formatTypes = ['PNG','JPG'];
                 var formatTypeTitles = {'PNG':'transparent background','JPG':'white background', 'PDF':'contains svg-like objects'};
                 array.forEach(formatTypes, function(f){
                     var btn = new dijitRadioButton({
@@ -229,7 +229,7 @@ return declare (ActionBarDialog,{
                         value: f,
                         '_prop': param
                     });
-                    btn.onClick = dojo.hitch(thisB, '_setParameter', btn);
+                    btn.onClick = lang.hitch(thisB, '_setParameter', btn);
                     dom.create('span',{innerHTML:f, className:'screenshot-dialog-opt-span', title:formatTypeTitles[f]}, outD);
                     outD.appendChild(btn.domNode);
                 });
@@ -250,7 +250,7 @@ return declare (ActionBarDialog,{
                         intermediateChanges:true,
                         style:"width:75px;"
                 });
-                widget.onChange = dojo.hitch(thisB, '_setParameter',widget);
+                widget.onChange = lang.hitch(thisB, '_setParameter',widget);
                 widget.placeAt(spinD,'first');
             }
         }
@@ -342,7 +342,7 @@ return declare (ActionBarDialog,{
 
     hide: function() {
         this.inherited(arguments);
-        window.setTimeout( dojo.hitch( this, 'destroyRecursive' ), 500 );
+        window.setTimeout( lang.hitch( this, 'destroyRecursive' ), 500 );
     },
 
     _setMethylation: function(box){
