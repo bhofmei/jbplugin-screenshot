@@ -14,15 +14,20 @@ This plugin would not be possible without [phantomJS](http://phantomjs.org/), sp
 For JBrowse 1.11.6+ in the _JBrowse/plugins_ folder, type:  
 `git clone https://github.com/bhofmei/jbplugin-screenshot.git ScreenShotPlugin`
 
+**or**
+
+downloaded the latest release version at [releases](https://github.com/bhofmei/jbplugin-screenshot/releases).  
+Unzip the downloaded folder, place in _JBrowse/plugins_, and rename the folder _ScreenShotPlugin_
+
 ##Activate
 
-Add this to jbrowse.conf:
+Add this to _jbrowse.conf_ under `[GENERAL]`:
 ```
     [plugins.ScreenShotPlugin]
     location = plugins/ScreenShotPlugin
 ```
 
-If that doesn't work, add this to jbrowse_conf.json:
+If that doesn't work, add this to _jbrowse_conf.json_:
 ```
     "plugins" : {
         "ScreenShotPlugin" : { "location" : "plugins/ScreenShotPlugin" }
@@ -35,13 +40,13 @@ If this is insufficient, you can create a free account with PhantomJS Cloud whic
 
 If you do have your own account with PhantomJS, include your user API key when activating the plugin.
 
-For jbrowse.conf
+For _jbrowse.conf_
 ```
     [plugins.ScreenShotPlugin]
     location = plugins/ScreenShotPlugin
     apiKey = <insert_api_key>
 ```
-For jbrowse_conf.json
+For _jbrowse_conf.json_
 ```
     "plugins" : {
         "ScreenShotPlugin" : { "location" : "plugins/ScreenShotPlugin",
@@ -61,7 +66,7 @@ When increasing the zoom factor, you will likely need to increase the height and
 This plugin includes support for the [MethylationPlugin](https://github.com/bhofmei/jbplugin-methylation).  
 If the plugin ID<sup>1</sup> is anything except `MethylationPlugin`, the ID will need to be specified. 
 
-For jbrowse.conf
+For _jbrowse.conf_
 ```
     [plugins.ScreenShotPlugin]
     location = plugins/ScreenShotPlugin
@@ -78,7 +83,7 @@ This plugin only needs to know if the SeqViews Plugin is activated.
 
 It will automatically look for a plugin with the plugin ID `SeqViewsPlugin`. If the SeqViews Plugin has been activate but with a different plugin ID, indicate that `seqViewsPlugin = true`.
 
-In jbrowse.conf,
+In _jbrowse.conf_,
 ```
     [plugins.ScreenShotPlugin]
     ...
