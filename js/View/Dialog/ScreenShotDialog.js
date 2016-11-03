@@ -2,12 +2,14 @@ define( "ScreenShotPlugin/View/Dialog/ScreenShotDialog", [
     'dojo/_base/declare',
     'dojo/_base/lang',
     'dojo/dom-construct',
+    'dojo/dom-style',
     'dojo/_base/array',
     'dojo/on',
     'dijit/focus',
     'dijit/form/CheckBox',
     'dijit/form/NumberSpinner',
     'dijit/form/RadioButton',
+    "dijit/form/Select",
     'dijit/layout/ContentPane',
     //'dijit/layout/AccordionContainer',
     'dijit/layout/TabContainer',
@@ -20,12 +22,14 @@ function (
     declare,
     lang,
     dom,
+    domStyle,
     array,
     on,
     focus,
     dijitCheckBox,
     dijitNumberSpinner,
     dijitRadioButton,
+    dijitSelect,
     dijitContentPane,
     //dijitAccordionContainer,
     dijitTabContainer,
@@ -136,6 +140,9 @@ return declare (ActionBarDialog,{
             mainPaneBottom,
             paneFooter
         ] );
+        // hide/show based on output format
+        domStyle.set("screenshot-dialog-image-rows", "display", (thisB.parameters.output.format === 'PDF' ? 'none' : ''));
+            domStyle.set('screenshot-dialog-pdf-rows', 'display', (thisB.parameters.output.format == 'PDF' ? '' : 'none'));
 
         this.inherited( arguments );
     },
@@ -164,7 +171,6 @@ return declare (ActionBarDialog,{
                     style:"width:50px;"
                 });
             }else{
-                //if(param === 'labels' && thisB.browser.plugins.hasOwnProperty('HideTrackLabels')===false){
                 if(param === 'labels'){
                     input = null;
                 }else{
@@ -180,6 +186,7 @@ return declare (ActionBarDialog,{
                 input.placeAt(td,'first');
             }
         } // end for param
+        // handle methylation parameters if necessary
         if(thisB.browser.plugins.hasOwnProperty(thisB.configs.methylPlugin)){
             var mData = thisB.browser.plugins[thisB.configs.methylPlugin].config;
             row = dom.create('tr',{id:'screenshot-dialog-row-methyl'},table);
@@ -208,14 +215,15 @@ return declare (ActionBarDialog,{
         var thisB = this;
         dom.create('h2',{'innerHTML':'Output configuration options'}, obj);
         var tableB = dom.create('table',{'class':'screenshot-dialog-opt-table'},obj);
-        var param, data, row, row2;
+        var param, data, row, row2, tdLabel;
         // output options -> format (PNG, JPEG, PDF), height, width
         var outParam = thisB.parameters.output;
         for(param in outParam){
             data = outParam[param];
             if(param === 'format'){
                 row = dom.create('tr',{'id':'screenshot-dialog-row-'+param,'colspan':2},tableB);
-                dom.create('td',{'innerHTML':data.title,'class':'screenshot-dialog-pane-label'}, row);
+                tdLabel = dom.create('td',{}, row);
+                dom.create('div',{'innerHTML':data.title,'class':'screenshot-dialog-pane-label'},tdLabel)
                 row2 = dom.create('tr',{'class':'screenshot-dialog-pane-input'},tableB);
                 var outD = dom.create('td',{'colspan':2},row2);
                 // 3 check boxes
@@ -229,31 +237,74 @@ return declare (ActionBarDialog,{
                         value: f,
                         '_prop': param
                     });
-                    btn.onClick = lang.hitch(thisB, '_setParameter', btn);
+                    btn.onClick = lang.hitch(thisB, '_setFormatParameter', btn);
                     dom.create('span',{innerHTML:f, className:'screenshot-dialog-opt-span', title:formatTypeTitles[f]}, outD);
                     outD.appendChild(btn.domNode);
                 });
+            } else if (param === "image"){
+                // handle png/jpg height and width
+                var tbod = dom.create('tbody',{'id':'screenshot-dialog-image-rows', /*style:'display:'+(thisB.parameters.output.format === 'PDF' ? 'none' : 'inherit')*/}, tableB);
+
+                // loop through settings
+                var param2, data2;
+                for(param2 in data){
+                    data2 = data[param2];
+                    thisB._createSpinner(tbod, data2, param2, '_setImageParameter', thisB);
+                }
+            } else if (param === 'pdf'){
+                // handle pdf options
+                var tbod = dom.create('tbody',{'id':'screenshot-dialog-pdf-rows',/*style:'display:'+(thisB.parameters.output.format !== 'PDF' ? 'none' : 'inherit')*/}, tableB);
+                var param2, data2;
+                for(param2 in data){
+                    data2 = data[param2];
+                    if(param2 === 'page'){
+                        var listOpts = ['letter landscape','letter portrait', 'legal landscape','legal portrait','A3 landscape', 'A3 portrait', 'A4 landscape', 'A4 portrait', 'A5 landscape', 'A5 portrait', 'tabloid landscape', 'tabloid portrait'];
+                        var widgetOpts = array.map(listOpts, function(opt){
+                            return{label: opt, value: opt, selected: opt === thisB.parameters.output.pdf.page};
+                        })
+                        // dropdown selection
+                        row = dom.create('tr',{'id':'screenshot-dialog-row-'+param},tbod);
+                        tdLabel = dom.create('td',{},row);
+                        dom.create('div',{'innerHTML':data2.title,'class':'screenshot-dialog-pane-label'}, tdLabel);
+                        var spinD = dom.create('td',{'class':'screenshot-dialog-pane-input'},row);
+                        var widget = new dijitSelect({
+                            id: 'screenshot-dialog-pdf-page',
+                            '_prop': param2,
+                            options: widgetOpts,
+                            style:"width:100px;"
+                        });
+                        widget.onChange = lang.hitch(thisB, '_setPDFParameter', widget);
+                        widget.placeAt(spinD, 'first');
+                    } else{
+                        thisB._createSpinner(tbod, data2, param2, '_setPDFParameter', thisB);
+                    }
+                }
             } else {
                 // number spinners
-                data = outParam[param];
-                row = dom.create('tr',{'id':'screenshot-dialog-row-'+param},tableB);
-                dom.create('td',{'innerHTML':data.title,'class':'screenshot-dialog-pane-label'}, row);
-                var spinD = dom.create('td',{'class':'screenshot-dialog-pane-input'},row);
-                // create slider for quality and spinner for other
-                var widget = new dijitNumberSpinner({
-                        id:'screenshot-dialog-'+param+'-spinner',
-                        value: data.value,
-                        '_prop':param,
-                        //constraints: (param === 'zoom' ? {min:1,max:10} : {min:100,max:10000,pattern:'###0'}),
-                        constraints: {min: data.min, max: data.max},
-                        smallDelta:data.delta,
-                        intermediateChanges:true,
-                        style:"width:75px;"
-                });
-                widget.onChange = lang.hitch(thisB, '_setParameter',widget);
-                widget.placeAt(spinD,'first');
+                //data = outParam[param];
+                thisB._createSpinner(tableB, data, param, '_setParameter', thisB);
             }
         }
+    },
+
+    _createSpinner: function(inTable, data, param, callbackStr, objScope){
+        var row = dom.create('tr',{'id':'screenshot-dialog-row-'+param},inTable);
+        var tdLabel = dom.create('td',{},row);
+        dom.create('div',{'innerHTML':data.title,'class':'screenshot-dialog-pane-label'}, tdLabel);
+        var spinD = dom.create('td',{'class':'screenshot-dialog-pane-input'},row);
+        // create slider for quality and spinner for other
+        var widget = new dijitNumberSpinner({
+            id:'screenshot-dialog-'+param+'-spinner',
+            value: data.value,
+            '_prop':param,
+            //constraints: (param === 'zoom' ? {min:1,max:10} : {min:100,max:10000,pattern:'###0'}),
+            constraints: {min: data.min, max: data.max},
+            smallDelta:data.delta,
+            intermediateChanges:true,
+            style:"width:75px;"
+        });
+        widget.onChange = lang.hitch(objScope, callbackStr, widget);
+        widget.placeAt(spinD, 'first');
     },
 
     _paneTracks: function(rPane){
@@ -355,15 +406,44 @@ return declare (ActionBarDialog,{
         }
     },
 
+    _setFormatParameter: function(input){
+        // set png, jpg, pdf and hide/show appropriate options
+        var prop = input._prop;
+        if(input.checked && this.parameters.output.hasOwnProperty(prop))
+            this.parameters.output[prop].value = input.value;
+        // objects we need 'id':'screenshot-dialog-image-rows' and 'id':'screenshot-dialog-pdf-rows'
+        // if pdf
+        if(input.value === 'PDF'){
+            domStyle.set("screenshot-dialog-image-rows", "display", "none");
+            domStyle.set('screenshot-dialog-pdf-rows', 'display', '');
+        } else {
+            domStyle.set("screenshot-dialog-image-rows", "display", "");
+            domStyle.set('screenshot-dialog-pdf-rows', 'display', 'none');
+        }
+    },
+
+    _setImageParameter: function(input){
+        var prop = input._prop;
+        if(this.parameters.output.image.hasOwnProperty(prop))
+            this.parameters.output.image[prop].value = input.value;
+    },
+
+    _setPDFParameter: function(input){
+        console.log(input.value);
+        var prop = input._prop;
+        if(this.parameters.output.pdf.hasOwnProperty(prop))
+            this.parameters.output.pdf[prop].value = input.value;
+    },
+
     _setParameter: function(input){
         var prop = input._prop;
         // format radio box parameter
-        if(prop === 'format'){
+        /*if(prop === 'format'){
             if(input.checked && this.parameters.output.hasOwnProperty(prop))
                 this.parameters.output[prop].value = input.value;
-        }
+        }*/
         // check box parameters
-        else if(input.hasOwnProperty('checked')){
+        if(input.hasOwnProperty('checked')){
             if(this.parameters.view.hasOwnProperty(prop))
                 this.parameters.view[prop].value = !! input.checked;
         }
@@ -416,8 +496,11 @@ return declare (ActionBarDialog,{
         var width = {value: 3300, title: 'Width (px)', min:100, max:10000, delta:100};
         var height = {value: 2400, title: 'Height (px)', min:100, max:10000, delta:100};
         var quality = {value: 70, title: 'Render quality', min:0, max:100, delta:10};
+        var pdfOpt = {value: 'letter landscape', title: 'Page format'};
+        var pdfWidth = {value: 1800, title: 'View width (px)', min:100, max:10000, delta:100};
+        var pdfHeight = {value: 1200, title: 'View height (px)', min:100, max:10000, delta:100};
 
-       return { view:{trackSpacing: trackSpacing, locOver: locOver, trackList: trackList, nav: nav, menu: menu, labels: labels}, methylation:{CG:true, CHG:true, CHH:true}, output: {format: format, zoom: zoom, quality: quality, width: width, height: height} };
+       return { view:{trackSpacing: trackSpacing, locOver: locOver, trackList: trackList, nav: nav, menu: menu, labels: labels}, methylation:{CG:true, CHG:true, CHH:true}, output: {format: format, zoom: zoom, quality: quality, image: {width: width, height: height}, pdf: {page: pdfOpt, pdfWidth: pdfWidth, pdfHeight: pdfHeight}} };
     },
 
     _getTrackParameters: function(){
