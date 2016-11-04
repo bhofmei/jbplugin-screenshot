@@ -3,9 +3,11 @@ define( "ScreenShotPlugin/View/Dialog/ScreenShotDialog", [
     'dojo/_base/lang',
     'dojo/dom-construct',
     'dojo/dom-style',
+    'dojo/dom-attr',
     'dojo/_base/array',
     'dojo/on',
     'dijit/focus',
+    "dijit/registry",
     'dijit/form/CheckBox',
     'dijit/form/NumberSpinner',
     'dijit/form/RadioButton',
@@ -23,9 +25,11 @@ function (
     lang,
     dom,
     domStyle,
+    domAttr,
     array,
     on,
     focus,
+    registry,
     dijitCheckBox,
     dijitNumberSpinner,
     dijitRadioButton,
@@ -140,9 +144,10 @@ return declare (ActionBarDialog,{
             mainPaneBottom,
             paneFooter
         ] );
+
         // hide/show based on output format
         domStyle.set("screenshot-dialog-image-rows", "display", (thisB.parameters.output.format === 'PDF' ? 'none' : ''));
-            domStyle.set('screenshot-dialog-pdf-rows', 'display', (thisB.parameters.output.format == 'PDF' ? '' : 'none'));
+        domStyle.set('screenshot-dialog-pdf-rows', 'display', (thisB.parameters.output.format == 'PDF' ? '' : 'none'));
 
         this.inherited( arguments );
     },
@@ -416,6 +421,13 @@ return declare (ActionBarDialog,{
         if(input.value === 'PDF'){
             domStyle.set("screenshot-dialog-image-rows", "display", "none");
             domStyle.set('screenshot-dialog-pdf-rows', 'display', '');
+            // if checked, uncheck "show navigation"
+            var varlist = 'screenshot-dialog-opt-box-trackList';
+            //console.log(domAttr.get(varlist, 'checked'));
+            if( domAttr.get(varlist, 'checked') === true ){
+                registry.byId(varlist).set('checked', false);
+                this.parameters.view.trackList.value = false;
+            }
         } else {
             domStyle.set("screenshot-dialog-image-rows", "display", "");
             domStyle.set('screenshot-dialog-pdf-rows', 'display', 'none');
@@ -429,7 +441,7 @@ return declare (ActionBarDialog,{
     },
 
     _setPDFParameter: function(input){
-        console.log(input.value);
+        //console.log(input.value);
         var prop = input._prop;
         if(this.parameters.output.pdf.hasOwnProperty(prop))
             this.parameters.output.pdf[prop].value = input.value;
