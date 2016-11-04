@@ -59,6 +59,10 @@ Click the "Screen shot" button in the browser. A dialog box will open with optio
 
 When increasing the zoom factor, you will likely need to increase the height and width to ensure a full image.
 
+When selecting the PDF output, you must choose a page size (A3, A4, A5, letter, legal, or tabloid) and orientation (landscape or portrait). 
+The height and width parameters do not specify output page size. Now they specificy the "viewport" (portion of screen to be printed) of the image to be placed on the output page. This may require some trial and error to get the best view.  
+Also, the tracklist does not always display well when using PDF output. When selecting the PDF output option, it will automatically uncheck "Show tracklist".
+
 **Note:** Due to the nature of URL-encoded screenshots, default track configurations will be used unless overriden by settings selected in this dialog box. Locally added tracks, such as combination tracks, will not be included.
 
 ##Support for Additional Plugins
@@ -93,6 +97,5 @@ In _jbrowse.conf_,
 Optionally, you can specify `seqViewsPlugin = false` if you do not want to include support for it.
 
 ##Future Improvements
-- Add PDF format as output type
 - Hide track labels
 - Convert canvas features to HTML features for better SVG editting
