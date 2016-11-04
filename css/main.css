@@ -37,6 +37,9 @@ div.screenshot-dialog-pane h2 {
 .screenshot-dialog-opt-table {
   margin-left: 5px;
 }
+#screenshot-dialog-pane-top-right tbody td div.screenshot-dialog-pane-label {
+  width: 95px;
+}
 .screenshot-dialog-pane-bottom-warning {
   font-size: smaller;
   text-align: center;
