@@ -1816,6 +1816,10 @@ return declare( JBrowsePlugin,
         if( args.config.methylPlugin !== undefined )
             this.config.methylPlugin = args.methylPlugin;
 
+        this.config.smrnaPlugin = 'SmallRNAPlugin';
+        if( args.config.smrnaPlugin !== undefined)
+            this.config.smrnaPlugin = args.smrnaPlugin;
+
         // this is a true or false value since we don't actually need the path
         // just need to know if it exists
         this.config.seqViewsPlugin = browser.plugins.hasOwnProperty('SeqViewsPlugin');
@@ -1824,11 +1828,6 @@ return declare( JBrowsePlugin,
 
         var thisB = this;
         browser.afterMilestone('initPlugins', function(){
-            // this is a true or false value since we don't actually need the path
-            // just need to know if it exists
-            thisB.config.seqViewsPlugin = browser.plugins.hasOwnProperty('SeqViewsPlugin');
-            if (args.seqViewsPlugin !== undefined)
-                thisB.config.seqViewsPlugin = args.seqViewsPlugin;
             // check for screenshot query parameters
             //console.log(browser);
             if(browser.config.queryParams.hasOwnProperty('screenshot')){
@@ -1902,6 +1901,7 @@ return declare( JBrowsePlugin,
                             lang.mixin(thisB.browser.trackConfigsByName[t], mix);
                         }
                     }
+                // TODO: add command to disable toolbar buttons if necessary
                 } // end if params[m] === false
             } // end for m in params
         } // end if MethylationPlugin
@@ -1939,7 +1939,7 @@ return declare( JBrowsePlugin,
     _applyTrackLabelConfig: function(){
         var thisB = this;
         if(thisB.browser.plugins.hasOwnProperty('HideTrackLabels')){
-            console.log('call')
+            //console.log('call')
             thisB.browser.showTrackLabels((thisB.browser.config.show_tracklabels ? 'show' : 'hide'))
         }
     }
