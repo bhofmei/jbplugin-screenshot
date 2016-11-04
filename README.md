@@ -79,11 +79,11 @@ For _jbrowse.conf_
 
 Future support will be added for SmallRNAPlugin by the same author.
 
-<sup>1</sup>For jbrowse.conf, the plugin ID is found as `[ plugins.ID]` for each plugin.  
+<sup>1</sup>For jbrowse.conf, the plugin ID is found as `[plugins.ID]` for each plugin.  
 In jbrowse_conf.json, the plugin ID is found as `"plugins":{"ID":{"location":"..."}}`
 
 ###SeqViewsPlugin
-This plugin only needs to know if the SeqViews Plugin is activated.
+This plugin only needs to know if the [SeqViewsPlugin](https://github.com/bhofmei/jbplugin-seqview) is activated.
 
 It will automatically look for a plugin with the plugin ID `SeqViewsPlugin`. If the SeqViews Plugin has been activate but with a different plugin ID, indicate that `seqViewsPlugin = true`.
 
