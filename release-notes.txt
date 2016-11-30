@@ -1,4 +1,7 @@
 # Release Notes
+v1.3.1 - Nov 31, 2016
+- minor update for formatting
+
 v1.3.0 - Nov 30, 2016
 - includes support for small rna plugin (see readme for additional details)
 

@@ -207,11 +207,11 @@ return declare (ActionBarDialog,{
             row = dom.create('tr',{id:'screenshot-dialog-row-methyl'},table);
             dom.create('td',{innerHTML:'Methylation',className:'screenshot-dialog-pane-label', 'colspan':3},row);
             row2 = dom.create('tr',{'id':'screenshot-dialog-row-methyl-boxes'},table);
-            var tdata = dom.create('td',{'colspan':3},row2);
             // methylation types - animal vs plants
             var mTypes = (cdata.isAnimal ? {CG:true,CH:true} : thisB.parameters.methylation);
             var m;
             for (m in mTypes){
+                var tdata = dom.create('td',{align:'right'},row2);
                 var box = new dijitCheckBox({
                     id:'screenshot-dialog-methyl-'+m,
                     //'class':m+'-checkbox',
