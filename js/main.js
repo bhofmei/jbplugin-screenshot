@@ -1810,23 +1810,23 @@ return declare( JBrowsePlugin,
         // PhantomJS Username
         if( args.config.apiKey !== undefined )
             this.config.apiKey = args.config.apiKey;
-
-        // other plugins
-        this.config.methylPlugin = 'MethylationPlugin'
-        if( args.config.methylPlugin !== undefined )
-            this.config.methylPlugin = args.methylPlugin;
-
-        this.config.smrnaPlugin = 'SmallRNAPlugin';
-        if( args.config.smrnaPlugin !== undefined)
-            this.config.smrnaPlugin = args.smrnaPlugin;
-
-        // this is a true or false value since we don't actually need the path
-        // just need to know if it exists
-        this.config.seqViewsPlugin = browser.plugins.hasOwnProperty('SeqViewsPlugin');
-        if (args.seqViewsPlugin !== undefined)
-            this.config.seqViewsPlugin = args.seqViewsPlugin;
-
         var thisB = this;
+        // other plugins
+        browser.afterMilestone('initPlugins', function(){
+            thisB.config.methylPlugin = 'MethylationPlugin'
+            if( args.config.methylPlugin !== undefined )
+                thisB.config.methylPlugin = args.methylPlugin;
+
+            thisB.config.smrnaPlugin = 'SmallRNAPlugin';
+            if( args.config.smrnaPlugin !== undefined)
+                this.config.smrnaPlugin = args.smrnaPlugin;
+
+            // this is a true or false value since we don't actually need the path
+            // just need to know if it exists
+            thisB.config.seqViewsPlugin = browser.plugins.hasOwnProperty('SeqViewsPlugin');
+            if (args.seqViewsPlugin !== undefined)
+                thisB.config.seqViewsPlugin = args.seqViewsPlugin;
+        });
         browser.afterMilestone('initPlugins', function(){
             // check for screenshot query parameters
             //console.log(browser);
