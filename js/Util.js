@@ -55,14 +55,22 @@ Util = {
     },
 
     _encodeGeneralSettings: function(params){
-        // locOver, menu, methylation, nav, trackList, trackSpacing, labels, zoom
+        // locOver, menu, methylation, nav, trackList, trackSpacing, labels, zoom, small rna
         var output = '';
-        var eLabels = { zoom:'z', trackSpacing:'p', locOver: 'o', trackList:'r', nav:'n', menu:'u', labels:'b', methylation:'m'};
+        var eLabels = { zoom:'z', trackSpacing:'p', locOver: 'o', trackList:'r', nav:'n', menu:'u', labels:'b', methylation:'m', smallrna: 's'};
         var param;
+        var thisB = this;
         for(param in params){
             var data = params[param];
             if(param==='methylation')
                 output += eLabels[param] + this._encodeBoolean(data.CG) + this._encodeBoolean(data.CHG) + this._encodeBoolean(data.CHH);
+            else if(param === 'smallrna'){
+                output += eLabels[param];
+                var types = ['21','22','23','24','pi','Others'];
+                array.forEach(types, function(t){
+                    output += thisB._encodeBoolean(data[t])
+                });
+            }
             else if((param==='zoom')||(param==='trackSpacing'))
                 output += eLabels[param] + data.value;
             else
@@ -123,7 +131,7 @@ Util = {
     },
 
     _decodeGeneralSettings: function (input){
-        var outProp = {basic:{}, view:{},methylation:{}};
+        var outProp = {basic:{}, view:{},methylation:{},smallrna:{}};
         // zoom
         var resultZ = /z([0-9]+)/gi.exec(input);
         if (resultZ != null)
@@ -159,6 +167,15 @@ Util = {
             outProp.methylation['CG'] = this._decodeBoolen(resultM[1].substring(0,1));
             outProp.methylation['CHG'] = this._decodeBoolen(resultM[1].substring(1,2));
             outProp.methylation['CHH'] = this._decodeBoolen(resultM[1].substring(2,3));
+        }
+        var resultS = /s([0-9]+)/gi.exec(input);
+        if (resultS != null){
+            outProp.smallrna['21'] = this._decodeBoolen(resultS[1].substring(0,1));
+            outProp.smallrna['22'] = this._decodeBoolen(resultS[1].substring(1,2));
+            outProp.smallrna['23'] = this._decodeBoolen(resultS[1].substring(2,3));
+            outProp.smallrna['24'] = this._decodeBoolen(resultS[1].substring(3,4));
+            outProp.smallrna['pi'] = this._decodeBoolen(resultS[1].substring(4,5));
+            outProp.smallrna['Others'] = this._decodeBoolen(resultS[1].substring(5,6));
         }
         return outProp;
     },
