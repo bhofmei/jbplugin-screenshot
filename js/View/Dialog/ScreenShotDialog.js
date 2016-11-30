@@ -13,7 +13,6 @@ define( "ScreenShotPlugin/View/Dialog/ScreenShotDialog", [
     'dijit/form/RadioButton',
     "dijit/form/Select",
     'dijit/layout/ContentPane',
-    //'dijit/layout/AccordionContainer',
     'dijit/layout/TabContainer',
     'dijit/form/Button',
     'JBrowse/View/Dialog/WithActionBar',
@@ -35,7 +34,6 @@ function (
     dijitRadioButton,
     dijitSelect,
     dijitContentPane,
-    //dijitAccordionContainer,
     dijitTabContainer,
     Button,
     ActionBarDialog,
@@ -58,10 +56,8 @@ return declare (ActionBarDialog,{
         this.setCallback    = args.setCallback || function() {};
         this.cancelCallback = args.cancelCallback || function() {};
         this.vTracks = this.browser.view.visibleTracks();
-        //console.log(this.vTracks);
         this.configs = args.config || {};
         this.trackParameters = this._getTrackParameters();
-        //console.log(this.trackParameters);
      },
      
      _fillActionBar: function( actionBar ){
@@ -73,6 +69,10 @@ return declare (ActionBarDialog,{
                 //console.log(this.trackParameters);
                 var gParams = this.parameters.view;
                 gParams.methylation=this.parameters.methylation;
+                gParams.smallrna = {};
+                for(var s in this.parameters.smallrna){
+                    gParams.smallrna[s] = !this.parameters.smallrna[s]['value'];
+                }
                 gParams.zoom = this.parameters.output.zoom
                 var scParams = {general: gParams, tracks: this.trackParameters};
                 // js params
@@ -191,29 +191,74 @@ return declare (ActionBarDialog,{
                 input.placeAt(td,'first');
             }
         } // end for param
-        // handle methylation parameters if necessary
+        //
+        if(thisB.browser.plugins.hasOwnProperty(thisB.configs.smrnaPlugin) || thisB.browser.plugins.hasOwnProperty(thisB.configs.methylPlugin)){
+            thisB._methylation_smrna_table(obj);
+        }
+    },
+
+    _methylation_smrna_table: function(obj){
+        var thisB = this;
+        var table = dom.create('table',{'class':'screenshot-dialog-opt-table'}, obj);
+        var row, row2, tdata, box, cdata;
+        // methylation
         if(thisB.browser.plugins.hasOwnProperty(thisB.configs.methylPlugin)){
-            var mData = thisB.browser.plugins[thisB.configs.methylPlugin].config;
+            var cdata = thisB.browser.plugins[thisB.configs.methylPlugin].config;
             row = dom.create('tr',{id:'screenshot-dialog-row-methyl'},table);
-            dom.create('td',{innerHTML:'Methylation',className:'screenshot-dialog-pane-label', 'colspan':2},row);
-            var row2 = dom.create('tr',{'id':'screenshot-dialog-row-methyl-boxes'},table);
-            var methylD = dom.create('td',{'colspan':2},row2);
+            dom.create('td',{innerHTML:'Methylation',className:'screenshot-dialog-pane-label', 'colspan':3},row);
+            row2 = dom.create('tr',{'id':'screenshot-dialog-row-methyl-boxes'},table);
+            var tdata = dom.create('td',{'colspan':3},row2);
             // methylation types - animal vs plants
-            var mTypes = (mData.isAnimal ? {CG:true,CH:true} : thisB.parameters.methylation);
+            var mTypes = (cdata.isAnimal ? {CG:true,CH:true} : thisB.parameters.methylation);
             var m;
             for (m in mTypes){
-                var mbox = new dijitCheckBox({
+                var box = new dijitCheckBox({
                     id:'screenshot-dialog-methyl-'+m,
                     //'class':m+'-checkbox',
-                    style:'background-image:url('+mData.baseUrl.slice(1)+'/img/checkmark-'+m+'.png'+');',
+                    style:'background-image:url('+cdata.baseUrl.slice(1)+'/img/checkmark-'+m+'.png'+');',
                     '_prop':m,
                     checked: (m === 'CH' ? (thisB.parameters.methylation.CHG && thisB.parameters.methylation.CHH): thisB.parameters.methylation[m])
                 });
-                mbox.onClick = lang.hitch(thisB, '_setMethylation', mbox);
-                dom.create('span',{innerHTML:m,className:'screenshot-dialog-opt-span'}, methylD);
-                methylD.appendChild(mbox.domNode);
+                box.onClick = lang.hitch(thisB, '_setMethylation', box);
+                dom.create('span',{innerHTML:m,className:'screenshot-dialog-opt-span'}, tdata);
+                tdata.appendChild(box.domNode);
             }
-        }
+        } // end methylation
+
+        // small rna
+        if(thisB.browser.plugins.hasOwnProperty(thisB.configs.smrnaPlugin)){
+            cdata = thisB.browser.plugins[thisB.configs.smrnaPlugin].config;
+            row = dom.create('tr',{id:'screenshot-dialog-row-smrna'},table);
+            dom.create('td',{innerHTML:'Small RNAs',className:'screenshot-dialog-pane-label', 'colspan':3},row);
+            //row2 = dom.create('tr',{'id':'screenshot-dialog-row-smrna-1'},table);
+            // small rna types - if not animal, pirna = null
+            if(!cdata.isAnimal){
+                thisB.parameters.smallrna.pi.label = null;
+            }
+            var s, sinfo;
+            var types = ['1','21','22','23','2','24','pi','Others'];
+
+            array.forEach(types, function(s){
+                sinfo = thisB.parameters.smallrna[s];
+                // create new row
+                if(sinfo === undefined){
+                    // create new row
+                    row2 = dom.create('tr',{'id':'screenshot-dialog-row-smrna-'+s},table);
+                }
+                else if(sinfo.label !== null){
+                    tdata = dom.create('td',{className: 'screenshot-dialog-smrna-data', align: 'right'},row2);
+                    box = new dijitCheckBox({
+                        id:'screenshot-dialog-smrna-'+s,
+                        style:'background-image:url('+cdata.baseUrl.slice(1)+'/img/checkmark-'+sinfo.color+'.png'+');',
+                        '_prop':s,
+                        checked: sinfo.value
+                    });
+                    box.onClick = lang.hitch(thisB, '_setSmallRNA', box);
+                    dom.create('span',{innerHTML:sinfo.label,className:'screenshot-dialog-opt-span'}, tdata);
+                    tdata.appendChild(box.domNode);
+                }
+            });
+        } // end smallrna
     },
 
     _paneOut: function(obj){
@@ -411,6 +456,12 @@ return declare (ActionBarDialog,{
         }
     },
 
+    _setSmallRNA: function(box){
+        if(this.parameters.smallrna.hasOwnProperty(box._prop)){
+            this.parameters.smallrna[box._prop]['value'] = box.checked;
+        }
+    },
+
     _setFormatParameter: function(input){
         // set png, jpg, pdf and hide/show appropriate options
         var prop = input._prop;
@@ -485,7 +536,7 @@ return declare (ActionBarDialog,{
     },
 
     _getInitialParameters: function(){
-        // get browser parameterss
+        // get browser parameters
         var config = this.browser.config;
         // spinner -> zoom and trackSpacing
         var zoom = { value: config.highResolutionMode, title: 'Zoom factor'};
@@ -512,7 +563,14 @@ return declare (ActionBarDialog,{
         var pdfWidth = {value: 1800, title: 'View width (px)', min:100, max:10000, delta:100};
         var pdfHeight = {value: 1200, title: 'View height (px)', min:100, max:10000, delta:100};
 
-       return { view:{trackSpacing: trackSpacing, locOver: locOver, trackList: trackList, nav: nav, menu: menu, labels: labels}, methylation:{CG:true, CHG:true, CHH:true}, output: {format: format, zoom: zoom, quality: quality, image: {width: width, height: height}, pdf: {page: pdfOpt, pdfWidth: pdfWidth, pdfHeight: pdfHeight}} };
+        var smrna = {'21': {value: true, color: 'blue', label: '21-mers'},
+                     '22': {value: true, color: 'green', label: '22-mers'},
+                     '23': {value: true, color: 'orange', label: '23-mers'},
+                     '24': {value: true, color: 'red', label: '24-mers'},
+                     'pi': {value: true, color: 'purple', label: 'piRNAs'},
+                     'Others': {value: true, color: 'yellow', label: 'others'}};
+
+       return { view:{trackSpacing: trackSpacing, locOver: locOver, trackList: trackList, nav: nav, menu: menu, labels: labels}, methylation:{CG:true, CHG:true, CHH:true}, output: {format: format, zoom: zoom, quality: quality, image: {width: width, height: height}, pdf: {page: pdfOpt, pdfWidth: pdfWidth, pdfHeight: pdfHeight}}, smallrna: smrna };
     },
 
     _getTrackParameters: function(){
@@ -568,7 +626,7 @@ return declare (ActionBarDialog,{
                              quant: false});
         }
         // test canvas features and alignments
-        if(/CanvasFeatures$/.test(tType) || /Alignments2$/.test(tType)){
+        if(/CanvasFeatures$/.test(tType) || /Alignments2$/.test(tType) || /smAlignments$/.test(tType)){
             // check for SeqViews plugin
             var newM = {mode:{title:'Display mode',value:config.displayMode}};
             if(this.configs.seqViewsPlugin){

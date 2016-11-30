@@ -1805,6 +1805,7 @@ return declare( JBrowsePlugin,
         var baseUrl = this._defaultConfig().baseUrl;
         var browser = this.browser;
         this.isScreenshot = false;
+        console.log('ScreenShotPlugin starting');
 
         this.config.apiKey = 'a-demo-key-with-low-quota-per-ip-address';
         // PhantomJS Username
@@ -1839,6 +1840,7 @@ return declare( JBrowsePlugin,
                 thisB._applyScreenshotConfig(decoded);
                 browser.afterMilestone('loadConfig', function(){
                     thisB._applyMethylationConfig( decoded.general.methylation );
+                    thisB._applySmallRNAConfig( decoded.general.smallrna );
                     thisB._applyTracksConfig(decoded.tracks);
                 });
             }
@@ -1868,9 +1870,6 @@ return declare( JBrowsePlugin,
             // shortcut key
             browser.setGlobalKeyboardShortcut('s', showScreenShotDialog);
         });
-        browser.afterMilestone('completely initialized',function(){
-            //thisB._applyTrackLabelConfig();
-        })
     }, // end constructor
 
     _getPhantomJSUrl: function(){
@@ -1887,7 +1886,6 @@ return declare( JBrowsePlugin,
 
     _applyMethylationConfig: function(params){
         var thisB = this;
-        //var methylation = thisB.decoded.methylation;
         // check for methylation plugin
         if(thisB.browser.plugins.hasOwnProperty(thisB.config.methylPlugin)){
             var m,t;
@@ -1906,10 +1904,37 @@ return declare( JBrowsePlugin,
             } // end for m in params
         } // end if MethylationPlugin
     },
+
     _testMethylation: function(trackType){
         if(trackType === undefined || trackType === null)
             return false;
         return ((/\b(MethylXYPlot)/.test( trackType )  || /\b(MethylPlot)/.test( trackType ) ));
+    },
+
+    _applySmallRNAConfig: function(params){
+        var thisB = this;
+        // check for small rna plugin
+        if(thisB.browser.plugins.hasOwnProperty(thisB.config.smrnaPlugin)){
+            var m,t;
+            var tracks = lang.clone(thisB.browser.trackConfigsByName);
+            for(m in params){
+                if(params[m] === true){
+                    var mix = {};
+                    mix['hide'+m] = true;
+                    for(t in tracks){
+                        if(thisB._testSmallRNA(tracks[t].type)){
+                            lang.mixin(thisB.browser.trackConfigsByName[t], mix);
+                        }
+                    }
+                // TODO: add command to disable toolbar buttons if necessary
+                } // end if params[m] === true
+            } // end for m in params
+        } // end if SmallRNAPlugin
+    },
+    _testSmallRNA: function(trackType){
+        if(trackType === undefined || trackType === null)
+            return false;
+        return (/\b(smAlignments)/.test( trackType ) );
     },
 
     _applyTracksConfig: function(params){
@@ -1918,7 +1943,6 @@ return declare( JBrowsePlugin,
         // loop through tracks
         var t;
         for (t in tracks){
-            //console.log(thisB.browser.trackConfigsByName[t]);
             if(params.hasOwnProperty(t)){
                 // pull out histograms and/or style
                 var hist = params[t].histograms;
