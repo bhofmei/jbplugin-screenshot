@@ -73,11 +73,20 @@ If the plugin ID<sup>1</sup> is anything except `MethylationPlugin`, the ID will
 For _jbrowse.conf_
 ```
     [plugins.ScreenShotPlugin]
-    location = plugins/ScreenShotPlugin
+    ...
     methylPlugin = <methylation_plugin_id>
 ```
 
-Future support will be added for SmallRNAPlugin by the same author.
+###Small RNA Plugin
+This plugin includes support for the [SmallRNAPlugin](https://github.com/bhofmei/jbplugin-smallrna).  
+If the plugin ID<sup>1</sup> is anything except `SmallRNAPlugin`, the ID will need to be specified. 
+
+For _jbrowse.conf_
+```
+    [plugins.ScreenShotPlugin]
+    ...
+    smrnaPlugin = <smallrna_plugin_id>
+```
 
 <sup>1</sup>For jbrowse.conf, the plugin ID is found as `[plugins.ID]` for each plugin.  
 In jbrowse_conf.json, the plugin ID is found as `"plugins":{"ID":{"location":"..."}}`

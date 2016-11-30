@@ -1,4 +1,7 @@
 # Release Notes
+v1.3.0 - Nov 30, 2016
+- includes support for small rna plugin (see readme for additional details)
+
 v1.2.0 - Nov 4, 2016
 - allows for pdf output option with some pdf specific parameters
 - PDF output requires selecting a page size and orientation
