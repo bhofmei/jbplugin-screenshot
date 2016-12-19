@@ -1,4 +1,7 @@
 # Release Notes
+v1.3.2 - Dec 19, 2016
+- fixed small rna hide/show in screenshot (previously no small rna's were hidden when taking the screenshot)
+
 v1.3.1 - Nov 31, 2016
 - minor update for formatting
 

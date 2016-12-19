@@ -1827,8 +1827,8 @@ return declare( JBrowsePlugin,
             thisB.config.seqViewsPlugin = browser.plugins.hasOwnProperty('SeqViewsPlugin');
             if (args.seqViewsPlugin !== undefined)
                 thisB.config.seqViewsPlugin = args.seqViewsPlugin;
-        });
-        browser.afterMilestone('initPlugins', function(){
+        //});
+        //browser.afterMilestone('initPlugins', function(){
             // check for screenshot query parameters
             //console.log(browser);
             if(browser.config.queryParams.hasOwnProperty('screenshot')){
@@ -1836,11 +1836,13 @@ return declare( JBrowsePlugin,
                 var encoded = browser.config.queryParams.screenshot;
                 var trackList = browser.config.queryParams.tracks;
                 var decoded = Util.decode(encoded,trackList);
+                //console.log(JSON.stringify(browser.plugins));
                 // apply
                 thisB._applyScreenshotConfig(decoded);
                 browser.afterMilestone('loadConfig', function(){
-                    thisB._applyMethylationConfig( decoded.general.methylation );
-                    thisB._applySmallRNAConfig( decoded.general.smallrna );
+                    //thisB._applyMethylationConfig( decoded.general.methylation );
+                    //thisB._applySmallRNAConfig( decoded.general.smallrna );
+                    thisB._applyMethSmRNAConfig(decoded.general.methylation, decoded.general.smallrna );
                     thisB._applyTracksConfig(decoded.tracks);
                 });
             }
@@ -1884,12 +1886,39 @@ return declare( JBrowsePlugin,
         lang.mixin(this.browser.config.view, params.general.view);
     },
 
+    _applyMethSmRNAConfig: function(mParams, sParams){
+        var thisB = this;
+        var s, m, t;
+        var mmix = {};
+        for(m in mParams){
+            if(mParams[m]===false){
+                mmix['show'+m]=false;
+            }
+        }
+        var smix = {};
+        for(s in sParams){
+            if(sParams[s] === true){
+                smix['hide'+s] = true;
+            }
+        }
+        var tracks = lang.clone(thisB.browser.trackConfigsByName);
+        for(t in tracks){
+            if(thisB._testMethylation(tracks[t].type)){
+                lang.mixin(thisB.browser.trackConfigsByName[t], mmix);
+            } else if(thisB._testSmallRNA(tracks[t].type)){
+                lang.mixin(thisB.browser.trackConfigsByName[t], smix);
+            }
+        }
+
+    },
+
     _applyMethylationConfig: function(params){
         var thisB = this;
         // check for methylation plugin
         if(thisB.browser.plugins.hasOwnProperty(thisB.config.methylPlugin)){
             var m,t;
             var tracks = lang.clone(thisB.browser.trackConfigsByName);
+            //console.log('methylation tracks');
             for(m in params){
                 if(params[m] === false){
                     var mix = {};
@@ -1912,9 +1941,10 @@ return declare( JBrowsePlugin,
     },
 
     _applySmallRNAConfig: function(params){
+
         var thisB = this;
         // check for small rna plugin
-        if(thisB.browser.plugins.hasOwnProperty(thisB.config.smrnaPlugin)){
+        //if(thisB.browser.plugins.hasOwnProperty(thisB.config.smrnaPlugin)){
             var m,t;
             var tracks = lang.clone(thisB.browser.trackConfigsByName);
             for(m in params){
@@ -1925,11 +1955,12 @@ return declare( JBrowsePlugin,
                         if(thisB._testSmallRNA(tracks[t].type)){
                             lang.mixin(thisB.browser.trackConfigsByName[t], mix);
                         }
+
                     }
                 // TODO: add command to disable toolbar buttons if necessary
                 } // end if params[m] === true
             } // end for m in params
-        } // end if SmallRNAPlugin
+        //} // end if SmallRNAPlugin
     },
     _testSmallRNA: function(trackType){
         if(trackType === undefined || trackType === null)
