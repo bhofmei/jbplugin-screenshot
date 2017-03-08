@@ -1,15 +1,44 @@
-v0.1.3 - Aug 30, 2016
+# Release Notes
+v1.3.2 - Dec 19, 2016
+- fixed small rna hide/show in screenshot (previously no small rna's were hidden when taking the screenshot)
+
+v1.3.1 - Nov 31, 2016
+- minor update for formatting
+
+v1.3.0 - Nov 30, 2016
+- includes support for small rna plugin (see readme for additional details)
+
+v1.2.0 - Nov 4, 2016
+- allows for pdf output option with some pdf specific parameters
+- PDF output requires selecting a page size and orientation
+- height/width parameters are used for "viewport" not output page size
+
+v1.1.1 - Sept 12, 2016
+- bug fix for SeqViewsPlugin configuration
+
+v1.1.0 - Sept 12, 2016
+- for canvas-feature type tracks, now can specificy display mode (normal, compact, collapsed)
+- when SeqViewsPlugin is activated, can also specificy display style (default, features, histograms)
+
+v1.0.5 - Sept 8, 2016
+- fixed issue with track-specific y-scale radio buttons not correctly checked when dialog is open
+- improved check for XYPlots which includes StrandedXYPlots from StrandedPlotPlugin
+
+v1.0.4 - Aug 30, 2016
+- animal methylation coloring
+
+v1.0.3 - Aug 30, 2016
 - added methylPlugin configuration parameter to correctly handle MethylationPlugin
 - fixed path to methylation plugin for checkboxes to work properly
 
-v0.1.2 - Aug 30, 2016
+v1.0.2 - Aug 30, 2016
 - rearranged dialog so track-specific settings are at the bottom
 - track specific setting uses tab container instead of accordian since accordian had problems with more than 8-ish tracks
 
-v0.1.1 - Aug 29, 2016
+v1.0.1 - Aug 29, 2016
 - fixed issue with track specific setting where settings for tracks 10+ were ignored
 
-v0.1.0 - Aug 11, 2016
+v1.0.0 - Aug 11, 2016
 - track-specific settings
 
 v0.0.4 - Aug 3, 2016
