@@ -391,8 +391,13 @@ return declare (ActionBarDialog,{
             // loop through parameters
             for(param in tParams){
                 data = tParams[param];
+                // data undefined issue
+                if(data === undefined){
+                    var unDefDiv = dom.create('div',{innerHTML:'Error with track'},obj);
+                    tParams[param] = {};
+                }
                 // yscale is radio boxes
-                if(param in {'ypos':1, 'mode':1,'style':1}){
+                else if(param in {'ypos':1, 'mode':1,'style':1}){
                     // list of options to use
                     var optList = optDict[param];
                     // yscale position radio boxes

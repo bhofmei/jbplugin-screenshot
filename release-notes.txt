@@ -1,4 +1,7 @@
 # Release Notes
+v1.3.3 - Mar 9, 2017
+- Catch data undefined issue
+
 v1.3.2 - Dec 19, 2016
 - fixed small rna hide/show in screenshot (previously no small rna's were hidden when taking the screenshot)
 
