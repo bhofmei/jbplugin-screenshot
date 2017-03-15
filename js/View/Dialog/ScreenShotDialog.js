@@ -79,7 +79,7 @@ return declare (ActionBarDialog,{
                 var jsParams = this.parameters.output;
                 // get the url
                 var url = this._getPhantomJSUrl(scParams, jsParams);
-                console.log(url);
+                //console.log(url);
                 window.open(url);
                 this.setCallback && this.setCallback( );
                 //this.hide();
