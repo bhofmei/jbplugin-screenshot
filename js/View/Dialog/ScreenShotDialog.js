@@ -66,7 +66,7 @@ return declare (ActionBarDialog,{
             label: "Render",
             onClick: lang.hitch(this, function() {
                 // screenshot parameters
-                //console.log(this.trackParameters);
+                //console.log(this.parameters);
                 var gParams = this.parameters.view;
                 gParams.methylation=this.parameters.methylation;
                 gParams.smallrna = {};
@@ -79,7 +79,7 @@ return declare (ActionBarDialog,{
                 var jsParams = this.parameters.output;
                 // get the url
                 var url = this._getPhantomJSUrl(scParams, jsParams);
-                //console.log(url);
+                console.log(url);
                 window.open(url);
                 this.setCallback && this.setCallback( );
                 //this.hide();
@@ -329,6 +329,18 @@ return declare (ActionBarDialog,{
                         thisB._createSpinner(tbod, data2, param2, '_setPDFParameter', thisB);
                     }
                 }
+            } else if (param === 'time') {
+                // check boxes
+                 var row = dom.create('tr',{id:'screenshot-dialog-row-'+param},tableB);
+                dom.create('td',{'innerHTML':data.title,'class':'screenshot-dialog-pane-label'}, row);
+                var td = dom.create('td',{'class':'screenshot-dialog-pane-input'},row);
+                var input = new dijitCheckBox({
+                    id:'screenshot-dialog-opt-box-'+param,
+                    '_prop': param,
+                    checked: data.value
+                });
+                input.onClick = lang.hitch(thisB, '_setParameter', input);
+                input.placeAt(td,'first');
             } else {
                 // number spinners
                 //data = outParam[param];
@@ -512,13 +524,19 @@ return declare (ActionBarDialog,{
         }*/
         // check box parameters
         if(input.hasOwnProperty('checked')){
+            // view parameters
             if(this.parameters.view.hasOwnProperty(prop))
                 this.parameters.view[prop].value = !! input.checked;
+            // output parameters
+            else if(this.parameters.output.hasOwnProperty(prop))
+                this.parameters.output[prop].value = !! input.checked;
         }
         // else spinner or slider
         else{
+            // view parameters
             if(this.parameters.view.hasOwnProperty(prop))
                 this.parameters.view[prop].value = input.value;
+            // output parameters
             else if(this.parameters.output.hasOwnProperty(prop))
                 this.parameters.output[prop].value = input.value;
         }
@@ -567,6 +585,7 @@ return declare (ActionBarDialog,{
         var pdfOpt = {value: 'letter landscape', title: 'Page format'};
         var pdfWidth = {value: 1800, title: 'View width (px)', min:100, max:10000, delta:100};
         var pdfHeight = {value: 1200, title: 'View height (px)', min:100, max:10000, delta:100};
+        var time = {value: false, title: 'Extra rendering time'};
 
         var smrna = {'21': {value: true, color: 'blue', label: '21-mers'},
                      '22': {value: true, color: 'green', label: '22-mers'},
@@ -575,7 +594,7 @@ return declare (ActionBarDialog,{
                      'pi': {value: true, color: 'purple', label: 'piRNAs'},
                      'Others': {value: true, color: 'yellow', label: 'others'}};
 
-       return { view:{trackSpacing: trackSpacing, locOver: locOver, trackList: trackList, nav: nav, menu: menu, labels: labels}, methylation:{CG:true, CHG:true, CHH:true}, output: {format: format, zoom: zoom, quality: quality, image: {width: width, height: height}, pdf: {page: pdfOpt, pdfWidth: pdfWidth, pdfHeight: pdfHeight}}, smallrna: smrna };
+       return { view:{trackSpacing: trackSpacing, locOver: locOver, trackList: trackList, nav: nav, menu: menu, labels: labels}, methylation:{CG:true, CHG:true, CHH:true}, output: {format: format, zoom: zoom, quality: quality, image: {width: width, height: height}, pdf: {page: pdfOpt, pdfWidth: pdfWidth, pdfHeight: pdfHeight}, time: time}, smallrna: smrna };
     },
 
     _getTrackParameters: function(){

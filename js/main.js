@@ -1780,6 +1780,7 @@ define('ScreenShotPlugin/main',[
     'dojo/_base/array',
     'dojo/dom',
     "dojo/dom-attr",
+    'dojo/dom-construct',
     'dijit/form/Button',
     './View/Dialog/ScreenShotDialog',
     './Util',
@@ -1792,6 +1793,7 @@ function(
     array,
     dom,
     domAttr,
+    domConstr,
     dijitButton,
     ScreenShotDialog,
     Util,
@@ -1869,8 +1871,18 @@ return declare( JBrowsePlugin,
         });
                 menuBar.appendChild( button.domNode );
             }
+            // hidden attribute
+            var gb = dom.byId('GenomeBrowser');
+            var h = domConstr.create('input',{type:'hidden',id:'screenshot-hidden-element'},gb);
+            //console.log(h);
             // shortcut key
             browser.setGlobalKeyboardShortcut('s', showScreenShotDialog);
+        });
+
+        browser.afterMilestone('completely initialized', function(){
+           //var h = dom.byId('screenshot-hidden-element');
+           domAttr.set('screenshot-hidden-element','value','set');
+            //console.log('set');
         });
     }, // end constructor
 
