@@ -64,6 +64,9 @@ div#screenshot-dialog-pane-top div.dijit.dijitReset.dijitInline.dijitCheckBox {
   font-weight: bold;
   padding: 2px 0px 2px 0px;
 }
+#screenshot-dialog-row-maxtime td div.screenshot-dialog-pane-label {
+  padding-left: 15px;
+}
 .screenshot-dialog-pane-input {
   padding-left: 5px;
 }

@@ -21,7 +21,7 @@ Util = {
     },
 
     encodePhantomJSSettings: function(params){
-        // params include url, format, height, width, zoom
+        // params include url, format, height, width, zoom, time
         // ?request={url:"http://www.highcharts.com/demo/pie-donut",renderType:"jpg",renderSettings:{zoomFactor:2,viewport:{width:100,height:500}}}
         // split parameters into pdf type and image type
         var outDict = {url: params.url, renderType: params.format.value};
@@ -36,6 +36,10 @@ Util = {
             renderDict['viewport'] = {width:params.pdf.pdfWidth.value, height: params.pdf.pdfHeight.value};
         } else {
             renderDict['viewport'] = {width:params.image.width.value, height: params.image.height.value};
+        }
+        // check for extra time
+        if(params.time.value){
+            outDict['requestSettings'] = {maxWait:(params.time.extra.value*1000)};
         }
         outDict['renderSettings'] = renderDict;
         var outString = json.stringify(outDict);

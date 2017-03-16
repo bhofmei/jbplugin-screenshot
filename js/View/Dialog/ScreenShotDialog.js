@@ -148,6 +148,7 @@ return declare (ActionBarDialog,{
         // hide/show based on output format
         domStyle.set("screenshot-dialog-image-rows", "display", (thisB.parameters.output.format === 'PDF' ? 'none' : ''));
         domStyle.set('screenshot-dialog-pdf-rows', 'display', (thisB.parameters.output.format == 'PDF' ? '' : 'none'));
+        domStyle.set('screenshot-dialog-row-maxtime','display',(thisB.parameters.output.time.value ? '' : 'none'));
 
         this.inherited( arguments );
     },
@@ -330,7 +331,7 @@ return declare (ActionBarDialog,{
                     }
                 }
             } else if (param === 'time') {
-                // check boxes
+                // check box
                  var row = dom.create('tr',{id:'screenshot-dialog-row-'+param},tableB);
                 dom.create('td',{'innerHTML':data.title,'class':'screenshot-dialog-pane-label'}, row);
                 var td = dom.create('td',{'class':'screenshot-dialog-pane-input'},row);
@@ -339,8 +340,11 @@ return declare (ActionBarDialog,{
                     '_prop': param,
                     checked: data.value
                 });
-                input.onClick = lang.hitch(thisB, '_setParameter', input);
+                input.onClick = lang.hitch(thisB, '_setTimeParameter', input);
                 input.placeAt(td,'first');
+                // create the extra hidden row
+                thisB._createSpinner(tableB, data.extra, 'maxtime', '_setTimeParameter', thisB);
+                //domStyle.set('screenshot-dialog-row-maxtime','display','none');
             } else {
                 // number spinners
                 //data = outParam[param];
@@ -502,6 +506,26 @@ return declare (ActionBarDialog,{
         }
     },
 
+    _setTimeParameter: function(input){
+        var prop = input._prop;
+        prop = (prop === 'maxtime' ? 'time' : prop);
+        if(this.parameters.output.hasOwnProperty(prop)){
+            // checkbox
+            if(input.hasOwnProperty('checked')){
+                var isCheck = !!input.checked;
+                this.parameters.output[prop].value = isCheck;
+                // checked - show the max time row
+                if(isCheck)
+                    domStyle.set('screenshot-dialog-row-maxtime','display','');
+                else
+                    domStyle.set('screenshot-dialog-row-maxtime','display','none');
+            } // number spinner
+            else {
+                this.parameters.output[prop].extra.value = input.value;
+            }
+        }
+    },
+
     _setImageParameter: function(input){
         var prop = input._prop;
         if(this.parameters.output.image.hasOwnProperty(prop))
@@ -585,7 +609,8 @@ return declare (ActionBarDialog,{
         var pdfOpt = {value: 'letter landscape', title: 'Page format'};
         var pdfWidth = {value: 1800, title: 'View width (px)', min:100, max:10000, delta:100};
         var pdfHeight = {value: 1200, title: 'View height (px)', min:100, max:10000, delta:100};
-        var time = {value: false, title: 'Extra rendering time'};
+        var time = {value: false, title: 'Extra render time',
+                    extra:{value:40, title: 'Max (s)', min:40, max:300, delta:10}};
 
         var smrna = {'21': {value: true, color: 'blue', label: '21-mers'},
                      '22': {value: true, color: 'green', label: '22-mers'},
