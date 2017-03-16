@@ -1,11 +1,13 @@
 define( "ScreenShotPlugin/Util", [
     'dojo/_base/declare',
     'dojo/_base/array',
+    'dojo/_base/lang',
     'dojo/json'
     ],
 function (
     declare,
     array,
+    lang,
     json
 ) {
 var Util;
@@ -21,8 +23,21 @@ Util = {
     encodePhantomJSSettings: function(params){
         // params include url, format, height, width, zoom
         // ?request={url:"http://www.highcharts.com/demo/pie-donut",renderType:"jpg",renderSettings:{zoomFactor:2,viewport:{width:100,height:500}}}
-        var outDict = {url: params.url, renderType: params.format.value, renderSettings: {
-            zoomFactor: params.zoom.value, viewport: {width:params.width.value, height: params.height.value}}};
+        // split parameters into pdf type and image type
+        var outDict = {url: params.url, renderType: params.format.value};
+        var renderDict = {zoomFactor: params.zoom.value, quality: params.quality.value};
+        //var outDict = {url: params.url, renderType: params.format.value, renderSettings: {zoomFactor: params.zoom.value, viewport: {width:params.width.value, height: params.height.value}}};
+        // check PDF
+        if(params.format.value === 'PDF'){
+            // page needs split by space, then format, orientation
+            var pageFormat = params.pdf.page.value;
+            pageFormat = pageFormat.split(' ');
+            renderDict['pdfOptions'] = {format: pageFormat[0], orientation: pageFormat[1], footer:null};
+            renderDict['viewport'] = {width:params.pdf.pdfWidth.value, height: params.pdf.pdfHeight.value};
+        } else {
+            renderDict['viewport'] = {width:params.image.width.value, height: params.image.height.value};
+        }
+        outDict['renderSettings'] = renderDict;
         var outString = json.stringify(outDict);
         outString = outString.replace(/\"([^(\")"]+)\":/g,"$1:");
         return '?request='+outString;
@@ -40,14 +55,22 @@ Util = {
     },
 
     _encodeGeneralSettings: function(params){
-        // locOver, menu, methylation, nav, trackList, trackSpacing, labels, zoom
+        // locOver, menu, methylation, nav, trackList, trackSpacing, labels, zoom, small rna
         var output = '';
-        var eLabels = { zoom:'z', trackSpacing:'p', locOver: 'o', trackList:'r', nav:'n', menu:'u', labels:'b', methylation:'m'};
+        var eLabels = { zoom:'z', trackSpacing:'p', locOver: 'o', trackList:'r', nav:'n', menu:'u', labels:'b', methylation:'m', smallrna: 's'};
         var param;
+        var thisB = this;
         for(param in params){
             var data = params[param];
             if(param==='methylation')
                 output += eLabels[param] + this._encodeBoolean(data.CG) + this._encodeBoolean(data.CHG) + this._encodeBoolean(data.CHH);
+            else if(param === 'smallrna'){
+                output += eLabels[param];
+                var types = ['21','22','23','24','pi','Others'];
+                array.forEach(types, function(t){
+                    output += thisB._encodeBoolean(data[t])
+                });
+            }
             else if((param==='zoom')||(param==='trackSpacing'))
                 output += eLabels[param] + data.value;
             else
@@ -73,8 +96,12 @@ Util = {
     _encodeTrack: function(params){
         // q[0|1] quantitative, y[0|1|2|3] yscale none, center, left, right
         // h# track height, i# min, x# max
-        var eLabels = {height: 'h', min: 'i', max: 'x', quant: 'q', ypos: 'y'};
-        var locDict = {'none': 0, 'center': 1, 'left': 2, 'right':3 };
+        // d[0|1|2] display mode normal, compact, collapse
+        // f[0|1|2] display style default, features, histograms
+        var eLabels = {height: 'h', min: 'i', max: 'x', quant: 'q', ypos: 'y', mode: 'd', style: 'f'};
+        var optsDict = {ypos:{'none': 0, 'center': 1, 'left': 2, 'right':3 },
+                        mode: {'normal':0,'compact':1,'collapsed':2},
+                        style: {'default':0,'features':1,'histograms':2}};
         var param, data;
 
         var output = '~' + params.trackNum;
@@ -85,9 +112,9 @@ Util = {
                 output += eLabels[param] + this._encodeBoolean(data);
             else if(!(data === undefined || data.value === undefined || eLabels.hasOwnProperty(param)===false )){
                 output += eLabels[param]
-                // ypos
-                if (param === 'ypos')
-                    output += locDict[data.value];
+                // ypos, mode, style
+                if (param in {ypos:1, mode:1, style:1})
+                    output +=  optsDict[param][data.value];
                 else
                     output += data.value;
             }
@@ -104,7 +131,7 @@ Util = {
     },
 
     _decodeGeneralSettings: function (input){
-        var outProp = {basic:{}, view:{},methylation:{}};
+        var outProp = {basic:{}, view:{},methylation:{},smallrna:{}};
         // zoom
         var resultZ = /z([0-9]+)/gi.exec(input);
         if (resultZ != null)
@@ -140,6 +167,15 @@ Util = {
             outProp.methylation['CG'] = this._decodeBoolen(resultM[1].substring(0,1));
             outProp.methylation['CHG'] = this._decodeBoolen(resultM[1].substring(1,2));
             outProp.methylation['CHH'] = this._decodeBoolen(resultM[1].substring(2,3));
+        }
+        var resultS = /s([0-9]+)/gi.exec(input);
+        if (resultS != null){
+            outProp.smallrna['21'] = this._decodeBoolen(resultS[1].substring(0,1));
+            outProp.smallrna['22'] = this._decodeBoolen(resultS[1].substring(1,2));
+            outProp.smallrna['23'] = this._decodeBoolen(resultS[1].substring(2,3));
+            outProp.smallrna['24'] = this._decodeBoolen(resultS[1].substring(3,4));
+            outProp.smallrna['pi'] = this._decodeBoolen(resultS[1].substring(4,5));
+            outProp.smallrna['Others'] = this._decodeBoolen(resultS[1].substring(5,6));
         }
         return outProp;
     },
@@ -208,6 +244,22 @@ Util = {
                 var locList = ['none','center','left','right'];
                 var yposI = parseInt(resultY[1]);
                 out[tLabel]['yScalePosition'] = locList[yposI];
+            }
+            // get mode
+            var resultD = /d([0-2])/gi.exec(parmStr);
+            //console.log(resultY);
+            if (resultD != null){
+                var modeList = ['normal','compact','collapsed'];
+                var modeI = parseInt(resultD[1]);
+                out[tLabel]['displayMode'] = modeList[modeI];
+            }
+            // get style
+            var resultF = /f([0-2])/gi.exec(parmStr);
+            //console.log(resultY);
+            if (resultF != null){
+                var styleList = ['default','features','histograms'];
+                var styleI = parseInt(resultF[1]);
+                out[tLabel]['displayStyle'] = styleList[styleI];
             }
         });
         return out;

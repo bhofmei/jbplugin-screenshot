@@ -2,14 +2,17 @@ define( "ScreenShotPlugin/View/Dialog/ScreenShotDialog", [
     'dojo/_base/declare',
     'dojo/_base/lang',
     'dojo/dom-construct',
+    'dojo/dom-style',
+    'dojo/dom-attr',
     'dojo/_base/array',
     'dojo/on',
     'dijit/focus',
+    "dijit/registry",
     'dijit/form/CheckBox',
     'dijit/form/NumberSpinner',
     'dijit/form/RadioButton',
+    "dijit/form/Select",
     'dijit/layout/ContentPane',
-    //'dijit/layout/AccordionContainer',
     'dijit/layout/TabContainer',
     'dijit/form/Button',
     'JBrowse/View/Dialog/WithActionBar',
@@ -20,14 +23,17 @@ function (
     declare,
     lang,
     dom,
+    domStyle,
+    domAttr,
     array,
     on,
     focus,
+    registry,
     dijitCheckBox,
     dijitNumberSpinner,
     dijitRadioButton,
+    dijitSelect,
     dijitContentPane,
-    //dijitAccordionContainer,
     dijitTabContainer,
     Button,
     ActionBarDialog,
@@ -50,20 +56,23 @@ return declare (ActionBarDialog,{
         this.setCallback    = args.setCallback || function() {};
         this.cancelCallback = args.cancelCallback || function() {};
         this.vTracks = this.browser.view.visibleTracks();
-        //console.log(this.vTracks);
-        this.trackParameters = this._getTrackParameters();
         this.configs = args.config || {};
+        this.trackParameters = this._getTrackParameters();
      },
      
      _fillActionBar: function( actionBar ){
         dojo.addClass(actionBar, 'screenshot-dialog-actionbar');
         var ok_button = new Button({
             label: "Render",
-            onClick: dojo.hitch(this, function() {
+            onClick: lang.hitch(this, function() {
                 // screenshot parameters
                 //console.log(this.trackParameters);
                 var gParams = this.parameters.view;
                 gParams.methylation=this.parameters.methylation;
+                gParams.smallrna = {};
+                for(var s in this.parameters.smallrna){
+                    gParams.smallrna[s] = !this.parameters.smallrna[s]['value'];
+                }
                 gParams.zoom = this.parameters.output.zoom
                 var scParams = {general: gParams, tracks: this.trackParameters};
                 // js params
@@ -79,7 +88,7 @@ return declare (ActionBarDialog,{
 
         var cancel_button = new Button({
             label: "Cancel",
-            onClick: dojo.hitch(this, function() {
+            onClick: lang.hitch(this, function() {
                 //console.log(this.trackParameters);
                 this.cancelCallback && this.cancelCallback();
                 this.hide();
@@ -136,6 +145,10 @@ return declare (ActionBarDialog,{
             paneFooter
         ] );
 
+        // hide/show based on output format
+        domStyle.set("screenshot-dialog-image-rows", "display", (thisB.parameters.output.format === 'PDF' ? 'none' : ''));
+        domStyle.set('screenshot-dialog-pdf-rows', 'display', (thisB.parameters.output.format == 'PDF' ? '' : 'none'));
+
         this.inherited( arguments );
     },
     
@@ -163,7 +176,6 @@ return declare (ActionBarDialog,{
                     style:"width:50px;"
                 });
             }else{
-                //if(param === 'labels' && thisB.browser.plugins.hasOwnProperty('HideTrackLabels')===false){
                 if(param === 'labels'){
                     input = null;
                 }else{
@@ -175,49 +187,98 @@ return declare (ActionBarDialog,{
                 }
             }
             if(input !== null){
-                input.onClick = dojo.hitch(thisB, '_setParameter', input);
+                input.onClick = lang.hitch(thisB, '_setParameter', input);
                 input.placeAt(td,'first');
             }
         } // end for param
+        //
+        if(thisB.browser.plugins.hasOwnProperty(thisB.configs.smrnaPlugin) || thisB.browser.plugins.hasOwnProperty(thisB.configs.methylPlugin)){
+            thisB._methylation_smrna_table(obj);
+        }
+    },
+
+    _methylation_smrna_table: function(obj){
+        var thisB = this;
+        var table = dom.create('table',{'class':'screenshot-dialog-opt-table'}, obj);
+        var row, row2, tdata, box, cdata;
+        // methylation
         if(thisB.browser.plugins.hasOwnProperty(thisB.configs.methylPlugin)){
-            var mData = thisB.browser.plugins[thisB.configs.methylPlugin].config;
+            var cdata = thisB.browser.plugins[thisB.configs.methylPlugin].config;
             row = dom.create('tr',{id:'screenshot-dialog-row-methyl'},table);
-            dom.create('td',{innerHTML:'Methylation',className:'screenshot-dialog-pane-label', 'colspan':2},row);
-            var row2 = dom.create('tr',{'id':'screenshot-dialog-row-methyl-boxes'},table);
-            var methylD = dom.create('td',{'colspan':2},row2);
+            dom.create('td',{innerHTML:'Methylation',className:'screenshot-dialog-pane-label', 'colspan':3},row);
+            row2 = dom.create('tr',{'id':'screenshot-dialog-row-methyl-boxes'},table);
+            // methylation types - animal vs plants
+            var mTypes = (cdata.isAnimal ? {CG:true,CH:true} : thisB.parameters.methylation);
             var m;
-            for (m in thisB.parameters.methylation){
-                var mbox = new dijitCheckBox({
+            for (m in mTypes){
+                var tdata = dom.create('td',{align:'right'},row2);
+                var box = new dijitCheckBox({
                     id:'screenshot-dialog-methyl-'+m,
                     //'class':m+'-checkbox',
-                    style:'background-image:url('+mData.baseUrl.slice(1)+'/img/checkmark-'+m+'.png'+');',
+                    style:'background-image:url('+cdata.baseUrl.slice(1)+'/img/checkmark-'+m+'.png'+');',
                     '_prop':m,
-                    checked: thisB.parameters.methylation[m]
+                    checked: (m === 'CH' ? (thisB.parameters.methylation.CHG && thisB.parameters.methylation.CHH): thisB.parameters.methylation[m])
                 });
-                mbox.onClick = dojo.hitch(thisB, '_setMethylation', mbox);
-                dom.create('span',{innerHTML:m,className:'screenshot-dialog-opt-span'}, methylD);
-                methylD.appendChild(mbox.domNode);
+                box.onClick = lang.hitch(thisB, '_setMethylation', box);
+                dom.create('span',{innerHTML:m,className:'screenshot-dialog-opt-span'}, tdata);
+                tdata.appendChild(box.domNode);
             }
-        }
+        } // end methylation
+
+        // small rna
+        if(thisB.browser.plugins.hasOwnProperty(thisB.configs.smrnaPlugin)){
+            cdata = thisB.browser.plugins[thisB.configs.smrnaPlugin].config;
+            row = dom.create('tr',{id:'screenshot-dialog-row-smrna'},table);
+            dom.create('td',{innerHTML:'Small RNAs',className:'screenshot-dialog-pane-label', 'colspan':3},row);
+            //row2 = dom.create('tr',{'id':'screenshot-dialog-row-smrna-1'},table);
+            // small rna types - if not animal, pirna = null
+            if(!cdata.isAnimal){
+                thisB.parameters.smallrna.pi.label = null;
+            }
+            var s, sinfo;
+            var types = ['1','21','22','23','2','24','pi','Others'];
+
+            array.forEach(types, function(s){
+                sinfo = thisB.parameters.smallrna[s];
+                // create new row
+                if(sinfo === undefined){
+                    // create new row
+                    row2 = dom.create('tr',{'id':'screenshot-dialog-row-smrna-'+s},table);
+                }
+                else if(sinfo.label !== null){
+                    tdata = dom.create('td',{className: 'screenshot-dialog-smrna-data', align: 'right'},row2);
+                    box = new dijitCheckBox({
+                        id:'screenshot-dialog-smrna-'+s,
+                        style:'background-image:url('+cdata.baseUrl.slice(1)+'/img/checkmark-'+sinfo.color+'.png'+');',
+                        '_prop':s,
+                        checked: sinfo.value
+                    });
+                    box.onClick = lang.hitch(thisB, '_setSmallRNA', box);
+                    dom.create('span',{innerHTML:sinfo.label,className:'screenshot-dialog-opt-span'}, tdata);
+                    tdata.appendChild(box.domNode);
+                }
+            });
+        } // end smallrna
     },
 
     _paneOut: function(obj){
         var thisB = this;
         dom.create('h2',{'innerHTML':'Output configuration options'}, obj);
         var tableB = dom.create('table',{'class':'screenshot-dialog-opt-table'},obj);
-        var param, data, row, row2;
+        var param, data, row, row2, tdLabel;
         // output options -> format (PNG, JPEG, PDF), height, width
         var outParam = thisB.parameters.output;
         for(param in outParam){
             data = outParam[param];
             if(param === 'format'){
                 row = dom.create('tr',{'id':'screenshot-dialog-row-'+param,'colspan':2},tableB);
-                dom.create('td',{'innerHTML':data.title,'class':'screenshot-dialog-pane-label'}, row);
+                tdLabel = dom.create('td',{}, row);
+                dom.create('div',{'innerHTML':data.title,'class':'screenshot-dialog-pane-label'},tdLabel)
                 row2 = dom.create('tr',{'class':'screenshot-dialog-pane-input'},tableB);
                 var outD = dom.create('td',{'colspan':2},row2);
                 // 3 check boxes
-                //var formatTypes = ['PNG','JPG','PDF'];
-                var formatTypes = ['PNG','JPG'];
+                var formatTypes = ['PNG','JPG','PDF'];
+                //var formatTypes = ['PNG','JPG'];
                 var formatTypeTitles = {'PNG':'transparent background','JPG':'white background', 'PDF':'contains svg-like objects'};
                 array.forEach(formatTypes, function(f){
                     var btn = new dijitRadioButton({
@@ -226,36 +287,82 @@ return declare (ActionBarDialog,{
                         value: f,
                         '_prop': param
                     });
-                    btn.onClick = dojo.hitch(thisB, '_setParameter', btn);
+                    btn.onClick = lang.hitch(thisB, '_setFormatParameter', btn);
                     dom.create('span',{innerHTML:f, className:'screenshot-dialog-opt-span', title:formatTypeTitles[f]}, outD);
                     outD.appendChild(btn.domNode);
                 });
+            } else if (param === "image"){
+                // handle png/jpg height and width
+                var tbod = dom.create('tbody',{'id':'screenshot-dialog-image-rows', /*style:'display:'+(thisB.parameters.output.format === 'PDF' ? 'none' : 'inherit')*/}, tableB);
+
+                // loop through settings
+                var param2, data2;
+                for(param2 in data){
+                    data2 = data[param2];
+                    thisB._createSpinner(tbod, data2, param2, '_setImageParameter', thisB);
+                }
+            } else if (param === 'pdf'){
+                // handle pdf options
+                var tbod = dom.create('tbody',{'id':'screenshot-dialog-pdf-rows',/*style:'display:'+(thisB.parameters.output.format !== 'PDF' ? 'none' : 'inherit')*/}, tableB);
+                var param2, data2;
+                for(param2 in data){
+                    data2 = data[param2];
+                    if(param2 === 'page'){
+                        var listOpts = ['letter landscape','letter portrait', 'legal landscape','legal portrait','A3 landscape', 'A3 portrait', 'A4 landscape', 'A4 portrait', 'A5 landscape', 'A5 portrait', 'tabloid landscape', 'tabloid portrait'];
+                        var widgetOpts = array.map(listOpts, function(opt){
+                            return{label: opt, value: opt, selected: opt === thisB.parameters.output.pdf.page};
+                        })
+                        // dropdown selection
+                        row = dom.create('tr',{'id':'screenshot-dialog-row-'+param},tbod);
+                        tdLabel = dom.create('td',{},row);
+                        dom.create('div',{'innerHTML':data2.title,'class':'screenshot-dialog-pane-label'}, tdLabel);
+                        var spinD = dom.create('td',{'class':'screenshot-dialog-pane-input'},row);
+                        var widget = new dijitSelect({
+                            id: 'screenshot-dialog-pdf-page',
+                            '_prop': param2,
+                            options: widgetOpts,
+                            style:"width:100px;"
+                        });
+                        widget.onChange = lang.hitch(thisB, '_setPDFParameter', widget);
+                        widget.placeAt(spinD, 'first');
+                    } else{
+                        thisB._createSpinner(tbod, data2, param2, '_setPDFParameter', thisB);
+                    }
+                }
             } else {
                 // number spinners
-                data = outParam[param];
-                row = dom.create('tr',{'id':'screenshot-dialog-row-'+param},tableB);
-                dom.create('td',{'innerHTML':data.title,'class':'screenshot-dialog-pane-label'}, row);
-                var spinD = dom.create('td',{'class':'screenshot-dialog-pane-input'},row);
-                // create slider for quality and spinner for other
-                var widget = new dijitNumberSpinner({
-                        id:'screenshot-dialog-'+param+'-spinner',
-                        value: data.value,
-                        '_prop':param,
-                        //constraints: (param === 'zoom' ? {min:1,max:10} : {min:100,max:10000,pattern:'###0'}),
-                        constraints: {min: data.min, max: data.max},
-                        smallDelta:data.delta,
-                        intermediateChanges:true,
-                        style:"width:75px;"
-                });
-                widget.onChange = dojo.hitch(thisB, '_setParameter',widget);
-                widget.placeAt(spinD,'first');
+                //data = outParam[param];
+                thisB._createSpinner(tableB, data, param, '_setParameter', thisB);
             }
         }
+    },
+
+    _createSpinner: function(inTable, data, param, callbackStr, objScope){
+        var row = dom.create('tr',{'id':'screenshot-dialog-row-'+param},inTable);
+        var tdLabel = dom.create('td',{},row);
+        dom.create('div',{'innerHTML':data.title,'class':'screenshot-dialog-pane-label'}, tdLabel);
+        var spinD = dom.create('td',{'class':'screenshot-dialog-pane-input'},row);
+        // create slider for quality and spinner for other
+        var widget = new dijitNumberSpinner({
+            id:'screenshot-dialog-'+param+'-spinner',
+            value: data.value,
+            '_prop':param,
+            //constraints: (param === 'zoom' ? {min:1,max:10} : {min:100,max:10000,pattern:'###0'}),
+            constraints: {min: data.min, max: data.max},
+            smallDelta:data.delta,
+            intermediateChanges:true,
+            style:"width:75px;"
+        });
+        widget.onChange = lang.hitch(objScope, callbackStr, widget);
+        widget.placeAt(spinD, 'first');
     },
 
     _paneTracks: function(rPane){
         var thisB = this;
         var locationList = ['left','center','right','none'];
+        var modeList = ['normal','compact','collapsed'];
+        var styleList = ['default','features','histograms'];
+        var optDict= {'ypos':locationList, 'mode':modeList, 'style':styleList};
         dom.create('h2',{'innerHTML':'Track-specific configuration options'}, rPane);
 
         var tab = new dijitTabContainer({
@@ -285,49 +392,29 @@ return declare (ActionBarDialog,{
             for(param in tParams){
                 data = tParams[param];
                 // yscale is radio boxes
-                if(param === 'ypos'){
+                if(param in {'ypos':1, 'mode':1,'style':1}){
+                    // list of options to use
+                    var optList = optDict[param];
                     // yscale position radio boxes
-                    if(tParams.ypos !== false){
-                        var row = dom.create('tr',{'id':'screenshot-dialog-row-'+label+'-ypos'},table);
-                        dom.create('td',{'innerHTML':'Y-scale position','class':'screenshot-dialog-pane-label'}, row);
-                        array.forEach(locationList, function(loc){
+                    if(data !== false){
+                        var row = dom.create('tr',{'id':'screenshot-dialog-row-'+label+'-'+param},table);
+                        dom.create('td',{'innerHTML':data.title,'class':'screenshot-dialog-pane-label'}, row);
+                        array.forEach(optList, function(opt){
                             var button = new dijitRadioButton({
-                                name:'yscale-'+label,
-                                checked: loc === tParams.ypos,
-                                id:'screenshot-dialog-radio-'+label+'-'+loc,
-                                value: loc,
+                                name:param+'-'+label,
+                                checked: opt === data.value,
+                                id:'screenshot-dialog-radio-'+label+'-'+opt,
+                                value: opt,
                                 '_label': label,
-                                '_prop': 'ypos'
+                                '_prop': param
                         });
                         button.onClick = dojo.hitch(thisB, '_setTrackParameter', button);
                         var td = dom.create('td', {className:'screenshot-dialog-td-button'}, row);
                         button.placeAt(td, 'first');
-                        dom.create('label', {"for":'yscale-dialog-radio-'+label+'-'+loc, innerHTML: loc}, td);
+                        dom.create('label', {"for":'screenshot-dialog-radio-'+label+'-'+opt, innerHTML: opt}, td);
                     });
                     } // end y-scale position
                 }
-                // methylation check boxes
-                /*else if(param==='methyl'){
-                    // paramater data
-                    data = tParams.methyl;
-                    var row = dom.create('tr',{'id':'screenshot-dialog-row-'+label+'-methyl'},table);
-                    dom.create('td',{'innerHTML':'Methylation','class':'screenshot-dialog-pane-label'}, row);
-                    for(var m in data){
-                        var box = new dijitCheckBox({
-                                checked: tParams.methyl[m],
-                                id:'screenshot-dialog-radio-'+label+'-'+m,
-                                value: m,
-                                class: m+'-checkbox',
-                                _label: label,
-                                _prop: 'methyl'
-                        });
-                        box.onClick = dojo.hitch(thisB, '_setTrackParameter', box);
-                        var td = dom.create('td',{class:'screenshot-dialog-pane-input'},row);
-                        box.placeAt(td,'first');
-                        dom.create('label',{"for":'yscale-dialog-radio-'+label+'-'+m, innerHTML: m}, td);
-                    }
-
-                } */
                 else if(data.hasOwnProperty('value')){
                     // otherwise its a number spinner text box thing
                     var row = dom.create('tr',{'id':'screenshot-dialog-row-'+label+'-'+param},table);
@@ -356,24 +443,70 @@ return declare (ActionBarDialog,{
 
     hide: function() {
         this.inherited(arguments);
-        window.setTimeout( dojo.hitch( this, 'destroyRecursive' ), 500 );
+        window.setTimeout( lang.hitch( this, 'destroyRecursive' ), 500 );
     },
 
     _setMethylation: function(box){
-        if(this.parameters.methylation.hasOwnProperty(box._prop)){
+        if(box._prop == 'CH'){
+            this.parameters.methylation.CHG = box.checked;
+            this.parameters.methylation.CHH = box.checked;
+        }
+        else if(this.parameters.methylation.hasOwnProperty(box._prop)){
             this.parameters.methylation[box._prop] = box.checked;
         }
+    },
+
+    _setSmallRNA: function(box){
+        if(this.parameters.smallrna.hasOwnProperty(box._prop)){
+            this.parameters.smallrna[box._prop]['value'] = box.checked;
+        }
+    },
+
+    _setFormatParameter: function(input){
+        // set png, jpg, pdf and hide/show appropriate options
+        var prop = input._prop;
+        if(input.checked && this.parameters.output.hasOwnProperty(prop))
+            this.parameters.output[prop].value = input.value;
+        // objects we need 'id':'screenshot-dialog-image-rows' and 'id':'screenshot-dialog-pdf-rows'
+        // if pdf
+        if(input.value === 'PDF'){
+            domStyle.set("screenshot-dialog-image-rows", "display", "none");
+            domStyle.set('screenshot-dialog-pdf-rows', 'display', '');
+            // if checked, uncheck "show navigation"
+            var varlist = 'screenshot-dialog-opt-box-trackList';
+            //console.log(domAttr.get(varlist, 'checked'));
+            if( domAttr.get(varlist, 'checked') === true ){
+                registry.byId(varlist).set('checked', false);
+                this.parameters.view.trackList.value = false;
+            }
+        } else {
+            domStyle.set("screenshot-dialog-image-rows", "display", "");
+            domStyle.set('screenshot-dialog-pdf-rows', 'display', 'none');
+        }
+    },
+
+    _setImageParameter: function(input){
+        var prop = input._prop;
+        if(this.parameters.output.image.hasOwnProperty(prop))
+            this.parameters.output.image[prop].value = input.value;
+    },
+
+    _setPDFParameter: function(input){
+        //console.log(input.value);
+        var prop = input._prop;
+        if(this.parameters.output.pdf.hasOwnProperty(prop))
+            this.parameters.output.pdf[prop].value = input.value;
     },
 
     _setParameter: function(input){
         var prop = input._prop;
         // format radio box parameter
-        if(prop === 'format'){
+        /*if(prop === 'format'){
             if(input.checked && this.parameters.output.hasOwnProperty(prop))
                 this.parameters.output[prop].value = input.value;
-        }
+        }*/
         // check box parameters
-        else if(input.hasOwnProperty('checked')){
+        if(input.hasOwnProperty('checked')){
             if(this.parameters.view.hasOwnProperty(prop))
                 this.parameters.view[prop].value = !! input.checked;
         }
@@ -394,18 +527,6 @@ return declare (ActionBarDialog,{
             console.warn('Error: no track labeled '+tLabel);
             return
         }
-        // handle methylation
-        /*if(prop === 'methyl'){
-            if(this.trackParameters[tLabel].methyl.hasOwnProperty(input.value)){
-                this.trackParameters[tLabel].methyl[input.value] = input.checked;
-            }
-        }
-        // y-scale position
-        if(input.hasOwnProperty('checked') && input.checked){
-            if(this.trackParameters[tLabel].hasOwnProperty(prop)){
-                this.trackParameters[tLabel][prop] = input.value;
-            }
-        }*/
         // number spinner type
         else{
             if(this.trackParameters[tLabel].hasOwnProperty(prop)){
@@ -415,7 +536,7 @@ return declare (ActionBarDialog,{
     },
 
     _getInitialParameters: function(){
-        // get browser parameterss
+        // get browser parameters
         var config = this.browser.config;
         // spinner -> zoom and trackSpacing
         var zoom = { value: config.highResolutionMode, title: 'Zoom factor'};
@@ -438,8 +559,18 @@ return declare (ActionBarDialog,{
         var width = {value: 3300, title: 'Width (px)', min:100, max:10000, delta:100};
         var height = {value: 2400, title: 'Height (px)', min:100, max:10000, delta:100};
         var quality = {value: 70, title: 'Render quality', min:0, max:100, delta:10};
+        var pdfOpt = {value: 'letter landscape', title: 'Page format'};
+        var pdfWidth = {value: 1800, title: 'View width (px)', min:100, max:10000, delta:100};
+        var pdfHeight = {value: 1200, title: 'View height (px)', min:100, max:10000, delta:100};
 
-       return { view:{trackSpacing: trackSpacing, locOver: locOver, trackList: trackList, nav: nav, menu: menu, labels: labels}, methylation:{CG:true, CHG:true, CHH:true}, output: {format: format, zoom: zoom, quality: quality, width: width, height: height} };
+        var smrna = {'21': {value: true, color: 'blue', label: '21-mers'},
+                     '22': {value: true, color: 'green', label: '22-mers'},
+                     '23': {value: true, color: 'orange', label: '23-mers'},
+                     '24': {value: true, color: 'red', label: '24-mers'},
+                     'pi': {value: true, color: 'purple', label: 'piRNAs'},
+                     'Others': {value: true, color: 'yellow', label: 'others'}};
+
+       return { view:{trackSpacing: trackSpacing, locOver: locOver, trackList: trackList, nav: nav, menu: menu, labels: labels}, methylation:{CG:true, CHG:true, CHH:true}, output: {format: format, zoom: zoom, quality: quality, image: {width: width, height: height}, pdf: {page: pdfOpt, pdfWidth: pdfWidth, pdfHeight: pdfHeight}}, smallrna: smrna };
     },
 
     _getTrackParameters: function(){
@@ -447,8 +578,12 @@ return declare (ActionBarDialog,{
         var out = {};
         array.forEach(this.vTracks, function(track, i){
            var tType = track.config.type;
+            var tConfig = track.config;
+            // due to weirdness with displayMode, update config.mixin if necessary
             // handle parameters by type
-            out[track.config.label] = thisB._handleTrackTypeParameters(i, tType, track.config);
+            if (track.hasOwnProperty('displayMode'))
+                tConfig.displayMode = track.displayMode;
+            out[track.config.label] = thisB._handleTrackTypeParameters(i, tType, tConfig);
         });
         return out;
     },
@@ -464,16 +599,15 @@ return declare (ActionBarDialog,{
        if(/\b(MethylPlot)/.test( tType )|| /\b(MethylPlot)/.test( tType )){
             /*lang.mixin(out,{methyl:{CG: config.showCG, CHG: config.showCHG, CHH: config.showCHH}});*/
             // also mixin the bigwig like features
-            lang.mixin(out, {ypos:{title: 'Y-scale position',  value:config.yScalePosition},
-                             height: {title: 'Track height', value:config.style.height, delta:10},
-                             min: {title: 'Min. score', value:config.min_score, delta:0.1},
+            lang.mixin(out, {height: {title: 'Track height', value:config.style.height, delta:10},
+                             ypos:{title: 'Y-scale position',  value:config.yScalePosition},
+                            min: {title: 'Min. score', value:config.min_score, delta:0.1},
                              max: {title: 'Max. score', value:config.max_score, delta:0.1},
                              quant:true});
         }
         // test bigwig
-        else if(/\b(XYPlot)/.test( tType ) || /\b(XYDensity)/.test( tType )){
-            lang.mixin(out, {ypos: {title: 'Y-scale position',  value:config.yScalePosition},
-                             height: {title: 'Track height', value:config.style.height, delta:10},
+        else if(/\b(XYPlot)/.test( tType ) || /\b(XYDensity)/.test( tType ) || /XYPlot$/.test(tType) ){
+            lang.mixin(out, {height: {title: 'Track height', value:config.style.height, delta:10}, ypos: {title: 'Y-scale position',  value:config.yScalePosition},
                              min: {title: 'Min. score', value:config.min_score, delta:10},
                              max: {title: 'Max. score', value:config.max_score, delta:10},
                              quant:true});
@@ -490,6 +624,15 @@ return declare (ActionBarDialog,{
                              min: {title: 'Min. score', value:config.histograms.min, delta:10},
                              max: {title: 'Max. score', value:config.histograms.max, delta:10},
                              quant: false});
+        }
+        // test canvas features and alignments
+        if(/CanvasFeatures$/.test(tType) || /Alignments2$/.test(tType) || /smAlignments$/.test(tType)){
+            // check for SeqViews plugin
+            var newM = {mode:{title:'Display mode',value:config.displayMode}};
+            if(this.configs.seqViewsPlugin){
+                lang.mixin(newM,{style:{title:'Feature style',value:(config.displayStyle===undefined ? 'default' : config.displayStyle)}});
+            }
+            lang.mixin(out,newM);
         }
         return out;
     },
