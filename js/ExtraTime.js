@@ -1,4 +1,5 @@
 function ExtraTime(){
+    this.run = function(){
     var e = document.getElementById("screenshot-hidden-element");
     _pjscMeta.manualWait=true;
     var i = setInterval(function(){
@@ -7,4 +8,5 @@ function ExtraTime(){
             clearInterval(i);
         }
     },500);
+    }
 }
