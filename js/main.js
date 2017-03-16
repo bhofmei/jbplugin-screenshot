@@ -1871,19 +1871,8 @@ return declare( JBrowsePlugin,
         });
                 menuBar.appendChild( button.domNode );
             }
-            // hidden attribute
-            var gb = dom.byId('GenomeBrowser');
-            //var h = domConstr.create('input',{type:'hidden',id:'screenshot-hidden-element'},gb);
-            var h = domConstr.create('div',{hidden:true,id:'screenshot-hidden-element'},gb);
-            //console.log('(',h.innerHTML,')');
             // shortcut key
             browser.setGlobalKeyboardShortcut('s', showScreenShotDialog);
-        });
-
-        browser.afterMilestone('completely initialized', function(){
-           //var h = dom.byId('screenshot-hidden-element');
-           domAttr.set('screenshot-hidden-element','innerHTML','set');
-            //console.log(dom.byId('screenshot-hidden-element').innerHTML);
         });
     }, // end constructor
 
