@@ -654,8 +654,8 @@ return declare (ActionBarDialog,{
                              max: {title: 'Max. score', value:config.max_score, delta:0.1},
                              quant:true});
         }
-        // test bigwig
-        else if(/\b(XYPlot)/.test( tType ) || /\b(XYDensity)/.test( tType ) || /XYPlot$/.test(tType) ){
+        // test bigwig and SNPCoverage
+        else if(/\b(XYPlot)/.test( tType ) || /\b(XYDensity)/.test( tType ) || /XYPlot$/.test(tType) || /SNPCoverage$/.test( tType ) ){
             lang.mixin(out, {height: {title: 'Track height', value:config.style.height, delta:10}, ypos: {title: 'Y-scale position',  value:config.yScalePosition},
                              min: {title: 'Min. score', value:config.min_score, delta:10},
                              max: {title: 'Max. score', value:config.max_score, delta:10},
@@ -667,8 +667,8 @@ return declare (ActionBarDialog,{
                              ypos: false});
         }
         // Canvas/Alignments2 have maxHeight option and possibly histogram with min/max and height
-        // test for histograms
-        if(config.histograms !== undefined){
+        // test for histograms and not SNPCoverage
+        if(config.histograms !== undefined && !/SNPCoverage$/.test(tType)){
             lang.mixin(out, {ypos: {title: 'Y-scale position',  value:config.yScalePosition},
                              min: {title: 'Min. score', value:config.histograms.min, delta:10},
                              max: {title: 'Max. score', value:config.histograms.max, delta:10},

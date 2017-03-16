@@ -1,4 +1,7 @@
 # Release Notes
+v1.4.1 - Mar 16, 2017
+- support for SNPCoverage tracks
+
 v1.4.0 - Mar 16, 2017
 - included option to allow for extra rendering time
 - default max render time is 35 s; can be increased to 5 min (300 s)
