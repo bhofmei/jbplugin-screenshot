@@ -1354,7 +1354,7 @@ define([
 			// The value 200 is chosen as it should be bigger than most
 			// Tab button widths.
 			domStyle.set(this.containerNode, "width",
-				(domStyle.get(this.containerNode, "width") + 200) + "px");
+				(domStyle.get(this.containerNode, "width") + 250) + "px");
 		},
 
 		onRemoveChild: function(page, insertIndex){
