@@ -100,10 +100,11 @@ return declare (ActionBarDialog,{
         var thisB = this;
         dojo.addClass(this.domNode, 'screenshot-dialog');
 
+        // For general config and output config options
         var mainPaneTop = dom.create('div',
             {className: 'screenshot-dialog-pane',
             id:'screenshot-dialog-pane-top'});
-
+        // for general config
         var mainPaneTopLeft = new dijitContentPane({
             className: 'screenshot-dialog-pane-sub',
             id:'screenshot-dialog-pane-top-left',
@@ -113,7 +114,7 @@ return declare (ActionBarDialog,{
         thisB._paneGen(mainPaneTopL);
         mainPaneTopLeft.placeAt(mainPaneTop);
 
-
+        // for output config
         var mainPaneTopRight = new dijitContentPane({
             className:'screenshot-dialog-pane-sub',
             id:'screenshot-dialog-pane-top-right',
@@ -124,18 +125,10 @@ return declare (ActionBarDialog,{
         mainPaneTopRight.placeAt(mainPaneTop);
 
         // for tracks
-
        var mainPaneBottom = dom.create('div',
             {className: 'screenshot-dialog-pane',
             id:'screenshot-dialog-pane-bottom'});
-
-        /*var mainPaneRightM = new dijitContentPane({
-            className: 'screenshot-dialog-pane',
-            id: 'screenshot-dialog-pane-right',
-            title: 'Track-specific configuration options'
-        });
-        var mainPaneRight = mainPaneRightM.containerNode;*/
-        thisB._paneTracks( mainPaneBottom );
+      thisB._paneTracks( mainPaneBottom );
 
         var paneFooter = dom.create('div',{className:'screenshot-dialog-pane-bottom-warning', innerHTML:'Local configuration changes will be ignored. Default configuration will be used unless specified in this dialog.<br>Rendering will open a new window.'});
 
@@ -163,7 +156,7 @@ return declare (ActionBarDialog,{
         for(param in viewParam){
             var data = viewParam[param];
             var row = dom.create('tr',{id:'screenshot-dialog-row-'+param},table);
-            dom.create('td',{'innerHTML':(param === 'labels' ? '' : data.title),'class':'screenshot-dialog-pane-label'}, row);
+            dom.create('td',{'innerHTML':data.title,'class':'screenshot-dialog-pane-label'}, row);
             var td = dom.create('td',{'class':'screenshot-dialog-pane-input'},row);
             var input;
             if(param === 'trackSpacing'){
@@ -177,15 +170,15 @@ return declare (ActionBarDialog,{
                     style:"width:50px;"
                 });
             }else{
-                if(param === 'labels'){
+                /*if(param === 'labels'){
                     input = null;
-                }else{
+                }else{*/
                 input = new dijitCheckBox({
                     id:'screenshot-dialog-opt-box-'+param,
                     '_prop': param,
                     checked: data.value
                 });
-                }
+                //}
             }
             if(input !== null){
                 input.onClick = lang.hitch(thisB, '_setParameter', input);
@@ -597,7 +590,7 @@ return declare (ActionBarDialog,{
         var trackList = { value: config.show_tracklist, title:'Show track list' };
         var nav = { value: config.show_nav, title:'Show navigation bar' };
         var menu = { value: config.show_menu, title:'Show menu bar' };
-        var labels = {value:true, title:'Show track labels'};
+        var labels = {value:config.show_tracklabels, title:'Show track labels'};
         // output parameters
         zoom['min'] = 0;
         zoom['max'] = 10;
