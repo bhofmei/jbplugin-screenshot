@@ -53,6 +53,8 @@ For _jbrowse_conf.json_
                             "apiKey": "<insert_api_key>" }
     }
 ```
+
+You can also use your own API key by inputting it in the dialog pane with the "Use Custom ApiKey" parameter.
     
 ## Use
 Click the "Screen shot" button in the browser. A dialog box will open with options for the screenshot. You can also press the `s` key as a shortcut to open the dialog box.

@@ -12,6 +12,7 @@ define( "ScreenShotPlugin/View/Dialog/ScreenShotDialog", [
     'dijit/form/NumberSpinner',
     'dijit/form/RadioButton',
     "dijit/form/Select",
+    "dijit/form/ValidationTextBox",
     'dijit/layout/ContentPane',
     'dijit/layout/TabContainer',
     'dijit/form/Button',
@@ -33,6 +34,7 @@ function (
     dijitNumberSpinner,
     dijitRadioButton,
     dijitSelect,
+    dijitTextBox,
     dijitContentPane,
     dijitTabContainer,
     Button,
@@ -53,6 +55,7 @@ return declare (ActionBarDialog,{
         this.browser = args.browser;
         this.parameters = this._getInitialParameters();
         this.requestUrl = args.requestUrl;
+        this.defaultApi = args.config.apiKey;
         this.setCallback    = args.setCallback || function() {};
         this.cancelCallback = args.cancelCallback || function() {};
         this.vTracks = this.browser.view.visibleTracks();
@@ -142,6 +145,7 @@ return declare (ActionBarDialog,{
         domStyle.set("screenshot-dialog-image-rows", "display", (thisB.parameters.output.format === 'PDF' ? 'none' : ''));
         domStyle.set('screenshot-dialog-pdf-rows', 'display', (thisB.parameters.output.format == 'PDF' ? '' : 'none'));
         domStyle.set('screenshot-dialog-row-maxtime','display',(thisB.parameters.output.time.value ? '' : 'none'));
+        domStyle.set('screenshot-dialog-row-apikey','display',(thisB.parameters.output.key.value ? '' : 'none'));
 
         this.inherited( arguments );
     },
@@ -315,7 +319,7 @@ return declare (ActionBarDialog,{
                             id: 'screenshot-dialog-pdf-page',
                             '_prop': param2,
                             options: widgetOpts,
-                            style:"width:100px;"
+                            style:"width:75px;"
                         });
                         widget.onChange = lang.hitch(thisB, '_setPDFParameter', widget);
                         widget.placeAt(spinD, 'first');
@@ -338,7 +342,35 @@ return declare (ActionBarDialog,{
                 // create the extra hidden row
                 thisB._createSpinner(tableB, data.extra, 'maxtime', '_setTimeParameter', thisB);
                 //domStyle.set('screenshot-dialog-row-maxtime','display','none');
-            } else {
+            } else if (param === 'key'){
+                var row = dom.create('tr',{id:'screenshot-dialog-row-'+param},tableB);
+                dom.create('td',{'innerHTML':data.title,'class':'screenshot-dialog-pane-label', 'title':'From PhantomJS account'}, row);
+                var td = dom.create('td',{'class':'screenshot-dialog-pane-input'},row);
+                var input = new dijitCheckBox({
+                    id:'screenshot-dialog-opt-box-'+param,
+                    '_prop': param,
+                    checked: data.value
+                });
+                input.onClick = lang.hitch(thisB, '_setApiKeyParameter', input);
+                input.placeAt(td,'first');
+                // create the extra hidden row
+                var row2 = dom.create('tr', {'id':'screenshot-dialog-row-apikey'}, tableB);
+                var tdLabel = dom.create('td',{},row2);
+                dom.create('div',{'innerHTML': data.extra.title, 'class': 'screenshot-dialog-pane-label'}, tdLabel);
+                var textD = dom.create('td',{'class':'screenshot-dialog-pane-input'}, row2);
+                var widget = new dijitTextBox({
+                    'id':'screenshot-dialog-apikey-textbox',
+                    '_prop': 'apikey',
+                    'value': data.extra.value,
+                    'placeHolder': thisB.defaultApi,
+                    'style': 'width:75px;',
+                    'regExp': '[^ ]+',
+                    'invalidMessage': 'No spaces allowed'
+                });
+                widget.onChange = lang.hitch(thisB, '_setApiKeyParameter', widget);
+                widget.placeAt(textD, 'first');
+            }
+            else {
                 // number spinners
                 //data = outParam[param];
                 thisB._createSpinner(tableB, data, param, '_setParameter', thisB);
@@ -499,6 +531,26 @@ return declare (ActionBarDialog,{
         }
     },
 
+    _setApiKeyParameter: function(input){
+        var prop = input._prop;
+        prop = (prop === 'apikey' ? 'key' : prop);
+        if(this.parameters.output.hasOwnProperty(prop)){
+            // checkbox
+            if(input.hasOwnProperty('checked')){
+                var isCheck = !!input.checked;
+                this.parameters.output[prop].value = isCheck;
+                // checked - show the max time row
+                if(isCheck)
+                    domStyle.set('screenshot-dialog-row-apikey','display','');
+                else
+                    domStyle.set('screenshot-dialog-row-apikey','display','none');
+            } // number spinner
+            else {
+                this.parameters.output[prop].extra.value = input.value;
+            }
+        }
+    },
+
     _setTimeParameter: function(input){
         var prop = input._prop;
         prop = (prop === 'maxtime' ? 'time' : prop);
@@ -604,6 +656,8 @@ return declare (ActionBarDialog,{
         var pdfHeight = {value: 1200, title: 'View height (px)', min:100, max:10000, delta:100};
         var time = {value: false, title: 'Extra render time',
                     extra:{value:40, title: 'Max (s)', min:40, max:300, delta:10}};
+        var key = {value: false, title: 'Use custom ApiKey',
+                  extra:{value: '', title: ''}};
 
         var smrna = {'21': {value: true, color: 'blue', label: '21-mers'},
                      '22': {value: true, color: 'green', label: '22-mers'},
@@ -612,7 +666,26 @@ return declare (ActionBarDialog,{
                      'pi': {value: true, color: 'purple', label: 'piRNAs'},
                      'Others': {value: true, color: 'yellow', label: 'others'}};
 
-       return { view:{trackSpacing: trackSpacing, locOver: locOver, trackList: trackList, nav: nav, menu: menu, labels: labels}, methylation:{CG:true, CHG:true, CHH:true}, output: {format: format, zoom: zoom, quality: quality, image: {width: width, height: height}, pdf: {page: pdfOpt, pdfWidth: pdfWidth, pdfHeight: pdfHeight}, time: time}, smallrna: smrna };
+       return { view:{
+               trackSpacing: trackSpacing,
+               locOver: locOver,
+               trackList: trackList,
+               nav: nav,
+               menu: menu,
+               labels: labels
+           }, methylation:{
+               CG:true,
+               CHG:true,
+               CHH:true
+           }, output: {
+               format: format,
+               zoom: zoom,
+               quality: quality,
+               image: {width: width, height: height},
+               pdf: {page: pdfOpt, pdfWidth: pdfWidth, pdfHeight: pdfHeight},
+               time: time,
+               key: key
+           }, smallrna: smrna };
     },
 
     _getTrackParameters: function(){
@@ -687,11 +760,13 @@ return declare (ActionBarDialog,{
         var scEncode = Util.encode(scParams);
         currentUrl += '&screenshot='+scEncode;
         currentUrl = currentUrl.replace(/\u0026/g,'%26');
+        // get api key info
+        var apiKey = jsParams.key.value ? (jsParams.key.extra.value === '' ? this.defaultApi : jsParams.key.extra.value) : this.defaultApi;
         // encode jsParams
         jsParams['url'] = currentUrl;
         var jsEncode = Util.encodePhantomJSSettings(jsParams);
         // put it all together
-        return this.requestUrl + jsEncode;
+        return this.requestUrl + apiKey + '/' + jsEncode;
     }
 });
 });

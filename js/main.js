@@ -1877,7 +1877,7 @@ return declare( JBrowsePlugin,
     }, // end constructor
 
     _getPhantomJSUrl: function(){
-        return 'https://phantomjscloud.com/api/browser/v2/' + this.config.apiKey + '/'
+        return 'https://phantomjscloud.com/api/browser/v2/';
     },
 
     _applyScreenshotConfig: function(params){
