@@ -1,4 +1,10 @@
 # Release Notes
+v1.6.0 - Jul 28, 2017
+- Refactor ScreenShotDialog file to separate out parameter logic
+- included option to convert CanvasFeature tracks to HTMLFeature tracks
+  - this is useful for PDF rendering so annotation objects are movable
+- Bug fix for plugin configuration
+
 v1.5.0 - Jul 27, 2017
 - included option to use a custom apikey
 - useful for getting aroung 100 page/day limit of the default apikey

@@ -67,6 +67,10 @@ Also, the tracklist does not always display well when using PDF output. When sel
 
 Hiding track labels only works for JBrowse v1.12.3 when HideTracksButton plugin is activated. If browser is an earlier version and/or the plugin is not activates, track labels will always be shown.
 
+Canvas Feature tracks are great when browsing but don't show up as well in screenshots. 
+If you'd like to convert a canvas feature track to HTML feature track when taking the screenshot, click the "HTML feature" checkbox on that track's configuration. 
+The style/look of the features is controlled by the track "style.className" configuration.
+
 **Note:** Due to the nature of URL-encoded screenshots, default track configurations will be used unless overriden by settings selected in this dialog box. Locally added tracks, such as combination tracks, will not be included.
 
 ## Support for Additional Plugins
@@ -112,12 +116,24 @@ Optionally, you can specify `seqViewsPlugin = false` if you do not want to inclu
 ### Other plugins
 Support for other plugins can be added based on demand. To request support for other plugins, either
 
-a. Create an issue in GitHub. Include the plugin name and URL as well as what configuration options should be supported
+a. Create an [issue](https://github.com/bhofmei/jbplugin-screenshot/issues) in GitHub. Include the plugin name and URL as well as what configuration options should be supported
 
 or
 
 b. Fork this plugin, add the support, then submit a pull request.
 
+## Issues/Bugs
+This plugin is difficult to test and debug because it relies on PhantomJS Cloud.
+
+### General troubleshooting
+1. **If account login information is required to access the browser, it will not work.** There are ways around this, although they are not currently implemented because I haven't figured out a good way to do it securely and lack of demand.
+2. **If the PhantomJS window is blank**
+  * In the full request URL, change the render type to "json" and resubmit. Look for error messages.
+  * Check is the request URL. In the full URL sent to PhantomJS cloud, extract the portion at `.../?request:{url:"get_this_url",...}`. Replace `%26` with `&` and `%3A` with `:` and open this updated link. Look for any error messages in the console.
+3. If the PhantomJS window gives an error message about being out of credits, create a PhantomJS account.
+
+### Extra help
+For additional debugging help, submit an [issue](https://github.com/bhofmei/jbplugin-screenshot/issues). Include the URL when submitting an issue.
+
 ## Future Improvements
 - Support MethylationPlugin v3
-- Convert canvas features to HTML features for better SVG editting
