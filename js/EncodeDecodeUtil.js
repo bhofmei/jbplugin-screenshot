@@ -1,4 +1,4 @@
-define( "ScreenShotPlugin/Util", [
+define( "ScreenShotPlugin/EncodeDecodeUtil", [
     'dojo/_base/declare',
     'dojo/_base/array',
     'dojo/_base/lang',
@@ -10,8 +10,8 @@ function (
     lang,
     json
 ) {
-var Util;
-Util = {
+var EncodeDecodeUtil;
+EncodeDecodeUtil = {
     encode: function(inputs){
     // returns string with encode options for screenshot
         var gInputs = inputs.general;
@@ -94,15 +94,16 @@ Util = {
                 output += this._encodeTrack(params);
             }
         }
+      console.log(output);
         return(output);
     },
 
     _encodeTrack: function(params){
         // q[0|1] quantitative, y[0|1|2|3] yscale none, center, left, right
-        // h# track height, i# min, x# max
+        // h# track height, i# min, x# max v[0|1] html features
         // d[0|1|2] display mode normal, compact, collapse
         // f[0|1|2] display style default, features, histograms
-        var eLabels = {height: 'h', min: 'i', max: 'x', quant: 'q', ypos: 'y', mode: 'd', style: 'f'};
+        var eLabels = {height: 'h', min: 'i', max: 'x', quant: 'q', ypos: 'y', mode: 'd', style: 'f', html: 'v'};
         var optsDict = {ypos:{'none': 0, 'center': 1, 'left': 2, 'right':3 },
                         mode: {'normal':0,'compact':1,'collapsed':2},
                         style: {'default':0,'features':1,'histograms':2}};
@@ -112,7 +113,7 @@ Util = {
         // loop through parameters
         for(param in params){
             data = params[param];
-            if(param==='quant')
+            if(param in {'quant': 1, 'html': 1})
                 output += eLabels[param] + this._encodeBoolean(data);
             else if(!(data === undefined || data.value === undefined || eLabels.hasOwnProperty(param)===false )){
                 output += eLabels[param]
@@ -205,7 +206,17 @@ Util = {
                     out[tLabel]['style'] = {};
                 else
                     out[tLabel]['histograms'] = {}
-
+            }
+          // get html features
+          var isHtml = false;
+          var resultV = /v([0-1])/gi.exec(parmStr);
+            if (resultV != null){
+                isHtml = thisB._decodeBoolen(resultV[1]);
+                if(isHtml){
+                  out[tLabel]['type'] = 'JBrowse/View/Track/HTMLFeatures';
+                  //out[tLabel]['style'] = {'className': 'feature-'+tLabel};
+                  out[tLabel]['trackType'] = 'HTMLFeatures';
+                }
             }
             // get min
             var resultI = /i(-?[0-9]+(\.[0-9])?)/gi.exec(parmStr);
@@ -270,5 +281,5 @@ Util = {
     }
 
 }
-    return Util
+    return EncodeDecodeUtil;
 });

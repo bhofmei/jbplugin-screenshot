@@ -1783,7 +1783,7 @@ define('ScreenShotPlugin/main',[
     'dojo/dom-construct',
     'dijit/form/Button',
     './View/Dialog/ScreenShotDialog',
-    './Util',
+    './EncodeDecodeUtil',
     'JBrowse/Plugin',
     "JBrowse/Browser"
 ],
@@ -1809,19 +1809,27 @@ return declare( JBrowsePlugin,
         this.isScreenshot = false;
         console.log('ScreenShotPlugin starting');
 
+      // PhantomJS Username
         this.config.apiKey = 'a-demo-key-with-low-quota-per-ip-address';
-        // PhantomJS Username
-        if( args.config.apiKey !== undefined )
-            this.config.apiKey = args.config.apiKey;
+        if( args.apiKey !== undefined )
+            this.config.apiKey = args.apiKey;
+      // Debug mode (does not make call to PhantomJS)
+      this.config.debug = false;
+        if( args.debugMode !== undefined )
+            this.config.debug = args.debugMode;
+      // Include option for Canvas Features -> HTML features
+      this.config.htmlFeatures = false;
+      if(args.htmlFeatures !== undefined)
+        this.config.htmlFeatures = args.htmlFeatures;
         var thisB = this;
         // other plugins
         browser.afterMilestone('initPlugins', function(){
             thisB.config.methylPlugin = 'MethylationPlugin'
-            if( args.config.methylPlugin !== undefined )
+            if( args.methylPlugin !== undefined )
                 thisB.config.methylPlugin = args.methylPlugin;
 
             thisB.config.smrnaPlugin = 'SmallRNAPlugin';
-            if( args.config.smrnaPlugin !== undefined)
+            if( args.smrnaPlugin !== undefined)
                 this.config.smrnaPlugin = args.smrnaPlugin;
 
             // this is a true or false value since we don't actually need the path

@@ -18,7 +18,8 @@ define( "ScreenShotPlugin/View/Dialog/ScreenShotDialog", [
     'dijit/form/Button',
     'JBrowse/View/Dialog/WithActionBar',
     'JBrowse/Model/Location',
-    'ScreenShotPlugin/Util'
+    'ScreenShotPlugin/EncodeDecodeUtil',
+    'ScreenShotPlugin/ParametersUtil'
     ],
 function (
     declare,
@@ -40,7 +41,8 @@ function (
     Button,
     ActionBarDialog,
     Location,
-    Util
+    Util,
+    Parameters
 ) {
 
 return declare (ActionBarDialog,{
@@ -82,8 +84,10 @@ return declare (ActionBarDialog,{
                 var jsParams = this.parameters.output;
                 // get the url
                 var url = this._getPhantomJSUrl(scParams, jsParams);
-                //console.log(url);
-                window.open(url);
+                if (this.configs.debug)
+                  console.log(url);
+                else
+                  window.open(url);
                 this.setCallback && this.setCallback( );
                 //this.hide();
             })
@@ -437,7 +441,7 @@ return declare (ActionBarDialog,{
                     var unDefDiv = dom.create('div',{innerHTML:'Error with track'},obj);
                     tParams[param] = {};
                 }
-                // yscale is radio boxes
+                // radio boxes
                 else if(param in {'ypos':1, 'mode':1,'style':1}){
                     // list of options to use
                     var optList = optDict[param];
@@ -460,6 +464,20 @@ return declare (ActionBarDialog,{
                         dom.create('label', {"for":'screenshot-dialog-radio-'+label+'-'+opt, innerHTML: opt}, td);
                     });
                     } // end y-scale position
+                }
+                else if(param === 'html'){
+                  // checkbox
+                  var row = dom.create('tr',{'id':'screenshot-dialog-row-'+label+'-'+param},table);
+                    dom.create('td',{'innerHTML':data.title,'class':'screenshot-dialog-pane-label'}, row);
+                    var widget = new dijitCheckBox({
+                        id:'screenshot-dialog-spinner-'+label+'-'+param,
+                        checked: data.value,
+                        '_prop':param,
+                        '_label': label
+                    });
+                    widget.onChange = dojo.hitch(thisB, '_setTrackParameter', widget);
+                    var td = dom.create('td', {'class':'screenshot-dialog-pane-input', 'colspan':4}, row);
+                    widget.placeAt(td,'first');
                 }
                 else if(data.hasOwnProperty('value')){
                     // otherwise its a number spinner text box thing
@@ -619,137 +637,19 @@ return declare (ActionBarDialog,{
             console.warn('Error: no track labeled '+tLabel);
             return
         }
-        // number spinner type
         else{
             if(this.trackParameters[tLabel].hasOwnProperty(prop)){
-                this.trackParameters[tLabel][prop].value = input.value;
+                this.trackParameters[tLabel][prop].value = input.checked ? input.checked : input.value;
             }
         }
     },
 
     _getInitialParameters: function(){
-        // get browser parameters
-        var config = this.browser.config;
-        // spinner -> zoom and trackSpacing
-        var zoom = { value: config.highResolutionMode, title: 'Zoom factor'};
-        if (typeof zoom.value !== 'number')
-            zoom.value = 1
-        var trackSpacing = {value: 20, title: 'Track spacing'};
-        if(config.view !== undefined && config.view.trackPadding !== undefined)
-            trackSpacing.value = config.view.trackPadding;
-        // check boxes -> location overview, tracklist, nav, menu bars, track labels
-        var locOver = { value: config.show_overview, title:'Show location overview' };
-        var trackList = { value: config.show_tracklist, title:'Show track list' };
-        var nav = { value: config.show_nav, title:'Show navigation bar' };
-        var menu = { value: config.show_menu, title:'Show menu bar' };
-        var labels = {value:config.show_tracklabels, title:'Show track labels'};
-        // output parameters
-        zoom['min'] = 0;
-        zoom['max'] = 10;
-        zoom['delta'] = 1;
-        var format = {value: 'JPG', title: 'Output format'};
-        var width = {value: 3300, title: 'Width (px)', min:100, max:10000, delta:100};
-        var height = {value: 2400, title: 'Height (px)', min:100, max:10000, delta:100};
-        var quality = {value: 70, title: 'Render quality', min:0, max:100, delta:10};
-        var pdfOpt = {value: 'letter landscape', title: 'Page format'};
-        var pdfWidth = {value: 1800, title: 'View width (px)', min:100, max:10000, delta:100};
-        var pdfHeight = {value: 1200, title: 'View height (px)', min:100, max:10000, delta:100};
-        var time = {value: false, title: 'Extra render time',
-                    extra:{value:40, title: 'Max (s)', min:40, max:300, delta:10}};
-        var key = {value: false, title: 'Use custom ApiKey',
-                  extra:{value: '', title: ''}};
-
-        var smrna = {'21': {value: true, color: 'blue', label: '21-mers'},
-                     '22': {value: true, color: 'green', label: '22-mers'},
-                     '23': {value: true, color: 'orange', label: '23-mers'},
-                     '24': {value: true, color: 'red', label: '24-mers'},
-                     'pi': {value: true, color: 'purple', label: 'piRNAs'},
-                     'Others': {value: true, color: 'yellow', label: 'others'}};
-
-       return { view:{
-               trackSpacing: trackSpacing,
-               locOver: locOver,
-               trackList: trackList,
-               nav: nav,
-               menu: menu,
-               labels: labels
-           }, methylation:{
-               CG:true,
-               CHG:true,
-               CHH:true
-           }, output: {
-               format: format,
-               zoom: zoom,
-               quality: quality,
-               image: {width: width, height: height},
-               pdf: {page: pdfOpt, pdfWidth: pdfWidth, pdfHeight: pdfHeight},
-               time: time,
-               key: key
-           }, smallrna: smrna };
+      return Parameters.getInitialParameters(this.browser.config, {});
     },
 
     _getTrackParameters: function(){
-        var thisB = this;
-        var out = {};
-        array.forEach(this.vTracks, function(track, i){
-           var tType = track.config.type;
-            var tConfig = track.config;
-            // due to weirdness with displayMode, update config.mixin if necessary
-            // handle parameters by type
-            if (track.hasOwnProperty('displayMode'))
-                tConfig.displayMode = track.displayMode;
-            out[track.config.label] = thisB._handleTrackTypeParameters(i, tType, tConfig);
-        });
-        return out;
-    },
-
-    _handleTrackTypeParameters: function(iter, tType, config){
-        var out = {key:config.key, trackNum: iter};
-        // DNA sequence has no options for now
-        if(/\b(Sequence)/.test( tType )){
-            lang.mixin(out,{opts:false});
-            return out;
-        }
-        // test methylation tracks
-       if(/\b(MethylPlot)/.test( tType )|| /\b(MethylPlot)/.test( tType )){
-            /*lang.mixin(out,{methyl:{CG: config.showCG, CHG: config.showCHG, CHH: config.showCHH}});*/
-            // also mixin the bigwig like features
-            lang.mixin(out, {height: {title: 'Track height', value:config.style.height, delta:10},
-                             ypos:{title: 'Y-scale position',  value:config.yScalePosition},
-                            min: {title: 'Min. score', value:config.min_score, delta:0.1},
-                             max: {title: 'Max. score', value:config.max_score, delta:0.1},
-                             quant:true});
-        }
-        // test bigwig and SNPCoverage
-        else if(/\b(XYPlot)/.test( tType ) || /\b(XYDensity)/.test( tType ) || /XYPlot$/.test(tType) || /SNPCoverage$/.test( tType ) ){
-            lang.mixin(out, {height: {title: 'Track height', value:config.style.height, delta:10}, ypos: {title: 'Y-scale position',  value:config.yScalePosition},
-                             min: {title: 'Min. score', value:config.min_score, delta:10},
-                             max: {title: 'Max. score', value:config.max_score, delta:10},
-                             quant:true});
-        }
-        // else get track height from maxHeight and set ypos = false
-        else{
-            lang.mixin(out, {height:{title: 'Track height', value:config.maxHeight, delta:10},
-                             ypos: false});
-        }
-        // Canvas/Alignments2 have maxHeight option and possibly histogram with min/max and height
-        // test for histograms and not SNPCoverage
-        if(config.histograms !== undefined && !/SNPCoverage$/.test(tType)){
-            lang.mixin(out, {ypos: {title: 'Y-scale position',  value:config.yScalePosition},
-                             min: {title: 'Min. score', value:config.histograms.min, delta:10},
-                             max: {title: 'Max. score', value:config.histograms.max, delta:10},
-                             quant: false});
-        }
-        // test canvas features and alignments
-        if(/CanvasFeatures$/.test(tType) || /Alignments2$/.test(tType) || /smAlignments$/.test(tType)){
-            // check for SeqViews plugin
-            var newM = {mode:{title:'Display mode',value:config.displayMode}};
-            if(this.configs.seqViewsPlugin){
-                lang.mixin(newM,{style:{title:'Feature style',value:(config.displayStyle===undefined ? 'default' : config.displayStyle)}});
-            }
-            lang.mixin(out,newM);
-        }
-        return out;
+        return Parameters.getTrackParameters(this.vTracks, this.configs);
     },
 
     _getPhantomJSUrl: function(scParams, jsParams){
