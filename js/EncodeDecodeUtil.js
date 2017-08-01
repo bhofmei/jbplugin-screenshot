@@ -94,7 +94,6 @@ EncodeDecodeUtil = {
                 output += this._encodeTrack(params);
             }
         }
-      console.log(output);
         return(output);
     },
 
