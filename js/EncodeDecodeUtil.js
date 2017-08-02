@@ -112,8 +112,10 @@ EncodeDecodeUtil = {
         // loop through parameters
         for(param in params){
             data = params[param];
-            if(param in {'quant': 1, 'html': 1})
+            if(param in {'quant': 1})
                 output += eLabels[param] + this._encodeBoolean(data);
+            else if (param in {'html': 1})
+                output += eLabels[param] + this._encodeBoolean(data.value);
             else if(!(data === undefined || data.value === undefined || eLabels.hasOwnProperty(param)===false )){
                 output += eLabels[param]
                 // ypos, mode, style

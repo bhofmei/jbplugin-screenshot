@@ -1,4 +1,7 @@
 # Release Notes
+v1.6.1 - Aug 2, 2017
+- bug fix with canvas features/html features option
+
 v1.6.0 - Jul 28, 2017
 - Refactor ScreenShotDialog file to separate out parameter logic
 - included option to convert CanvasFeature tracks to HTMLFeature tracks

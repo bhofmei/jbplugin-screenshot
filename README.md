@@ -137,3 +137,6 @@ For additional debugging help, submit an [issue](https://github.com/bhofmei/jbpl
 
 ## Future Improvements
 - Support MethylationPlugin v3
+- Additional support for HTML style features, i.e. Alignments2 -> Alignments
+- Show/hide clip marker
+- Remember configuration settings after closing the dialog
