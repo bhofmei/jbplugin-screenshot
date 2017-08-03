@@ -1,4 +1,7 @@
 # Release Notes
+v1.6.2 - Aug 3, 2017
+- HTML style feature options available for small rna alignments, canvas feature tracks, and alignment2 tracks
+
 v1.6.1 - Aug 2, 2017
 - bug fix with canvas features/html features option
 
