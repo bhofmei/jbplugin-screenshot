@@ -214,9 +214,7 @@ EncodeDecodeUtil = {
             if (resultV != null){
                 isHtml = thisB._decodeBoolen(resultV[1]);
                 if(isHtml){
-                  out[tLabel]['type'] = 'JBrowse/View/Track/HTMLFeatures';
-                  //out[tLabel]['style'] = {'className': 'feature-'+tLabel};
-                  out[tLabel]['trackType'] = 'HTMLFeatures';
+                  out[tLabel]['type'] = 'ChangeHTMLFeatures';
                 }
             }
             // get min

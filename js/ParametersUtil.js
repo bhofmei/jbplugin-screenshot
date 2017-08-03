@@ -118,9 +118,6 @@ ParametersUtil = {
         if(/CanvasFeatures$/.test(tType) || /Alignments2$/.test(tType) || /smAlignments$/.test(tType)){
             // check for SeqViews plugin
             lang.mixin(out,this._seqViewParameters(config, pluginConfigs));
-        }
-        // test canvas features for html features option
-        if(/CanvasFeatures$/.test(tType)){
           lang.mixin(out, this._htmlParameters(pluginConfigs));
         }
 
