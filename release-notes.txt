@@ -1,4 +1,8 @@
 # Release Notes
+
+v1.6.3 - Aug 8, 2017
+- HTML style available for methylation tracks (must have latest version of methylation plugin)
+
 v1.6.2 - Aug 3, 2017
 - HTML style feature options available for small rna alignments, canvas feature tracks, and alignment2 tracks
 
