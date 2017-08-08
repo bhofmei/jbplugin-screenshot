@@ -1968,7 +1968,7 @@ define('ScreenShotPlugin/main', [
       _testMethylation: function (trackType) {
         if (trackType === undefined || trackType === null)
           return false;
-        return ((/\b(MethylXYPlot)/.test(trackType) || /\b(MethylPlot)/.test(trackType)));
+        return ((/\b(Methyl.*Plot)/.test(trackType)));
       },
 
       _applySmallRNAConfig: function (params) {
@@ -1993,6 +1993,7 @@ define('ScreenShotPlugin/main', [
         } // end for m in params
         //} // end if SmallRNAPlugin
       },
+
       _testSmallRNA: function (trackType) {
         if (trackType === undefined || trackType === null)
           return false;
@@ -2016,6 +2017,10 @@ define('ScreenShotPlugin/main', [
                 params[t].trackType = "CanvasFeatures";
               } else if (/Alignments2/.test(tracks[t].type)) {
                 params[t].type = 'JBrowse/View/Track/Alignments';
+              } else if(/MethylPlot/.test(tracks[t].type)){
+                params[t].type = 'MethylationPlugin/View/Track/MethylHTMLPlot';
+                params[t].maxHeight = params[t].style.height;
+                delete params[t].style.height;
               }
             }
             // pull out histograms and/or style

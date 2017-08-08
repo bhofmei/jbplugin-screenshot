@@ -98,8 +98,10 @@ ParametersUtil = {
             return out;
         }
         // test methylation tracks
-       if(/\b(MethylPlot)/.test( tType )|| /\b(MethylPlot)/.test( tType )){
+       if(/\b(Methyl.*Plot)/.test( tType )){
          lang.mixin(out, this._methylationParameters(config));
+         if(/\b(MethylPlot)/.test(tType))
+           lang.mixin(out, this._htmlParameters(pluginConfigs));
         }
         // test bigwig and SNPCoverage
         else if(/\b(XYPlot)/.test( tType ) || /\b(XYDensity)/.test( tType ) || /XYPlot$/.test(tType) || /SNPCoverage$/.test( tType ) ){
@@ -127,7 +129,7 @@ ParametersUtil = {
   _methylationParameters: function(config){
     return {
       height: {title: 'Track height', value:config.style.height, delta:10},
-      ypos:{title: 'Y-scale position', value:config.yScalePosition},
+      ypos:{title: 'Y-scale position', value:(config.hasOwnProperty('yScalePosition') ? config.yScalePosition : 'center')},
       min: {title: 'Min. score', value:config.min_score, delta:0.1},
       max: {title: 'Max. score', value:config.max_score, delta:0.1},
       quant:true
@@ -137,7 +139,7 @@ ParametersUtil = {
   _xyParameters: function(config){
     return {
       height: {title: 'Track height', value:config.style.height, delta:10},
-      ypos: {title: 'Y-scale position', value:config.yScalePosition},
+      ypos: {title: 'Y-scale position', value:(config.hasOwnProperty('yScalePosition') ? config.yScalePosition : 'center')},
       min: {title: 'Min. score', value:config.min_score, delta:10},
       max: {title: 'Max. score', value:config.max_score, delta:10},
       quant:true
@@ -175,8 +177,6 @@ ParametersUtil = {
       html: {title: 'HTML features', value: pluginConfig.htmlFeatures}
     };
   }
-
-
 
 }
     return ParametersUtil;
