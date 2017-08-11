@@ -1828,6 +1828,7 @@ define('ScreenShotPlugin/main', [
         var browser = this.browser;
         this.isScreenshot = false;
         console.log('ScreenShotPlugin starting');
+        this.config.version = '1.6.3';
 
         // PhantomJS Username
         this.config.apiKey = 'a-demo-key-with-low-quota-per-ip-address';
@@ -1838,40 +1839,23 @@ define('ScreenShotPlugin/main', [
         if (args.debugMode !== undefined)
           this.config.debug = args.debugMode;
         // Include option for Canvas Features -> HTML features
-        this.config.htmlFeatures = false;
+        this.config.htmlFeatures = {general: false};
         if (args.htmlFeatures !== undefined)
           this.config.htmlFeatures = args.htmlFeatures;
         var thisB = this;
+
         // other plugins
         browser.afterMilestone('initPlugins', function () {
-          thisB.config.methylPlugin = 'MethylationPlugin'
-          if (args.methylPlugin !== undefined)
-            thisB.config.methylPlugin = args.methylPlugin;
-
-          thisB.config.smrnaPlugin = 'SmallRNAPlugin';
-          if (args.smrnaPlugin !== undefined)
-            this.config.smrnaPlugin = args.smrnaPlugin;
-
-          // this is a true or false value since we don't actually need the path
-          // just need to know if it exists
-          thisB.config.seqViewsPlugin = browser.plugins.hasOwnProperty('SeqViewsPlugin');
-          if (args.seqViewsPlugin !== undefined)
-            thisB.config.seqViewsPlugin = args.seqViewsPlugin;
-          //});
-          //browser.afterMilestone('initPlugins', function(){
+          thisB._determinePluginSupport(args);
           // check for screenshot query parameters
-          //console.log(browser);
           if (browser.config.queryParams.hasOwnProperty('screenshot')) {
             thisB.isScreenshot = true;
             var encoded = browser.config.queryParams.screenshot;
             var trackList = browser.config.queryParams.tracks;
             var decoded = Util.decode(encoded, trackList);
-            //console.log(JSON.stringify(browser.plugins));
             // apply
             thisB._applyScreenshotConfig(decoded);
             browser.afterMilestone('loadConfig', function () {
-              //thisB._applyMethylationConfig( decoded.general.methylation );
-              //thisB._applySmallRNAConfig( decoded.general.smallrna );
               thisB._applyMethSmRNAConfig(decoded.general.methylation, decoded.general.smallrna);
               thisB._applyTracksConfig(decoded.tracks);
             });
@@ -1880,7 +1864,6 @@ define('ScreenShotPlugin/main', [
 
         browser.afterMilestone('initView', function () {
           // create screenshot button (possibly tools menu)
-          //console.log(browser);
           var menuBar = browser.menuBar;
 
           function showScreenShotDialog() {
@@ -1895,6 +1878,7 @@ define('ScreenShotPlugin/main', [
             var button = new dijitButton({
               className: 'screenshot-button',
               innerHTML: 'Screen Shot',
+              id: 'screenshot-button',
               title: 'take screen shot of browser',
               onClick: showScreenShotDialog
             });
@@ -1907,6 +1891,44 @@ define('ScreenShotPlugin/main', [
 
       _getPhantomJSUrl: function () {
         return 'https://phantomjscloud.com/api/browser/v2/';
+      },
+
+      _determinePluginSupport: function(args){
+        var config = this.config;
+        var browser = this.browser;
+        /* METHYLATION PLUGIN */
+        config.methylPlugin = 'MethylationPlugin'
+          if (args.methylPlugin !== undefined)
+            config.methylPlugin = args.methylPlugin;
+          // test that browser has the plugin
+          if(browser.plugins.hasOwnProperty(config.methylPlugin)){
+            // test version for html features -> 3.1.0
+            config.htmlFeatures['methyl'] = (browser.plugins[config.methylPlugin].config.hasOwnProperty('version')) ? (browser.plugins[config.methylPlugin].config.version >= '3.1.0') : false;
+          }
+
+        /* SMALL RNA PLUGIN */
+          config.smrnaPlugin = 'SmallRNAPlugin';
+          if (args.smrnaPlugin !== undefined)
+            config.smrnaPlugin = args.smrnaPlugin;
+          if(browser.plugins.hasOwnProperty(config.smrnaPlugin)){
+            // test version for html features -> "1.4.0"
+            config.htmlFeatures['smrna'] = (browser.plugins[config.smrnaPlugin].config.hasOwnProperty('version')) ? (browser.plugins[config.smrnaPlugin].config.version >= '1.4.0') : false;
+          }
+
+        /* STRANDED XYPLOT PLUGIN */
+        config.strandedPlugin = 'StrandedPlotPlugin';
+          if (args.strandedPlugin !== undefined)
+            config.strandedPlugin = args.strandedPlugin;
+          if(browser.plugins.hasOwnProperty(config.strandedPlugin)){
+            // test version for html features -> "1.1.0"
+            config.htmlFeatures['strandedplot'] = (browser.plugins[config.strandedPlugin].config.hasOwnProperty('version')) ? (browser.plugins[config.strandedPlugin].config.version >= '1.1.0') : false;
+          }
+
+          // this is a true or false value since we don't actually need the path
+          // just need to know if it exists
+          config.seqViewsPlugin = browser.plugins.hasOwnProperty('SeqViewsPlugin');
+          if (args.seqViewsPlugin !== undefined)
+            config.seqViewsPlugin = args.seqViewsPlugin;
       },
 
       _applyScreenshotConfig: function (params) {
@@ -2021,6 +2043,8 @@ define('ScreenShotPlugin/main', [
                 params[t].type = 'MethylationPlugin/View/Track/MethylHTMLPlot';
                 params[t].maxHeight = params[t].style.height;
                 delete params[t].style.height;
+              } else if(/StrandedXYPlot/.test(tracks[t].type)){
+                 params[t].type = 'StrandedPlotPlugin/View/Track/Wiggle/StrandedSVGPlot'
               }
             }
             // pull out histograms and/or style
