@@ -85,6 +85,8 @@ For _jbrowse.conf_
     methylPlugin = <methylation_plugin_id>
 ```
 
+For MethylationPlugin v3.1.0+, using HTML-based methylation track in the screenshot is supported
+
 ### Small RNA Plugin
 This plugin includes support for the [SmallRNAPlugin](https://github.com/bhofmei/jbplugin-smallrna).  
 If the plugin ID<sup>1</sup> is anything except `SmallRNAPlugin`, the ID will need to be specified. 
@@ -96,8 +98,22 @@ For _jbrowse.conf_
     smrnaPlugin = <smallrna_plugin_id>
 ```
 
+For SmallRNAPlugin v1.4.0+, using HTML-based small rna track in the screenshot is supported.
+
 <sup>1</sup>For jbrowse.conf, the plugin ID is found as `[plugins.ID]` for each plugin.  
 In jbrowse_conf.json, the plugin ID is found as `"plugins":{"ID":{"location":"..."}}`
+
+### Stranded XYPlot Plugin
+This plugin includes support for the [StrandedPlotPlugin](https://github.com/bhofmei/jbplugin-strandedplot).  
+If the plugin ID<sup>1</sup> is anything except `StrandedPlotPlugin`, the ID will need to be specified. 
+
+For _jbrowse.conf_
+```
+    [plugins.ScreenShotPlugin]
+    ...
+    strandedPlugin = <strandedplot_plugin_id>
+```
+For StrandedPlotPlugin v1.1.0, using SVG-based tracks in the screenshot is supported.
 
 ### SeqViewsPlugin
 This plugin only needs to know if the [SeqViewsPlugin](https://github.com/bhofmei/jbplugin-seqview) is activated.
@@ -137,6 +153,5 @@ For additional debugging help, submit an [issue](https://github.com/bhofmei/jbpl
 
 ## Future Improvements
 - Support MethylationPlugin v3
-- Additional support for HTML style features, i.e. Alignments2 -> Alignments
 - Show/hide clip marker
 - Remember configuration settings after closing the dialog
