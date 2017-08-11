@@ -1,0 +1,24 @@
+{
+  "name": "ScreenShotPlugin",
+  "version": "1.6.4",
+  "description": "Take easy JBrowse screenshots with PhantomJS cloud",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/bhofmei/jbplugin-screenshot.git"
+  },
+  "keywords": [
+    "JBrowse",
+    "PhantomJS",
+    "screenshots"
+  ],
+  "author": "Brigitte Hofmeister",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/bhofmei/jbplugin-screenshot/issues"
+  },
+  "homepage": "https://github.com/bhofmei/jbplugin-screenshot#readme"
+}
