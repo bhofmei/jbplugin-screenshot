@@ -1,5 +1,9 @@
 # Release Notes
 
+v1.6.4 - Aug 11, 2017
+- HTML style available or stranded xy tracks
+- include version checks for small rna plugin, methylation plugin, stranded plot plugin to ensure html/svg tracks are included
+
 v1.6.3 - Aug 8, 2017
 - HTML style available for methylation tracks (must have latest version of methylation plugin)
 
