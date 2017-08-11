@@ -458,7 +458,7 @@ return declare (ActionBarDialog,{
                                 '_label': label,
                                 '_prop': param
                         });
-                        button.onClick = dojo.hitch(thisB, '_setTrackParameter', button);
+                        button.onClick = lang.hitch(thisB, '_setTrackParameter', button);
                         var td = dom.create('td', {className:'screenshot-dialog-td-button'}, row);
                         button.placeAt(td, 'first');
                         dom.create('label', {"for":'screenshot-dialog-radio-'+label+'-'+opt, innerHTML: opt}, td);
@@ -470,12 +470,12 @@ return declare (ActionBarDialog,{
                   var row = dom.create('tr',{'id':'screenshot-dialog-row-'+label+'-'+param},table);
                     dom.create('td',{'innerHTML':data.title,'class':'screenshot-dialog-pane-label'}, row);
                     var widget = new dijitCheckBox({
-                        id:'screenshot-dialog-spinner-'+label+'-'+param,
+                        id:'screenshot-dialog-checkbox-'+label+'-'+param,
                         checked: data.value,
                         '_prop':param,
                         '_label': label
                     });
-                    widget.onChange = dojo.hitch(thisB, '_setTrackParameter', widget);
+                    widget.onChange = lang.hitch(thisB, '_setTrackParameter', widget);
                     var td = dom.create('td', {'class':'screenshot-dialog-pane-input', 'colspan':4}, row);
                     widget.placeAt(td,'first');
                 }
@@ -492,7 +492,7 @@ return declare (ActionBarDialog,{
                         intermediateChanges:true,
                         style:"width:60px;"
                     });
-                    widget.onChange = dojo.hitch(thisB, '_setTrackParameter', widget);
+                    widget.onChange = lang.hitch(thisB, '_setTrackParameter', widget);
                     var td = dom.create('td', {'class':'screenshot-dialog-pane-input', 'colspan':4}, row);
                     widget.placeAt(td,'first');
                 }
