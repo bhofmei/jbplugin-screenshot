@@ -451,7 +451,7 @@ return declare (ActionBarDialog,{
                         dom.create('td',{'innerHTML':data.title,'class':'screenshot-dialog-pane-label'}, row);
                         array.forEach(optList, function(opt){
                             var button = new dijitRadioButton({
-                                name:param+'-'+label,
+                                name:param+'-'+label.replace(/\./, '-'),
                                 checked: opt === data.value,
                                 id:'screenshot-dialog-radio-'+label+'-'+opt,
                                 value: opt,

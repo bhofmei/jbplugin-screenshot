@@ -116,7 +116,7 @@ EncodeDecodeUtil = {
                 output += eLabels[param] + this._encodeBoolean(data);
             else if (param in {'html': 1})
                 output += eLabels[param] + this._encodeBoolean(data.value);
-            else if(!(data === undefined || data.value === undefined || eLabels.hasOwnProperty(param)===false )){
+            else if(!(data === undefined || data.value === undefined || data.value === null || eLabels.hasOwnProperty(param)===false )){
                 output += eLabels[param]
                 // ypos, mode, style
                 if (param in {ypos:1, mode:1, style:1})

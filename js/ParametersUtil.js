@@ -219,7 +219,7 @@ define("ScreenShotPlugin/ParametersUtil", [
             lang.mixin(out, this._htmlParameters(pluginConfigs));
         }
         // test bigwig and SNPCoverage
-        else if (/\b(XYPlot)/.test(tType) || /\b(XYDensity)/.test(tType) || /XYPlot$/.test(tType) || /SNPCoverage$/.test(tType)) {
+        else if (/\b(XYPlot)/.test(tType) || /\b(Density)/.test(tType) || /XYPlot$/.test(tType) || /SNPCoverage$/.test(tType)) {
           lang.mixin(out, this._xyParameters(config));
         }
         // else get track height from maxHeight and set ypos = false
@@ -315,7 +315,7 @@ define("ScreenShotPlugin/ParametersUtil", [
         return {
           ypos: {
             title: 'Y-scale position',
-            value: config.yScalePosition
+            value: (config.hasOwnProperty('yScalePosition') ? config.yScalePosition : 'center')
           },
           min: {
             title: 'Min. score',
