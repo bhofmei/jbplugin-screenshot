@@ -1,6 +1,6 @@
 {
-  "name": "ScreenShotPlugin",
-  "version": "1.6.4",
+  "name": "jbplugin-screenshot",
+  "version": "1.6.5",
   "description": "Take easy JBrowse screenshots with PhantomJS cloud",
   "main": "index.js",
   "scripts": {
@@ -20,5 +20,9 @@
   "bugs": {
     "url": "https://github.com/bhofmei/jbplugin-screenshot/issues"
   },
-  "homepage": "https://github.com/bhofmei/jbplugin-screenshot#readme"
+  "homepage": "https://github.com/bhofmei/jbplugin-screenshot#readme",
+    "devDependencies": {
+        "jasmine": "^2.7.0",
+        "jbrowse": "git+https://github.com/bhofmei/jbrowse"
+    }
 }
