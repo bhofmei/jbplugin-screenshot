@@ -268,7 +268,7 @@ define("ScreenShotPlugin/View/Dialog/ScreenShotDialog", [
         } // end methylation
 
         // small rna
-        if (thisB.configs.smrnaPlugin)) {
+        if (thisB.configs.smrnaPlugin) {
           cdata = thisB.browser.plugins.SmallRNAPlugin.config;
           row = dom.create('tr', {
             id: 'screenshot-dialog-row-smrna'

@@ -1,4 +1,4 @@
-define([
+define('ScreenShotPlugin/ParametersUtil', [
     'dojo/_base/declare',
     'dojo/_base/array',
     'dojo/_base/lang',

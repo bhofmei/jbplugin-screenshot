@@ -1795,7 +1795,7 @@ require({
     'url:dijit/layout/templates/_ScrollingTabControllerButton.html': "<div data-dojo-attach-event=\"ondijitclick:_onClick\" class=\"dijitTabInnerDiv dijitTabContent dijitButtonContents\"  data-dojo-attach-point=\"focusNode\" role=\"button\">\n\t<span role=\"presentation\" class=\"dijitInline dijitTabStripIcon\" data-dojo-attach-point=\"iconNode\"></span>\n\t<span data-dojo-attach-point=\"containerNode,titleNode\" class=\"dijitButtonText\"></span>\n</div>"
   }
 });
-define('ScreenShotPlugin/main', [
+define([
     'dojo/_base/declare',
     'dojo/_base/lang',
     'dojo/_base/array',
@@ -1803,8 +1803,8 @@ define('ScreenShotPlugin/main', [
     "dojo/dom-attr",
     'dojo/dom-construct',
     'dijit/form/Button',
-    './View/Dialog/ScreenShotDialog',
-    './EncodeDecodeUtil',
+    'ScreenShotPlugin/View/Dialog/ScreenShotDialog',
+    'ScreenShotPlugin/EncodeDecodeUtil',
     'JBrowse/Plugin',
     "JBrowse/Browser"
 ],
