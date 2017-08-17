@@ -1,8 +1,8 @@
 {
   "name": "jbplugin-screenshot",
   "version": "1.6.5",
-  "description": "Take easy JBrowse screenshots with PhantomJS cloud",
-  "main": "index.js",
+  "description": "Take easy, configurable JBrowse screenshots with PhantomJS cloud",
+  "main": "main.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
@@ -16,7 +16,7 @@
     "screenshots"
   ],
   "author": "Brigitte Hofmeister",
-  "license": "MIT",
+  "license": "Apache-2.0",
   "bugs": {
     "url": "https://github.com/bhofmei/jbplugin-screenshot/issues"
   },
