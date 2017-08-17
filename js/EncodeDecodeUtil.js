@@ -1,4 +1,4 @@
-define( "ScreenShotPlugin/EncodeDecodeUtil", [
+define([
     'dojo/_base/declare',
     'dojo/_base/array',
     'dojo/_base/lang',
