@@ -219,20 +219,26 @@ define("ScreenShotPlugin/ParametersUtil", [
             lang.mixin(out, this._htmlParameters(pluginConfigs));
         }
         // test bigwig and SNPCoverage
-        else if (/\b(XYPlot)/.test(tType) || /\b(Density)/.test(tType) || /XYPlot$/.test(tType) || /SNPCoverage$/.test(tType)) {
+        else if (/\b(XYPlot)/.test(tType) || /XYPlot$/.test(tType) || /SNPCoverage$/.test(tType)) {
           lang.mixin(out, this._xyParameters(config));
+        }
+        // test for wiggle density (same as xy but no y axis)
+        else if( /\b(Density)/.test(tType) || /Density$/.test(tType)){
+          lang.mixin(out, this._densityParameters(config));
         }
         // else get track height from maxHeight and set ypos = false
         else {
           lang.mixin(out, this._basicParameters(config));
         }
 
-        // html features - canvas/alignments, smallrna, stranded
+        // html features - canvas/alignments, smallrna, stranded, xyplot/density
         if (/CanvasFeatures$/.test(tType) || /Alignments2$/.test(tType)) {
           lang.mixin(out, this._htmlParameters(pluginConfigs));
         } else if (/smAlignments$/.test(tType) && pluginConfigs.htmlFeatures.smrna) {
           lang.mixin(out, this._htmlParameters(pluginConfigs));
         } else if (/StrandedXYPlot$/.test(tType) && pluginConfigs.htmlFeatures.strandedplot) {
+          lang.mixin(out, this._htmlParameters(pluginConfigs));
+        } else if( (/\b(XYPlot)/.test(tType) || /\b(Density)/.test(tType)) && pluginConfigs.htmlFeatures.wiggle){
           lang.mixin(out, this._htmlParameters(pluginConfigs));
         }
         // Canvas/Alignments2 have maxHeight option and possibly histogram with min/max and height
@@ -244,7 +250,6 @@ define("ScreenShotPlugin/ParametersUtil", [
         if (/CanvasFeatures$/.test(tType) || /Alignments2$/.test(tType) || /smAlignments$/.test(tType)) {
           // check for SeqViews plugin
           lang.mixin(out, this._seqViewParameters(config, pluginConfigs));
-
         }
 
         return out;
@@ -285,6 +290,27 @@ define("ScreenShotPlugin/ParametersUtil", [
           ypos: {
             title: 'Y-scale position',
             value: (config.hasOwnProperty('yScalePosition') ? config.yScalePosition : 'center')
+          },
+          min: {
+            title: 'Min. score',
+            value: config.min_score,
+            delta: 10
+          },
+          max: {
+            title: 'Max. score',
+            value: config.max_score,
+            delta: 10
+          },
+          quant: true
+        };
+      },
+
+      _densityParameters: function(config){
+        return {
+          height: {
+            title: 'Track height',
+            value: config.style.height,
+            delta: 10
           },
           min: {
             title: 'Min. score',
