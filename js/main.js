@@ -1828,7 +1828,7 @@ define('ScreenShotPlugin/main', [
         var browser = this.browser;
         this.isScreenshot = false;
         console.log('ScreenShotPlugin starting');
-        this.config.version = '1.6.5';
+        this.config.version = '1.6.6';
 
         // PhantomJS Username
         this.config.apiKey = 'a-demo-key-with-low-quota-per-ip-address';
@@ -1839,7 +1839,9 @@ define('ScreenShotPlugin/main', [
         if (args.debugMode !== undefined)
           this.config.debug = args.debugMode;
         // Include option for Canvas Features -> HTML features
-        this.config.htmlFeatures = {general: false};
+        this.config.htmlFeatures = {
+          general: false
+        };
         if (args.htmlFeatures !== undefined)
           this.config.htmlFeatures = args.htmlFeatures;
         var thisB = this;
@@ -1893,42 +1895,46 @@ define('ScreenShotPlugin/main', [
         return 'https://phantomjscloud.com/api/browser/v2/';
       },
 
-      _determinePluginSupport: function(args){
+      _determinePluginSupport: function (args) {
         var config = this.config;
         var browser = this.browser;
         /* METHYLATION PLUGIN */
-        config.methylPlugin = 'MethylationPlugin'
-          if (args.methylPlugin !== undefined)
-            config.methylPlugin = args.methylPlugin;
-          // test that browser has the plugin
-          if(browser.plugins.hasOwnProperty(config.methylPlugin)){
-            // test version for html features -> 3.1.0
-            config.htmlFeatures['methyl'] = (browser.plugins[config.methylPlugin].config.hasOwnProperty('version')) ? (browser.plugins[config.methylPlugin].config.version >= '3.1.0') : false;
-          }
+        config.methylPlugin = false;
+        // test that browser has the plugin
+        if (browser.plugins.hasOwnProperty('MethylationPlugin')) {
+          config.methylPlugin = true;
+          // test version for html features -> 3.1.0
+          config.htmlFeatures['methyl'] = (browser.plugins.MethylationPlugin.config.hasOwnProperty('version')) ? (browser.plugins.MethylationPlugin.config.version >= '3.1.0') : false;
+        }
 
         /* SMALL RNA PLUGIN */
-          config.smrnaPlugin = 'SmallRNAPlugin';
-          if (args.smrnaPlugin !== undefined)
-            config.smrnaPlugin = args.smrnaPlugin;
-          if(browser.plugins.hasOwnProperty(config.smrnaPlugin)){
-            // test version for html features -> "1.4.0"
-            config.htmlFeatures['smrna'] = (browser.plugins[config.smrnaPlugin].config.hasOwnProperty('version')) ? (browser.plugins[config.smrnaPlugin].config.version >= '1.4.0') : false;
-          }
+        config.smrnaPlugin = false;
+        if (browser.plugins.hasOwnProperty('SmallRNAPlugin')) {
+          config.smrnaPlugin = true;
+          // test version for html features -> "1.4.0"
+          config.htmlFeatures['smrna'] = (browser.plugins.SmallRNAPlugin.config.hasOwnProperty('version')) ? (browser.plugins.SmallRNAPlugin.config.version >= '1.4.0') : false;
+        }
 
         /* STRANDED XYPLOT PLUGIN */
-        config.strandedPlugin = 'StrandedPlotPlugin';
-          if (args.strandedPlugin !== undefined)
-            config.strandedPlugin = args.strandedPlugin;
-          if(browser.plugins.hasOwnProperty(config.strandedPlugin)){
-            // test version for html features -> "1.1.0"
-            config.htmlFeatures['strandedplot'] = (browser.plugins[config.strandedPlugin].config.hasOwnProperty('version')) ? (browser.plugins[config.strandedPlugin].config.version >= '1.1.0') : false;
-          }
+        config.strandedPlugin = false;
+        if (browser.plugins.hasOwnProperty('StrandedPlotPlugin')) {
+          config.strandedPlugin = true;
+          // test version for html features -> "1.1.0"
+          config.htmlFeatures['strandedplot'] = (browser.plugins.StrandedPlotPlugin.config.hasOwnProperty('version')) ? (browser.plugins.StrandedPlotPlugin.config.version >= '1.1.0') : false;
+        }
 
-          // this is a true or false value since we don't actually need the path
-          // just need to know if it exists
-          config.seqViewsPlugin = browser.plugins.hasOwnProperty('SeqViewsPlugin');
-          if (args.seqViewsPlugin !== undefined)
-            config.seqViewsPlugin = args.seqViewsPlugin;
+        /* WIGGLE SVG PLOT PLUGIN */
+        config.wiggleSVGPlugin = false;
+        if (browser.plugins.hasOwnProperty('WiggleSVGPlotPlugin')) {
+          config.wiggleSVGPlugin = true;
+          config.htmlFeatures['wiggle'] = true;
+        }
+
+        // this is a true or false value since we don't actually need the path
+        // just need to know if it exists
+        config.seqViewsPlugin = browser.plugins.hasOwnProperty('SeqViewsPlugin');
+        if (args.seqViewsPlugin !== undefined)
+          config.seqViewsPlugin = args.seqViewsPlugin;
       },
 
       _applyScreenshotConfig: function (params) {
@@ -1990,7 +1996,7 @@ define('ScreenShotPlugin/main', [
       _testMethylation: function (trackType) {
         if (trackType === undefined || trackType === null)
           return false;
-        return ((/\b(Methyl.*Plot)/.test(trackType)));
+        return ((/(Methyl.*Plot$)/.test(trackType)));
       },
 
       _applySmallRNAConfig: function (params) {
@@ -2019,7 +2025,7 @@ define('ScreenShotPlugin/main', [
       _testSmallRNA: function (trackType) {
         if (trackType === undefined || trackType === null)
           return false;
-        return (/\b(smAlignments)/.test(trackType));
+        return (/(sm.*Alignments$)/.test(trackType));
       },
 
       _applyTracksConfig: function (params) {
@@ -2034,17 +2040,21 @@ define('ScreenShotPlugin/main', [
             if (params[t].type === 'ChangeHTMLFeatures') {
               if (thisB._testSmallRNA(tracks[t].type)) {
                 params[t].type = 'SmallRNAPlugin/View/Track/smHTMLAlignments'
-              } else if (/CanvasFeatures/.test(tracks[t].type)) {
+              } else if (/CanvasFeatures$/.test(tracks[t].type)) {
                 params[t].type = 'JBrowse/View/Track/HTMLFeatures';
-                params[t].trackType = "CanvasFeatures";
-              } else if (/Alignments2/.test(tracks[t].type)) {
+                params[t].trackType = "HTMLFeatures";
+              } else if (/Alignments2$/.test(tracks[t].type)) {
                 params[t].type = 'JBrowse/View/Track/Alignments';
-              } else if(/MethylPlot/.test(tracks[t].type)){
+              } else if (/MethylPlot$/.test(tracks[t].type)) {
                 params[t].type = 'MethylationPlugin/View/Track/MethylHTMLPlot';
                 params[t].maxHeight = params[t].style.height;
                 delete params[t].style.height;
-              } else if(/StrandedXYPlot/.test(tracks[t].type)){
-                 params[t].type = 'StrandedPlotPlugin/View/Track/Wiggle/StrandedSVGPlot'
+              } else if (/StrandedXYPlot$/.test(tracks[t].type)) {
+                params[t].type = 'StrandedPlotPlugin/View/Track/Wiggle/StrandedSVGPlot';
+              } else if (/\b(XYPlot)/.test(tracks[t].type)){
+                params[t].type = 'WiggleSVGPlotPlugin/View/Track/Wiggle/SVGXYPlot';
+              } else if (/\b(Density)/.test(tracks[t].type)){
+                params[t].type = 'WiggleSVGPlotPlugin/View/Track/Wiggle/SVGDensity';
               }
             }
             // pull out histograms and/or style
