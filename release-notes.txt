@@ -1,5 +1,11 @@
 # Release Notes
 
+v1.6.6 - Aug 17, 2017
+- Support for SVG-style XYPlot and Density tracks with WiggleSVGPlotPlugin
+- Additional plugins must have specified plugin ID
+- updated README to include Wiggle SVG Plot plugin and exact plugin id
+- Density tracks do not have y-scale option
+
 v1.6.5 - Aug 16, 2017
 - minor bug fixes
 

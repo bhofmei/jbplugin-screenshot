@@ -67,53 +67,51 @@ Also, the tracklist does not always display well when using PDF output. When sel
 
 Hiding track labels only works for JBrowse v1.12.3 when HideTracksButton plugin is activated. If browser is an earlier version and/or the plugin is not activates, track labels will always be shown.
 
+**Note:** Due to the nature of URL-encoded screenshots, default track configurations will be used unless overriden by settings selected in this dialog box. Locally added tracks, such as combination tracks, will not be included.
+
+### HTML and SVG Exporting
 Canvas Feature tracks are great when browsing but don't show up as well in screenshots. 
-If you'd like to convert a canvas feature track to HTML feature track when taking the screenshot, click the "HTML feature" checkbox on that track's configuration. 
+If you'd like to convert a canvas feature track to HTML feature track when taking the screenshot, click the "HTML feature" checkbox on that track's configuration.
 The style/look of the features is controlled by the track "style.className" configuration.
 
-**Note:** Due to the nature of URL-encoded screenshots, default track configurations will be used unless overriden by settings selected in this dialog box. Locally added tracks, such as combination tracks, will not be included.
+HTML/SVG track exports are available for Canvas Feature tracks and Alignment2 tracks by default.
+Additional support for XYPlots and Density plots are available with an [additional plugin](#wiggle-svg-plot-plugin).
+
+The default configuration is to leave each as-is and the HTML/SVG-style option must be selected for each support track.
+To change this default behavior (i.e. all tracks that can be converted to HTML/SVG are converted unless the option is deselected for each track), change the configuration when activating the plugin.
+
+In _jbrowse.conf_,
+
+```
+[plugins.ScreenShotPlugin]
+location = ...
+htmlFeatures = true
+```
+
 
 ## Support for Additional Plugins
 ### Methylation Plugin
 This plugin includes support for the [MethylationPlugin](https://github.com/bhofmei/jbplugin-methylation).  
-If the plugin ID<sup>1</sup> is anything except `MethylationPlugin`, the ID will need to be specified. 
-
-For _jbrowse.conf_
-```
-    [plugins.ScreenShotPlugin]
-    ...
-    methylPlugin = <methylation_plugin_id>
-```
+Make sure the plugin ID<sup>1</sup>  is `MethylationPlugin` and the plugin is activated.
 
 For MethylationPlugin v3.1.0+, using HTML-based methylation track in the screenshot is supported
 
 ### Small RNA Plugin
 This plugin includes support for the [SmallRNAPlugin](https://github.com/bhofmei/jbplugin-smallrna).  
-If the plugin ID<sup>1</sup> is anything except `SmallRNAPlugin`, the ID will need to be specified. 
-
-For _jbrowse.conf_
-```
-    [plugins.ScreenShotPlugin]
-    ...
-    smrnaPlugin = <smallrna_plugin_id>
-```
+Make sure the plugin ID<sup>1</sup> is `SmallRNAPlugin` and the plugin is activate. 
 
 For SmallRNAPlugin v1.4.0+, using HTML-based small rna track in the screenshot is supported.
 
-<sup>1</sup>For jbrowse.conf, the plugin ID is found as `[plugins.ID]` for each plugin.  
-In jbrowse_conf.json, the plugin ID is found as `"plugins":{"ID":{"location":"..."}}`
-
 ### Stranded XYPlot Plugin
 This plugin includes support for the [StrandedPlotPlugin](https://github.com/bhofmei/jbplugin-strandedplot).  
-If the plugin ID<sup>1</sup> is anything except `StrandedPlotPlugin`, the ID will need to be specified. 
+Make sure the plugin ID<sup>1</sup> is `StrandedPlotPlugin`and the plugin is activated. 
 
-For _jbrowse.conf_
-```
-    [plugins.ScreenShotPlugin]
-    ...
-    strandedPlugin = <strandedplot_plugin_id>
-```
 For StrandedPlotPlugin v1.1.0, using SVG-based tracks in the screenshot is supported.
+
+### Wiggle SVG Plot Plugin
+For XYPlot and Density plots to be exported as SVG-based tracks, download and activate the [Wiggle SVG Plot Plugin](https://github.com/bhofmei/jbplugin-wigglesvg).
+Make sure the plugin ID<sup>1</sup> is `WiggleSVGPlotPlugin` and the plugin is activated.
+
 
 ### SeqViewsPlugin
 This plugin only needs to know if the [SeqViewsPlugin](https://github.com/bhofmei/jbplugin-seqview) is activated.
@@ -128,6 +126,9 @@ In _jbrowse.conf_,
 ```
 
 Optionally, you can specify `seqViewsPlugin = false` if you do not want to include support for it.
+
+<sup>1</sup>For jbrowse.conf, the plugin ID is found as `[plugins.ID]` for each plugin.  
+In jbrowse_conf.json, the plugin ID is found as `"plugins":{"ID":{"location":"..."}}`
 
 ### Other plugins
 Support for other plugins can be added based on demand. To request support for other plugins, either
@@ -152,6 +153,5 @@ This plugin is difficult to test and debug because it relies on PhantomJS Cloud.
 For additional debugging help, submit an [issue](https://github.com/bhofmei/jbplugin-screenshot/issues). Include the URL when submitting an issue.
 
 ## Future Improvements
-- Support MethylationPlugin v3
 - Show/hide clip marker
 - Remember configuration settings after closing the dialog
