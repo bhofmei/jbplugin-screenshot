@@ -1,5 +1,8 @@
 # Release Notes
 
+v1.6.7 - Aug 18, 2017
+- bug fixes
+
 v1.6.6 - Aug 17, 2017
 - Support for SVG-style XYPlot and Density tracks with WiggleSVGPlotPlugin
 - Additional plugins must have specified plugin ID
