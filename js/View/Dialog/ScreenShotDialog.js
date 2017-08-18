@@ -83,7 +83,7 @@ define("ScreenShotPlugin/View/Dialog/ScreenShotDialog", [
               general: gParams,
               tracks: this.trackParameters
             };
-            console.log(scParams);
+            //console.log(scParams);
             // js params
             var jsParams = this.parameters.output;
             // get the url
@@ -799,7 +799,10 @@ define("ScreenShotPlugin/View/Dialog/ScreenShotDialog", [
           return
         } else {
           if (this.trackParameters[tLabel].hasOwnProperty(prop)) {
-            this.trackParameters[tLabel][prop].value = input.checked ? input.checked : input.value;
+            if(input.type === 'checkbox')
+              this.trackParameters[tLabel][prop].value = input.checked;
+            else
+              this.trackParameters[tLabel][prop].value = input.value;
           }
         }
       },
