@@ -1881,7 +1881,7 @@ define([
             }).show();
           }
 
-          if (browser.config.show_menu && (thisB.isScreenshot === false)) {
+          if (browser.config.show_menu && (thisB.isScreenshot === false || thisB.config.dialog)) {
             var button = new dijitButton({
               className: 'screenshot-button',
               innerHTML: 'Screen Shot',
@@ -1900,7 +1900,7 @@ define([
               setTimeout(function(){
             var button = dijitRegistry.byId('screenshot-button');
             button.onClick();
-                }, 500)
+                }, 700)
             }
           }
         })
