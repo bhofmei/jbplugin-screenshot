@@ -1803,6 +1803,7 @@ define([
     "dojo/dom-attr",
     'dojo/dom-construct',
     'dijit/form/Button',
+  'dijit/registry',
     'ScreenShotPlugin/View/Dialog/ScreenShotDialog',
     'ScreenShotPlugin/EncodeDecodeUtil',
     'JBrowse/Plugin',
@@ -1816,6 +1817,7 @@ define([
     domAttr,
     domConstr,
     dijitButton,
+     dijitRegistry,
     ScreenShotDialog,
     Util,
     JBrowsePlugin,
@@ -1838,6 +1840,9 @@ define([
         this.config.debug = false;
         if (args.debugMode !== undefined)
           this.config.debug = args.debugMode;
+        this.config.dialog = false;
+        if(args.dialogMode !== undefined)
+          this.config.dialog = args.dialogMode;
         // Include option for Canvas Features -> HTML features
         this.config.htmlFeatures = {
           general: false
@@ -1889,6 +1894,16 @@ define([
           // shortcut key
           browser.setGlobalKeyboardShortcut('s', showScreenShotDialog);
         });
+        browser.afterMilestone('completely initialized', function(){
+          if (thisB.config.dialog){
+            if(browser.view.tracks.length < 1){
+              setTimeout(function(){
+            var button = dijitRegistry.byId('screenshot-button');
+            button.onClick();
+                }, 500)
+            }
+          }
+        })
       }, // end constructor
 
       _getPhantomJSUrl: function () {
