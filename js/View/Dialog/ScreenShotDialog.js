@@ -83,6 +83,7 @@ define("ScreenShotPlugin/View/Dialog/ScreenShotDialog", [
               general: gParams,
               tracks: this.trackParameters
             };
+            console.log(scParams);
             // js params
             var jsParams = this.parameters.output;
             // get the url
@@ -371,7 +372,7 @@ define("ScreenShotPlugin/View/Dialog/ScreenShotDialog", [
           } else if (param === "image") {
             // handle png/jpg height and width
             var tbod = dom.create('tbody', {
-              'id': 'screenshot-dialog-image-rows',
+              'id': 'screenshot-dialog-image-rows'
               /*style:'display:'+(thisB.parameters.output.format === 'PDF' ? 'none' : 'inherit')*/
             }, tableB);
 
@@ -384,7 +385,7 @@ define("ScreenShotPlugin/View/Dialog/ScreenShotDialog", [
           } else if (param === 'pdf') {
             // handle pdf options
             var tbod = dom.create('tbody', {
-              'id': 'screenshot-dialog-pdf-rows',
+              'id': 'screenshot-dialog-pdf-rows'
               /*style:'display:'+(thisB.parameters.output.format !== 'PDF' ? 'none' : 'inherit')*/
             }, tableB);
             var param2, data2;
