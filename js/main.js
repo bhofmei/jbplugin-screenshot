@@ -1828,7 +1828,7 @@ define([
         var browser = this.browser;
         this.isScreenshot = false;
         console.log('ScreenShotPlugin starting');
-        this.config.version = '1.6.6';
+        this.config.version = '1.6.7';
 
         // PhantomJS Username
         this.config.apiKey = 'a-demo-key-with-low-quota-per-ip-address';
@@ -2046,7 +2046,7 @@ define([
               } else if (/Alignments2$/.test(tracks[t].type)) {
                 params[t].type = 'JBrowse/View/Track/Alignments';
               } else if (/MethylPlot$/.test(tracks[t].type)) {
-                params[t].type = 'MethylationPlugin/View/Track/MethylHTMLPlot';
+                params[t].type = 'MethylationPlugin/View/Track/Wiggle/MethylHTMLPlot';
                 params[t].maxHeight = params[t].style.height;
                 delete params[t].style.height;
               } else if (/StrandedXYPlot$/.test(tracks[t].type)) {
