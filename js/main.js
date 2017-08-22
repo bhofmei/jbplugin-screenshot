@@ -2077,7 +2077,7 @@ define([
                 params[t].type = 'WiggleSVGPlotPlugin/View/Track/Wiggle/SVGXYPlot';
               } else if (/\b(Density)/.test(tracks[t].type)){
                 params[t].type = 'WiggleSVGPlotPlugin/View/Track/Wiggle/SVGDensity';
-              } else if(/b(NucleotideDensity/.test(tracks[t].type)){
+              } else if(/b(NucleotideDensity)/.test(tracks[t].type)){
                 params[t].type = 'NucleotideDensityPlugin/View/Track/Wiggle/NucleotideSVGDensity';
               }
             }

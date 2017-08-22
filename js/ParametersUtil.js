@@ -240,7 +240,7 @@ define('ScreenShotPlugin/ParametersUtil', [
           lang.mixin(out, this._htmlParameters(pluginConfigs));
         } else if( (/\b(XYPlot)/.test(tType) || /\b(Density)/.test(tType)) && pluginConfigs.htmlFeatures.wiggle){
           lang.mixin(out, this._htmlParameters(pluginConfigs));
-        } else if(/b(NucleotideDensity/.test(tType) && pluginConfigs.htmlFeatures.nucdens){
+        } else if(/b(NucleotideDensity)/.test(tType) && pluginConfigs.htmlFeatures.nucdens){
           lang.mixin(out, this._htmlParameters(pluginConfigs));
         }
         // Canvas/Alignments2 have maxHeight option and possibly histogram with min/max and height
