@@ -1938,6 +1938,13 @@ define([
           config.htmlFeatures['strandedplot'] = (browser.plugins.StrandedPlotPlugin.config.hasOwnProperty('version')) ? (browser.plugins.StrandedPlotPlugin.config.version >= '1.1.0') : false;
         }
 
+        /* NUCLEOTIDE DENSITY PLUGIN */
+        config.nucDensPlugin = false;
+        if(browser.plugins.hasOwnProperty('NucleotideDensityPlugin')){
+          config.nucDensPlugin = true;
+          config.htmlFeatures['nucdens'] = (browser.plugins.NucleotideDensityPlugin.config.hasOwnProperty('version')) ? (browser.plugins.NucleotideDensityPlugin.config.version >= '1.1.0') : false;
+        }
+
         /* WIGGLE SVG PLOT PLUGIN */
         config.wiggleSVGPlugin = false;
         if (browser.plugins.hasOwnProperty('WiggleSVGPlotPlugin')) {
@@ -2070,6 +2077,8 @@ define([
                 params[t].type = 'WiggleSVGPlotPlugin/View/Track/Wiggle/SVGXYPlot';
               } else if (/\b(Density)/.test(tracks[t].type)){
                 params[t].type = 'WiggleSVGPlotPlugin/View/Track/Wiggle/SVGDensity';
+              } else if(/b(NucleotideDensity/.test(tracks[t].type)){
+                params[t].type = 'NucleotideDensityPlugin/View/Track/Wiggle/NucleotideSVGDensity';
               }
             }
             // pull out histograms and/or style
