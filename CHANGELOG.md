@@ -1,6 +1,13 @@
-# Release Notes
+# Change Log
 
-v1.6.7 - Aug 18, 2017
+## [Unreleased]
+- DELETED support for NucleotideDensityPlugin since it was rebranded as MotifDensityPlugin
+- ADDED support for MotifDensityPlugin
+
+## [v1.6.8] - 2017-08-22
+- ADDED Nucleotide density plugin SVG support
+
+## [v1.6.7] - 2017-08-18
 - bug fixes
 
 v1.6.6 - Aug 17, 2017
