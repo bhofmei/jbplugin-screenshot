@@ -106,7 +106,18 @@ For SmallRNAPlugin v1.4.0+, using HTML-based small rna track in the screenshot i
 This plugin includes support for the [StrandedPlotPlugin](https://github.com/bhofmei/jbplugin-strandedplot).  
 Make sure the plugin ID<sup>1</sup> is `StrandedPlotPlugin`and the plugin is activated. 
 
-For StrandedPlotPlugin v1.1.0, using SVG-based tracks in the screenshot is supported.
+For StrandedPlotPlugin v1.1.0+, using SVG-based tracks in the screenshot is supported.
+
+### Nucleotide Density Plugin
+Nucleotide Density Plugin was rebranded to [MotifDensityPlugin](https://github.com/bhofmei/jbplugin-motifdens). Download and use MotifDensityPlugin instead.
+
+Nucleotide Density tracks are still available for screenshots as a normal density track, however SVG-based screenshot tracks are no longer supported.
+
+### Motif Density Plugin
+This plugin includes support for the [MotifDensityPlugin](https://github.com/bhofmei/jbplugin-motifdens).  
+Make sure the plugin ID<sup>1</sup> is `MotifDensityPlugin`and the plugin is activated. 
+
+For MotifDensityPlugin v2.0.0+, using SVG-based tracks in the screenshot is supported.
 
 ### Wiggle SVG Plot Plugin
 For XYPlot and Density plots to be exported as SVG-based tracks, download and activate the [Wiggle SVG Plot Plugin](https://github.com/bhofmei/jbplugin-wigglesvg).
