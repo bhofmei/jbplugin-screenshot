@@ -34,7 +34,15 @@ If that doesn't work, add this to _jbrowse_conf.json_:
 }
 ```
 
-### PhantomJS Cloud Accounts
+## PhantomJS Cloud
+
+### Fine print
+Using this plugin means you agree to PhantomJS Cloud's [Terms of Service](https://phantomjscloud.com/tos.html).
+The important points
+1. Only have one PhantomJS Clound account.
+2. PhantomJS cloud is provided 'as-is' and does not guarantee service at all times.
+
+### Accounts
 This plugin will work directly out of the box with PhantomJS Cloud. PhantomJS Clous offers a "demo" version of its services where each IP address is limited to 100 requests per day.
 If this is insufficient, you can create a free account with PhantomJS Cloud which allows 500 requests per day to that account. See [PhantomJS Cloud](https://phantomjscloud.com/pricing.html) for more information.
 
