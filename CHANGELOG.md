@@ -1,6 +1,8 @@
 # Change Log
 
 ## [Unreleased]
+
+## [v1.6.9] - 2017-08-28
 - DELETED support for NucleotideDensityPlugin since it was rebranded as MotifDensityPlugin
 - ADDED support for MotifDensityPlugin
 
