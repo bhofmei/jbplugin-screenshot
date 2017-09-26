@@ -163,7 +163,10 @@ define('ScreenShotPlugin/ParametersUtil', [
           methylation: {
             CG: true,
             CHG: true,
-            CHH: true
+            CHH: true,
+            '4mC': true,
+            '5hmC': true,
+            '6mA': true
           },
           output: {
             format: format,

@@ -97,8 +97,13 @@ define('ScreenShotPlugin/EncodeDecodeUtil', [
         var thisB = this;
         for (param in params) {
           var data = params[param];
-          if (param === 'methylation')
-            output += eLabels[param] + this._encodeBoolean(data.CG) + this._encodeBoolean(data.CHG) + this._encodeBoolean(data.CHH);
+          if (param === 'methylation'){
+            var types = ['CG', 'CHG', 'CHH', '4mC', '5hmC', '6mA'];
+            output += eLabels[param];
+            array.forEach(types, function (t) {
+              output += thisB._encodeBoolean(data[t])
+            });
+          }
           else if (param === 'smallrna') {
             output += eLabels[param];
             var types = ['21', '22', '23', '24', 'pi', 'Others'];
@@ -250,6 +255,11 @@ define('ScreenShotPlugin/EncodeDecodeUtil', [
           outProp.methylation['CG'] = this._decodeBoolen(resultM[1].substring(0, 1));
           outProp.methylation['CHG'] = this._decodeBoolen(resultM[1].substring(1, 2));
           outProp.methylation['CHH'] = this._decodeBoolen(resultM[1].substring(2, 3));
+          if(resultM[1].length > 3){
+            outProp.methylation['4mC'] = this._decodeBoolen(resultM[1].substring(3, 4));
+            outProp.methylation['5hmC'] = this._decodeBoolen(resultM[1].substring(4, 5));
+            outProp.methylation['6mA'] = this._decodeBoolen(resultM[1].substring(5, 6));
+          }
         }
         var resultS = /s([0-9]+)/gi.exec(input);
         if (resultS != null) {

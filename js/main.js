@@ -1829,7 +1829,7 @@ define([
         var baseUrl = this._defaultConfig().baseUrl;
         var browser = this.browser;
         this.isScreenshot = false;
-        this.config.version = '1.6.9';
+        this.config.version = '1.6.10';
         console.log('ScreenShotPlugin starting - v', this.config.version);
 
         // PhantomJS Username
@@ -1968,6 +1968,14 @@ define([
       },
 
       _applyMethSmRNAConfig: function (mParams, sParams) {
+        // filter mParams by extended modifications if necessary
+        if(!this.browser.plugins.MethylationPlugin.config.extendedMods){
+          var rmTypes = ['4mC', '5hmC', '6mA'];
+          array.forEach(rmTypes, function(t){
+            if(mParams.hasOwnProperty(t))
+              delete mParams[t]
+          });
+        }
         var thisB = this;
         var s, m, t;
         var mmix = {};
@@ -1993,55 +2001,10 @@ define([
 
       },
 
-      _applyMethylationConfig: function (params) {
-        var thisB = this;
-        // check for methylation plugin
-        if (thisB.browser.plugins.hasOwnProperty(thisB.config.methylPlugin)) {
-          var m, t;
-          var tracks = lang.clone(thisB.browser.trackConfigsByName);
-          //console.log('methylation tracks');
-          for (m in params) {
-            if (params[m] === false) {
-              var mix = {};
-              mix['show' + m] = false;
-              for (t in tracks) {
-                if (thisB._testMethylation(tracks[t].type)) {
-                  lang.mixin(thisB.browser.trackConfigsByName[t], mix);
-                }
-              }
-              // TODO: add command to disable toolbar buttons if necessary
-            } // end if params[m] === false
-          } // end for m in params
-        } // end if MethylationPlugin
-      },
-
       _testMethylation: function (trackType) {
         if (trackType === undefined || trackType === null)
           return false;
         return ((/(Methyl.*Plot$)/.test(trackType)));
-      },
-
-      _applySmallRNAConfig: function (params) {
-
-        var thisB = this;
-        // check for small rna plugin
-        //if(thisB.browser.plugins.hasOwnProperty(thisB.config.smrnaPlugin)){
-        var m, t;
-        var tracks = lang.clone(thisB.browser.trackConfigsByName);
-        for (m in params) {
-          if (params[m] === true) {
-            var mix = {};
-            mix['hide' + m] = true;
-            for (t in tracks) {
-              if (thisB._testSmallRNA(tracks[t].type)) {
-                lang.mixin(thisB.browser.trackConfigsByName[t], mix);
-              }
-
-            }
-            // TODO: add command to disable toolbar buttons if necessary
-          } // end if params[m] === true
-        } // end for m in params
-        //} // end if SmallRNAPlugin
       },
 
       _testSmallRNA: function (trackType) {

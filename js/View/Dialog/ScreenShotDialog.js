@@ -61,7 +61,7 @@ define("ScreenShotPlugin/View/Dialog/ScreenShotDialog", [
         this.setCallback = args.setCallback || function () {};
         this.cancelCallback = args.cancelCallback || function () {};
         this.vTracks = this.browser.view.visibleTracks();
-        this.configs = args.config || {};
+        this.pluginConfig = args.config || {};
         this.trackParameters = this._getTrackParameters();
       },
 
@@ -88,7 +88,7 @@ define("ScreenShotPlugin/View/Dialog/ScreenShotDialog", [
             var jsParams = this.parameters.output;
             // get the url
             var url = this._getPhantomJSUrl(scParams, jsParams);
-            if (this.configs.debug)
+            if (this.pluginConfig.debug)
               console.log(url);
             else
               window.open(url);
@@ -217,7 +217,7 @@ define("ScreenShotPlugin/View/Dialog/ScreenShotDialog", [
           }
         } // end for param
         //
-        if (thisB.configs.smrnaPlugin || thisB.configs.methylPlugin) {
+        if (thisB.pluginConfig.smrnaPlugin || thisB.pluginConfig.methylPlugin) {
           thisB._methylation_smrna_table(obj);
         }
       },
@@ -229,7 +229,7 @@ define("ScreenShotPlugin/View/Dialog/ScreenShotDialog", [
         }, obj);
         var row, row2, tdata, box, cdata;
         // methylation
-        if (thisB.configs.methylPlugin) {
+        if (thisB.pluginConfig.methylPlugin) {
           var cdata = thisB.browser.plugins.MethylationPlugin.config;
           row = dom.create('tr', {
             id: 'screenshot-dialog-row-methyl'
@@ -243,33 +243,28 @@ define("ScreenShotPlugin/View/Dialog/ScreenShotDialog", [
             'id': 'screenshot-dialog-row-methyl-boxes'
           }, table);
           // methylation types - animal vs plants
-          var mTypes = (cdata.isAnimal ? {
+          /*var mTypes = (cdata.isAnimal ? {
             CG: true,
             CH: true
-          } : thisB.parameters.methylation);
-          var m;
-          for (m in mTypes) {
-            var tdata = dom.create('td', {
-              align: 'right'
-            }, row2);
-            var box = new dijitCheckBox({
-              id: 'screenshot-dialog-methyl-' + m,
-              //'class':m+'-checkbox',
-              style: 'background-image:url(' + cdata.baseUrl.slice(1) + '/img/checkmark-' + m + '.png' + ');',
-              '_prop': m,
-              checked: (m === 'CH' ? (thisB.parameters.methylation.CHG && thisB.parameters.methylation.CHH) : thisB.parameters.methylation[m])
-            });
-            box.onClick = lang.hitch(thisB, '_setMethylation', box);
-            dom.create('span', {
-              innerHTML: m,
-              className: 'screenshot-dialog-opt-span'
-            }, tdata);
-            tdata.appendChild(box.domNode);
+          } : thisB.parameters.methylation);*/
+          var mTypes1 = (cdata.isAnimal ? ['CG', 'CH'] : ['CG', 'CHG', 'CHH']);
+          array.forEach(mTypes1, function (m) {
+            thisB._createMethylCheckbox(row2, m, cdata, '_setMethylation', thisB);
+          }); // end mtypes1
+          // extended modifications
+          if (cdata.extendedMods) {
+            row2 = dom.create('tr', {
+              'id': 'screenshot-dialog-row-methyl-boxes-2'
+            }, table);
+            var mTypes2 = ['4mC', '5hmC', '6mA'];
+            array.forEach(mTypes2, function (m) {
+              thisB._createMethylCheckbox(row2, m, cdata, '_setMethylation', thisB);
+            }); // end mtypes2
           }
         } // end methylation
 
         // small rna
-        if (thisB.configs.smrnaPlugin) {
+        if (thisB.pluginConfig.smrnaPlugin) {
           cdata = thisB.browser.plugins.SmallRNAPlugin.config;
           row = dom.create('tr', {
             id: 'screenshot-dialog-row-smrna'
@@ -494,6 +489,25 @@ define("ScreenShotPlugin/View/Dialog/ScreenShotDialog", [
             thisB._createSpinner(tableB, data, param, '_setParameter', thisB);
           }
         }
+      },
+
+      _createMethylCheckbox: function (tableRow, param, data, callbackStr, objScope) {
+        var tdata = dom.create('td', {
+          align: 'right'
+        }, tableRow);
+        var box = new dijitCheckBox({
+          id: 'screenshot-dialog-methyl-' + param,
+          //'class':m+'-checkbox',
+          style: 'background-image:url(' + data.baseUrl.slice(1) + '/img/checkmark-' + param.toLowerCase() + '.png' + ');',
+          '_prop': param,
+          checked: (param === 'CH' ? (objScope.parameters.methylation.CHG && objScope.parameters.methylation.CHH) : objScope.parameters.methylation[param])
+        });
+        box.onClick = lang.hitch(objScope, callbackStr, box);
+        dom.create('span', {
+          innerHTML: param,
+          className: 'screenshot-dialog-opt-span'
+        }, tdata);
+        tdata.appendChild(box.domNode);
       },
 
       _createSpinner: function (inTable, data, param, callbackStr, objScope) {
@@ -799,7 +813,7 @@ define("ScreenShotPlugin/View/Dialog/ScreenShotDialog", [
           return
         } else {
           if (this.trackParameters[tLabel].hasOwnProperty(prop)) {
-            if(input.type === 'checkbox')
+            if (input.type === 'checkbox')
               this.trackParameters[tLabel][prop].value = input.checked;
             else
               this.trackParameters[tLabel][prop].value = input.value;
@@ -812,7 +826,7 @@ define("ScreenShotPlugin/View/Dialog/ScreenShotDialog", [
       },
 
       _getTrackParameters: function () {
-        return Parameters.getTrackParameters(this.vTracks, this.configs);
+        return Parameters.getTrackParameters(this.vTracks, this.pluginConfig);
       },
 
       _getPhantomJSUrl: function (scParams, jsParams) {
