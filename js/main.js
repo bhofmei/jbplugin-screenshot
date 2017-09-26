@@ -1829,8 +1829,8 @@ define([
         var baseUrl = this._defaultConfig().baseUrl;
         var browser = this.browser;
         this.isScreenshot = false;
-        console.log('ScreenShotPlugin starting');
         this.config.version = '1.6.9';
+        console.log('ScreenShotPlugin starting - v', this.config.version);
 
         // PhantomJS Username
         this.config.apiKey = 'a-demo-key-with-low-quota-per-ip-address';
