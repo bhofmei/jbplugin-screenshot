@@ -1830,7 +1830,7 @@ define([
         var browser = this.browser;
         this.isScreenshot = false;
         this.config.version = '1.6.10';
-        console.log('ScreenShotPlugin starting - v', this.config.version);
+        console.log('ScreenShotPlugin starting - v'+this.config.version);
 
         // PhantomJS Username
         this.config.apiKey = 'a-demo-key-with-low-quota-per-ip-address';
