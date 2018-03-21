@@ -131,22 +131,22 @@ define('ScreenShotPlugin/ParametersUtil', [
           },
           '23': {
             value: true,
-            color: 'orange',
+            color: 'purple',
             label: '23-mers'
           },
           '24': {
             value: true,
-            color: 'red',
+            color: 'orange',
             label: '24-mers'
           },
           'pi': {
             value: true,
-            color: 'purple',
+            color: 'red',
             label: 'piRNAs'
           },
           'Others': {
             value: true,
-            color: 'yellow',
+            color: 'gray',
             label: 'others'
           }
         };

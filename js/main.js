@@ -1817,7 +1817,7 @@ define([
     domAttr,
     domConstr,
     dijitButton,
-     dijitRegistry,
+    dijitRegistry,
     ScreenShotDialog,
     Util,
     JBrowsePlugin,
@@ -1829,7 +1829,7 @@ define([
         var baseUrl = this._defaultConfig().baseUrl;
         var browser = this.browser;
         this.isScreenshot = false;
-        this.config.version = '1.6.10';
+        this.config.version = '1.6.11';
         console.log('ScreenShotPlugin starting - v'+this.config.version);
 
         // PhantomJS Username

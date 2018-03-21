@@ -61,7 +61,9 @@ define("ScreenShotPlugin/View/Dialog/ScreenShotDialog", [
         this.setCallback = args.setCallback || function () {};
         this.cancelCallback = args.cancelCallback || function () {};
         this.vTracks = this.browser.view.visibleTracks();
+        console.log(this.vTracks);
         this.pluginConfig = args.config || {};
+        console.log(this.pluginConfig);
         this.trackParameters = this._getTrackParameters();
       },
 
