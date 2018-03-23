@@ -206,7 +206,6 @@ require([
     describe('Test track parameters', function () {
       var pluginConfig;
       var tracks;
-      var browser;
       beforeEach(function(done){
         browser = new Browser({unitTestMode: true});
         pluginConfig = {
@@ -342,8 +341,6 @@ require([
 
       it('should get parameters for Alignments', function(){
         var trackConfig = tracks[7];
-        // add defaults - display style, display mode, histogram.min, histograms.height, max.height
-        //lang.mixin(trackParam, {maxHeight: 600, histograms: {height: 100, min: 0}, displayMode: 'normal', displayStyle: 'default'});
         var params = parametersUtil._handleTrackTypeParameters(7, trackConfig.type, trackConfig, pluginConfig);
         expect(params.key).toBe(trackConfig.key);
         expect(params.trackNum).toBe(7);
@@ -426,7 +423,7 @@ require([
         expect(params.html).toEqual({title: 'HTML/SVG features', value: false});
       }); // end should get parameters for StrandedXYPlot
 
-      it('shoud get parameters for MotifDensity', function(){
+      it('should get parameters for MotifDensity', function(){
         var trackConfig = tracks[13];
         // defaults min_score: 0, max_score: 1, style.height: 100
         lang.mixin(trackConfig, {min_score: 0, max_score: 1, style: {height: 100}});
@@ -440,6 +437,16 @@ require([
         expect(params.quant).toBe(true);
         expect(params.html).toEqual({title: 'HTML/SVG features', value: false});
       }); // end shoud get parameters for MotifDensity
+
+      it('should get parameters for list of tracks', function(){
+        var testTracks = tracks.slice(0,14);
+        var visibleTracks = testTracks.map(function(el){
+          return {label: el.label, config: el}
+        });
+        var params = parametersUtil.getTrackParameters(visibleTracks, pluginConfig);
+        var trackKeys = Object.keys(params);
+        expect(trackKeys.length).toBe(14);
+      }); // end should get parameters for list of tracks
     }); // end Test track parameters
 
   }); // end Test ParametersUtil
