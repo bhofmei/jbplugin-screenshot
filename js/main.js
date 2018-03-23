@@ -2028,6 +2028,9 @@ define([
               } else if (/CanvasFeatures$/.test(tracks[t].type)) {
                 params[t].type = 'JBrowse/View/Track/HTMLFeatures';
                 params[t].trackType = "HTMLFeatures";
+              } else if (/CanvasVariants$/.test(tracks[t].type)) {
+                params[t].type = 'JBrowse/View/Track/HTMLVariants';
+                params[t].trackType = "HTMLVariants";
               } else if (/Alignments2$/.test(tracks[t].type)) {
                 params[t].type = 'JBrowse/View/Track/Alignments';
               } else if (/MethylPlot$/.test(tracks[t].type)) {

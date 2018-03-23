@@ -235,7 +235,7 @@ define('ScreenShotPlugin/ParametersUtil', [
         }
 
         // html features - canvas/alignments, smallrna, stranded, xyplot/density
-        if (/CanvasFeatures$/.test(tType) || /Alignments2$/.test(tType)) {
+        if (/CanvasFeatures$/.test(tType) || /Alignments2$/.test(tType) || /CanvasVariants$/.test(tType)) {
           lang.mixin(out, this._htmlParameters(pluginConfigs));
         } else if (/smAlignments$/.test(tType) && pluginConfigs.htmlFeatures.smrna) {
           lang.mixin(out, this._htmlParameters(pluginConfigs));
