@@ -1,6 +1,9 @@
+/* global console, expect, describe, it, beforeEach */
 require([
   'dojo/_base/declare',
   'dojo/_base/array',
+  'dojo/_base/lang',
+  'dojo/request',
   'JBrowse/Browser',
   'ScreenShotPlugin/View/Dialog/ScreenShotDialog',
   'ScreenShotPlugin/ParametersUtil',
@@ -8,6 +11,8 @@ require([
 ], function (
   declare,
   array,
+  lang,
+  request,
   Browser,
   ScreenShotDialog,
   parametersUtil,
@@ -93,7 +98,7 @@ require([
           max: 10000,
           delta: 100
         });
-        expect(outParam.image.height).toEqaul({
+        expect(outParam.image.height).toEqual({
           value: 2400,
           title: 'Height (px)',
           min: 100,
@@ -122,7 +127,7 @@ require([
           max: 10000,
           delta: 100
         });
-        expect(pdfParam.pdfheight).toEqual({
+        expect(pdfParam.pdfHeight).toEqual({
           value: 1200,
           title: 'View height (px)',
           min: 100,
@@ -200,7 +205,10 @@ require([
 
     describe('Test track parameters', function () {
       var pluginConfig;
+      var tracks;
+      var browser;
       beforeEach(function(done){
+        browser = new Browser({unitTestMode: true});
         pluginConfig = {
     apiKey: 'a-demo-key-with-low-quota-per-ip-address',
     dialog: false,
@@ -209,7 +217,7 @@ require([
       general: false,
       methyl: true,
       smrna: true,
-      strandedPlot: true,
+      strandedplot: true,
       motifdens: true,
       wiggle: true
     },
@@ -220,12 +228,218 @@ require([
     wiggleSVGPlugin: true,
     seqViewsPlugin: true
   }
-        done();
-      });
+        tracks = request('./data/trackList.json', {
+          handleAs: 'json'
+        }).then(function(data){
+          tracks = data.tracks;
+          done();
+        }, function(err){
+          console.log(err);
+          return;
+          //done();
+        });
+      }); // end beforeEach
 
-      it('should get parameters for CanvasFeatures', function () {
-        var params = parametersUtil._handleTrackTypeParameters(0, 'JBrowse/View/Track/CanvasFeatures', {}, pluginConfig)
-      });
+      it('should get parameters for Sequence', function () {
+        var trackParam = tracks[0];
+        var params = parametersUtil._handleTrackTypeParameters(0, 'JBrowse/View/Track/Sequence', trackParam, pluginConfig);
+        // has key, trackNum, opts
+        expect(params.key).toBe(trackParam.key);
+        expect(params.trackNum).toBe(0);
+        expect(params.opts).toBe(false);
+      }); // end should get parameters for Sequence
+
+      it('should get parameters for CanvasFeatures', function(){
+        var trackParam = tracks[1];
+        // track defaults - maxHeight, histograms.height, histograms.min, displayStyle
+        lang.mixin(trackParam, {maxHeight: 600, histograms: {height: 100, min: 0}});
+        var params = parametersUtil._handleTrackTypeParameters(1, trackParam.type, trackParam, pluginConfig);
+        expect(params.key).toBe(trackParam.key);
+        expect(params.trackNum).toBe(1);
+
+        // maxHeight, html, histograms, seqviews
+        expect(params.height).toEqual({title: 'Track height', value: 600, delta: 10});
+        // histogram stuff
+        expect(params.ypos).toEqual({title: 'Y-scale position', value: 'center'});
+        expect(params.min).toEqual({title: 'Min. score', value: 0, delta: 10});
+        expect(params.max).toEqual({title: 'Max. score', value: undefined, delta: 10});
+        expect(params.quant).toBe(false);
+        // seq views
+        expect(params.style).toEqual({title: 'Feature style', value: 'default'});
+        // html
+        expect(params.html).toEqual({title: 'HTML/SVG features', value: false});
+      }); // end should get parameters for CanvasFeatures
+
+      it('should get parameters for HTMLFeatures', function(){
+        var trackParam = tracks[2];
+        // defaults = maxHeight
+        trackParam.maxHeight = 1000;
+        var params = parametersUtil._handleTrackTypeParameters(2, trackParam.type, trackParam, pluginConfig);
+        expect(params.key).toBe(trackParam.key);
+        expect(params.trackNum).toBe(2);
+        // maxHeight, ypos=false
+        expect(params.height).toEqual({title: 'Track height', value: 1000, delta: 10});
+        expect(params.ypos).toBe(false);
+        expect(params.html).not.toBeDefined();
+      }); // end should get parameters for HTMLFeatures
+
+      it('should get parameters for CanvasVariants', function(){
+        var trackParam = tracks[3];
+        // add default
+        trackParam.maxHeight = 1000;
+        var params = parametersUtil._handleTrackTypeParameters(3, trackParam.type, trackParam, pluginConfig);
+        expect(params.key).toBe(trackParam.key);
+        expect(params.trackNum).toBe(3);
+        // height, ypos=false
+        expect(params.height).toEqual({title: 'Track height', value: 1000, delta: 10});
+        expect(params.ypos).toBe(false);
+        expect
+      }); // end should get parameters for HTMLVariants
+
+      it('should get parameters for HTMLVariants', function(){
+        var trackParam = tracks[4];
+        // add default
+        trackParam.maxHeight = 1000;
+        var params = parametersUtil._handleTrackTypeParameters(4, trackParam.type, trackParam, pluginConfig);
+        expect(params.key).toBe(trackParam.key);
+        expect(params.trackNum).toBe(4);
+        // height, ypos=false
+        expect(params.height).toEqual({title: 'Track height', value: 1000, delta: 10});
+        expect(params.ypos).toBe(false);
+        expect(params.html).not.toBeDefined();
+      }); // end should get parameters for HTMLVariants
+
+      it('should get parameters for Alignments2', function(){
+         var trackConfig = tracks[5];
+        // add defaults - display style, display mode, histogram.min, histograms.height, max.height
+        lang.mixin(trackConfig, {maxHeight: 600, histograms: {height: 100, min: 0}, displayMode: 'normal', displayStyle: 'default'});
+        var params = parametersUtil._handleTrackTypeParameters(5, trackConfig.type, trackConfig, pluginConfig);
+        expect(params.key).toBe(trackConfig.key);
+        expect(params.trackNum).toBe(5);
+
+        // maxHeight, html, histograms, seqviews
+        expect(params.height).toEqual({title: 'Track height', value: 600, delta: 10});
+        // histogram stuff
+        expect(params.ypos).toEqual({title: 'Y-scale position', value: 'center'});
+        expect(params.min).toEqual({title: 'Min. score', value: 0, delta: 10});
+        expect(params.max).toEqual({title: 'Max. score', value: undefined, delta: 10});
+        expect(params.quant).toBe(false);
+        // seq views
+        expect(params.mode).toEqual({title: 'Display mode', value: 'normal'});
+        expect(params.style).toEqual({title: 'Feature style', value: 'default'});
+        // html
+        expect(params.html).toEqual({title: 'HTML/SVG features', value: false});
+      }); // end should get parameters for Alignments2
+
+      it('should get parameters for SNP Coverage', function(){
+         var trackParam = tracks[6];
+        // add defaults - min.score
+
+        var params = parametersUtil._handleTrackTypeParameters(6, trackParam.type, trackParam, pluginConfig);
+        expect(params.key).toBe(trackParam.key);
+        expect(params.trackNum).toBe(6);
+      }); // end should get parameters for SNP Coverage
+
+      it('should get parameters for Alignments', function(){
+        var trackConfig = tracks[7];
+        // add defaults - display style, display mode, histogram.min, histograms.height, max.height
+        //lang.mixin(trackParam, {maxHeight: 600, histograms: {height: 100, min: 0}, displayMode: 'normal', displayStyle: 'default'});
+        var params = parametersUtil._handleTrackTypeParameters(7, trackConfig.type, trackConfig, pluginConfig);
+        expect(params.key).toBe(trackConfig.key);
+        expect(params.trackNum).toBe(7);
+      }); // end should get parameters for Alignments
+
+      it('should get parameters for Wiggle XYPlot', function(){
+        var trackConfig = tracks[8];
+        lang.mixin(trackConfig, {style: {height: 100}});
+        var params = parametersUtil._handleTrackTypeParameters(8, trackConfig.type, trackConfig, pluginConfig);
+        expect(params.key).toBe(trackConfig.key);
+        expect(params.trackNum).toBe(8);
+        // height, ypos, html, min, max, quant, html
+        expect(params.height).toEqual({title: 'Track height', value: 100, delta: 10});
+        expect(params.ypos).toEqual({title: 'Y-scale position', value: 'center'});
+        expect(params.min).toEqual({title: 'Min. score', value: undefined, delta: 10});
+        expect(params.max).toEqual({title: 'Max. score', value: undefined, delta: 10});
+        expect(params.quant).toBe(true);
+        expect(params.html).toEqual({title: 'HTML/SVG features', value: false});
+      }); // end should get parameters for Wiggle XYPlot
+
+      it('should get parameters for Wiggle Density', function(){
+        var trackConfig = tracks[9];
+        // add default height
+        lang.mixin(trackConfig, {style: {height: 31}});
+        var params = parametersUtil._handleTrackTypeParameters(9, trackConfig.type, trackConfig, pluginConfig);
+        expect(params.key).toBe(trackConfig.key);
+        expect(params.trackNum).toBe(9);
+        // height, ypos, html, min, max, quant, html
+        expect(params.height).toEqual({title: 'Track height', value: 31, delta: 10});
+        expect(params.ypos).not.toBeDefined();
+        expect(params.min).toEqual({title: 'Min. score', value: undefined, delta: 10});
+        expect(params.max).toEqual({title: 'Max. score', value: undefined, delta: 10});
+        expect(params.quant).toBe(true);
+        expect(params.html).toEqual({title: 'HTML/SVG features', value: false});
+
+      }); // end should get parameters for Wiggle Density
+
+      it('should get parameters for Small RNA Alignments', function(){
+        var trackConfig = tracks[10];
+        // defaults - displayStyle, displayMode, maxHeight, histograms.height, histograms.min
+        lang.mixin(trackConfig, {maxHeight: 400, displayMode: 'normal', displayStyle: 'default', histograms: {height: 100, min: 0}});
+        var params = parametersUtil._handleTrackTypeParameters(10, trackConfig.type, trackConfig, pluginConfig);
+        expect(params.key).toBe(trackConfig.key);
+        expect(params.trackNum).toBe(10);
+        // height, html, style
+        expect(params.height).toEqual({title: 'Track height', value: 400, delta: 10});
+        expect(params.ypos).toEqual({title: 'Y-scale position', value: 'center'});
+        expect(params.min).toEqual({title: 'Min. score', value: 0, delta: 10});
+        expect(params.max).toEqual({title: 'Max. score', value: undefined, delta: 10});
+        expect(params.style).toEqual({title: 'Feature style', value: 'default'});
+        expect(params.html).toEqual({title: 'HTML/SVG features', value: false});
+      }); // end should get parameters for Small RNA Alignments
+
+      it('should get parameters for Methylation', function(){
+        var trackConfig = tracks[11];
+        // defaults - min_score, max_score
+        lang.mixin(trackConfig, {min_score: -1,  max_score: 1});
+        var params = parametersUtil._handleTrackTypeParameters(11, trackConfig.type, trackConfig, pluginConfig);
+        expect(params.key).toBe(trackConfig.key);
+        expect(params.trackNum).toBe(11);
+        // height, ypos, min, max, html, quant
+        expect(params.height).toEqual({title: 'Track height', value: undefined, delta: 10});
+        expect(params.ypos).toEqual({title: 'Y-scale position', value: 'center'});
+        expect(params.min).toEqual({title: 'Min. score', value: -1, delta: 0.1});
+        expect(params.max).toEqual({title: 'Max. score', value: 1, delta: 0.1});
+        expect(params.html).toEqual({title: 'HTML/SVG features', value: false});
+        expect(params.quant).toBe(true);
+      }); // end should get parameters for Methylation
+
+      it('should get parameters for StrandedXYPlot', function(){
+        var trackConfig = tracks[12];
+        var params = parametersUtil._handleTrackTypeParameters(12, trackConfig.type, trackConfig, pluginConfig);
+        expect(params.key).toBe(trackConfig.key);
+        expect(params.trackNum).toBe(12);
+        // height, ypos, min, max, html
+        expect(params.height).toEqual({title: 'Track height', value: undefined, delta: 10});
+        expect(params.ypos).toEqual({title: 'Y-scale position', value: 'center'});
+        expect(params.min).toEqual({title: 'Min. score', value: undefined, delta: 10});
+        expect(params.max).toEqual({title: 'Max. score', value: undefined, delta: 10});
+        expect(params.html).toEqual({title: 'HTML/SVG features', value: false});
+      }); // end should get parameters for StrandedXYPlot
+
+      it('shoud get parameters for MotifDensity', function(){
+        var trackConfig = tracks[13];
+        // defaults min_score: 0, max_score: 1, style.height: 100
+        lang.mixin(trackConfig, {min_score: 0, max_score: 1, style: {height: 100}});
+        var params = parametersUtil._handleTrackTypeParameters(13, trackConfig.type, trackConfig, pluginConfig);
+        expect(params.key).toBe(trackConfig.key);
+        expect(params.trackNum).toBe(13);
+        // height, min, max, quant, html
+        expect(params.height).toEqual({title: 'Track height', value: 100, delta: 10});
+        expect(params.min).toEqual({title: 'Min. score', value: 0, delta: 10});
+        expect(params.max).toEqual({title: 'Max. score', value: 1, delta: 10});
+        expect(params.quant).toBe(true);
+        expect(params.html).toEqual({title: 'HTML/SVG features', value: false});
+      }); // end shoud get parameters for MotifDensity
     }); // end Test track parameters
 
   }); // end Test ParametersUtil

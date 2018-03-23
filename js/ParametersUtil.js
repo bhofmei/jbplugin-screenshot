@@ -264,7 +264,7 @@ define('ScreenShotPlugin/ParametersUtil', [
         return {
           height: {
             title: 'Track height',
-            value: config.style.height,
+            value: (config.style ? config.style.height : config.style),
             delta: 10
           },
           ypos: {
@@ -289,7 +289,7 @@ define('ScreenShotPlugin/ParametersUtil', [
         return {
           height: {
             title: 'Track height',
-            value: config.style.height,
+            value: (config.style ? config.style.height : config.style),
             delta: 10
           },
           ypos: {
@@ -314,7 +314,7 @@ define('ScreenShotPlugin/ParametersUtil', [
         return {
           height: {
             title: 'Track height',
-            value: config.style.height,
+            value: (config.style ? config.style.height : config.style),
             delta: 10
           },
           min: {
