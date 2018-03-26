@@ -451,6 +451,51 @@ require([
 
   }); // end Test ParametersUtil
 
+  describe('Test EncodeDecodeUtil', function(){
+    describe('Test encode methods', function(){
+      describe('Test PhantomJS encode', function(){
+        it('should get output for non-PDF output', function(){
+          var params = {url: 'http://url.com', format: {value: 'PNG'}, zoom: {value: 2}, quality: {value: 80}, image: {width: {value: 2400}, height: {value: 3200}}};
+          var paramsUrl = encodeDecodeUtil.encodePhantomJSSettings(params);
+          var expected = '?request={url:"http://url.com",renderType:"PNG",renderSettings:{zoomFactor:2,quality:80,viewPort:{width:2400,height:3200}}}'
+          expect(paramsUrl.toLowerCase()).toEqual(expected.toLowerCase());
+        }); // should get output for non-PDF output
+
+        it('should get output for PDF output', function(){
+          var params = {url: 'http://url.com', format: {value: 'PDF'}, zoom: {value: 1}, quality: {value: 80}, pdf: {pdfWidth: {value: 1800}, pdfHeight: {value: 2400}, page: {value: 'letter landscape'}}};
+          var paramsUrl = encodeDecodeUtil.encodePhantomJSSettings(params);
+          var expected = '?request={url:"http://url.com",renderType:"PDF",renderSettings:{zoomFactor:1,quality:80,pdfOptions:{format:"letter",orientation:"landscape",footer:null},viewPort:{width:1800,height:2400}}}'
+          expect(paramsUrl.toLowerCase()).toEqual(expected.toLowerCase());
+        }); // should get output for PDF output
+
+        it('should get output for extra time', function(){
+          var params = {url: 'http://url.com', format: {value: 'JPG'}, zoom: {value: 2}, quality: {value: 100}, image: {width: {value: 2800}, height: {value: 3000}}, time: {value: true, extra: {value: 50}}};
+          var paramsUrl = encodeDecodeUtil.encodePhantomJSSettings(params);
+          var expected = '?request={url:"http://url.com",renderType:"JPG",requestSettings:{maxWait:50000},renderSettings:{zoomFactor:2,quality:100,viewPort:{width:2800,height:3000}}}'
+          expect(paramsUrl.toLowerCase()).toEqual(expected.toLowerCase());
+        }); // should get output for extra time
+      }); // end Test PhantomJS encode
+
+      describe('Test general settings encode', function(){
+
+      }); // end Test general settings encode
+
+      describe('Test track settings encode', function(){
+
+      }); // end Test track settings encode
+    }); // end Test encode methods
+
+    describe('Test decode methods', function(){
+      describe('Test general settings decode', function(){
+
+      }); // end Test general settings decode
+
+      describe('Test track settings decode', function(){
+
+      }); // end Test track settings decode
+    }); // end Test decode methods
+  }); // end Test EncodeDecodeUtil
+
   /*describe('Browser test', function(){
     var browser = new Browser({unitTestMode: true});
   }); // end*/
