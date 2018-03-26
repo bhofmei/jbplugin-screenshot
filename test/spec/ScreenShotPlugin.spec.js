@@ -329,8 +329,12 @@ require([
           delta: 10
         });
         expect(params.ypos).toBe(false);
-        expect
-      }); // end should get parameters for HTMLVariants
+        // html
+        expect(params.html).toEqual({
+          title: 'HTML/SVG features',
+          value: false
+        });
+      }); // end should get parameters for CanvasVariants
 
       it('should get parameters for HTMLVariants', function () {
         var trackParam = tracks[4];
@@ -406,17 +410,44 @@ require([
       it('should get parameters for SNP Coverage', function () {
         var trackParam = tracks[6];
         // add defaults - min.score
-
+        lang.mixin(trackParam, {'min_score': 0});
         var params = parametersUtil._handleTrackTypeParameters(6, trackParam.type, trackParam, pluginConfig);
         expect(params.key).toBe(trackParam.key);
         expect(params.trackNum).toBe(6);
+        expect(params.height).toEqual({
+          title: 'Track height',
+          value: undefined,
+          delta: 10
+        });
+        expect(params.ypos).toEqual({
+          title: 'Y-scale position',
+          value: 'center'
+        });
+        expect(params.min).toEqual({
+          title: 'Min. score',
+          value: 0,
+          delta: 10
+        });
+        expect(params.max).toEqual({
+          title: 'Max. score',
+          value: undefined,
+          delta: 10
+        });
+        expect(params.quant).toBe(true);
+        expect(params.html).not.toBeDefined();
       }); // end should get parameters for SNP Coverage
 
       it('should get parameters for Alignments', function () {
         var trackConfig = tracks[7];
+        trackConfig.maxHeight = 1000;
         var params = parametersUtil._handleTrackTypeParameters(7, trackConfig.type, trackConfig, pluginConfig);
         expect(params.key).toBe(trackConfig.key);
         expect(params.trackNum).toBe(7);
+        expect(params.height).toEqual({
+          title: 'Track height',
+          value: 1000,
+          delta: 10
+        });
       }); // end should get parameters for Alignments
 
       it('should get parameters for Wiggle XYPlot', function () {
@@ -868,6 +899,127 @@ require([
       }); // end Test general settings encode
 
       describe('Test track settings encode', function () {
+        // params: key, trackNum, height, ypos, min,  max, style, mode, html\
+        it('should get encode for CanvasFeatures', function(){
+          var params = {key: 'CanvasFeatures', trackNum: 1, height: {value: 600}, ypos: {value: 'center'}, min: {value: 0}, max: {value: undefined}, quant: false, style: {value: 'default'}, html: {value: false}};
+          var paramsUrl = encodeDecodeUtil._encodeTrack(params);
+          var expected = '~1h600y1i0q0f0v0';
+          expect(paramsUrl).toBe(expected);
+        }); // end should get encode for CanvasFeatures
+
+        it('should get encode for HTMLFeatures', function(){
+          var params = {key: 'HTMLFeatures', trackNum: 2, height: {value: 1000},ypos: false};
+          var paramsUrl = encodeDecodeUtil._encodeTrack(params);
+          var expected = '~2h1000';
+          expect(paramsUrl).toBe(expected);
+        }); // end should get encode for HTMLFeatures
+
+        it('should get encode for CanvasVariants', function(){
+          var params = {key: 'CanvasVariants', trackNum: 3, height: {value: 1000}, ypos: false, html: {value: true}};
+          var paramsUrl = encodeDecodeUtil._encodeTrack(params);
+          var expected = '~3h1000v1';
+          expect(paramsUrl).toBe(expected);
+        }); // end should get encode for CanvasVariants
+
+        it('should get encode for HTMLVariants', function(){
+          var params = {key: 'HTMLVariants', trackNum: 4, height: {value: 1000}, ypos: false};
+          var paramsUrl = encodeDecodeUtil._encodeTrack(params);
+          var expected = '~4h1000';
+          expect(paramsUrl).toBe(expected);
+        }); // end should get encode for HTMLVariants
+
+        it('should get encode for Alignments2', function(){
+          var params = {key: 'Alignments2', trackNum: 5, height: {value: 600}, ypos: {value: 'center'}, min: {value: 0}, max: {value: undefined}, quant: false, mode: {value: 'normal'}, style: {value: 'default'}, html: {value: false}};
+          var paramsUrl = encodeDecodeUtil._encodeTrack(params);
+          var expected = '~5h600y1i0q0d0f0v0';
+          expect(paramsUrl).toBe(expected);
+        }); // end should get encode for Alignments2
+
+        it('should get encode for SNPCoverage', function(){
+          var params = {key: 'Wiggle XY', trackNum: 6, height: {value: 100}, ypos: {value: 'center'}, min: {}, max: {}, quant: true, html: {value: false}};
+          var paramsUrl = encodeDecodeUtil._encodeTrack(params);
+          var expected = '~6h100y1q1v0';
+          expect(paramsUrl).toBe(expected);
+        }); // end should get encode for SNPCoverage
+
+        it('should get encode for Alignments', function(){
+          var params = {key: 'Alignments', trackNum: 7, height: {value: 1000}};
+          var paramsUrl = encodeDecodeUtil._encodeTrack(params);
+          var expected = '~7h1000';
+          expect(paramsUrl).toBe(expected);
+        }); // end should get encode for Alignments
+
+        it('should get encode for Wiggle XY', function(){
+          var params = {key: 'Wiggle XY', trackNum: 8, height: {value: 100}, ypos: {value: 'center'}, min: {}, max: {}, quant: true, html: {value: false}};
+          var paramsUrl = encodeDecodeUtil._encodeTrack(params);
+          var expected = '~8h100y1q1v0';
+          expect(paramsUrl).toBe(expected);
+        }); // end should get encode for Wiggle XY
+
+        it('should get encode for Wiggle Density', function(){
+          var params = {key: 'Wiggle Density', trackNum: 9, height: {value: 31}, min: {}, max: {}, quant: true, html: {value: false}};
+          var paramsUrl = encodeDecodeUtil._encodeTrack(params);
+          var expected = '~9h31q1v0';
+          expect(paramsUrl).toBe(expected);
+        }); // end should get encode for Wiggle Density
+
+        it('should get encode for Small RNA Alignments', function(){
+          var params = {key: 'smAlignments', trackNum: 10, height: {value: 400}, ypos: {value: 'center'}, min: {value: 0}, max: {}, style: {value: 'default'}, html: {value: false}};
+          var paramsUrl = encodeDecodeUtil._encodeTrack(params);
+          var expected = '~10h400y1i0f0v0';
+          expect(paramsUrl).toBe(expected);
+        }); // end should get encode for Small RNA Alignments
+
+        it('should get encode for Methylation', function(){
+          var params = {key: 'MethylPlot', trackNum: 11, ypos: {value: 'center'}, min: {value: -1}, max: {value: 1}, quant: true, html: {value: false}};
+          var paramsUrl = encodeDecodeUtil._encodeTrack(params);
+          var expected = '~11y1i-1x1q1v0';
+          expect(paramsUrl).toBe(expected);
+        }); // end should get encode for Methylation
+
+        it('should get encode for StrandedXYPlot', function(){
+          var params = {key: 'StrandedXYPlot', trackNum: 12, ypos: {value: 'center'}, min: {}, max: {}, quant: true, html: {value: false}};
+          var paramsUrl = encodeDecodeUtil._encodeTrack(params);
+          var expected = '~12y1q1v0';
+          expect(paramsUrl).toBe(expected);
+        }); // end should get encode for StrandedXYPlot
+
+        it('should get encode for MotifDensity', function(){
+          var params = {key: 'MotifDensity', trackNum: 13, height:{value: 100}, min: {value: 0}, max: {value: 1}, html: {value: false}};
+          var paramsUrl = encodeDecodeUtil._encodeTrack(params);
+          var expected = '~13h100i0x1v0';
+          expect(paramsUrl).toBe(expected);
+        }); // end should get encode for MotifDensity
+
+        it('should encode different y-scale positions', function(){
+          var posList = ['center','left','right','none'];
+          var trackList = posList.map(function(el,i){
+            return {trackNum: i, height: {value:75}, ypos: {value: el}}
+          });
+          var paramsUrl = encodeDecodeUtil._endcodeTrackSettings(trackList);
+          var expected = '~0h75y1~1h75y2~2h75y3~3h75y0';
+          expect(paramsUrl).toBe(expected);
+        }); // end should encode different y-scale positions
+
+        it('should encode different display modes', function(){
+          var modeList = ['compact', 'normal', 'collapsed'];
+          var trackList = modeList.map(function(el,i){
+            return {trackNum: i, height: {value:50}, mode: {value: el}}
+          });
+          var paramsUrl = encodeDecodeUtil._endcodeTrackSettings(trackList);
+          var expected = '~0h50d1~1h50d0~2h50d2';
+          expect(paramsUrl).toBe(expected);
+        }); // end should encode different display modes
+
+         it('should encode different feature styles', function(){
+          var styleList = ['histograms','features','default'];
+          var trackList = styleList.map(function(el,i){
+            return {trackNum: i, height: {value:100}, style: {value: el}, html: {value: true}}
+          });
+          var paramsUrl = encodeDecodeUtil._endcodeTrackSettings(trackList);
+          var expected = '~0h100f2v1~1h100f1v1~2h100f0v1';
+          expect(paramsUrl).toBe(expected);
+        }); // end should encode different feature styles
 
       }); // end Test track settings encode
     }); // end Test encode methods
@@ -878,19 +1030,7 @@ require([
       }); // end Test general settings decode
 
       describe('Test track settings decode', function () {
-        var tracks;
-        beforeEach(function (done) {
-        tracks = request('./data/trackList.json', {
-          handleAs: 'json'
-        }).then(function (data) {
-          tracks = data.tracks;
-          done();
-        }, function (err) {
-          console.log(err);
-          return;
-          //done();
-        });
-      }); // end beforeEach
+
 
       }); // end Test track settings decode
     }); // end Test decode methods
