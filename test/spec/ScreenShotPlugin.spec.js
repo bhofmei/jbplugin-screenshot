@@ -1359,6 +1359,7 @@ require([
             style: {
               value: 'features'
             },
+            quant: false,
             html: {
               value: true
             }
@@ -1385,7 +1386,7 @@ require([
           tracks: trackParams
         };
         var encodeUrl = encodeDecodeUtil.encode(params);
-        var expected = 'p15o1r0n0u1b1z1m111011s000001~0h600y1i0q0f0v0~1h600y1i0x700q0d1f0v0~2y1i-1x1q1v0~3h400y1i0f1v1~4h100y2q1v1';
+        var expected = 'p15o1r0n0u1b1z1m111011s000001~0h600y1i0q0f0v0~1h600y1i0x700q0d1f0v0~2y1i-1x1q1v0~3h400y1i0f1q0v1~4h100y2q1v1';
         expect(encodeUrl.toLowerCase()).toEqual(expected.toLowerCase());
       }); // end Test full encode
     }); // end Test encode methods
@@ -1667,6 +1668,46 @@ require([
         }); // end should decode different display feature styles
 
       }); // end Test track settings decode
+
+    it('should full decode', function(){
+      var inUrl ='p15o1r0n0u1b1z1m111011s000001~0h600y1i0q0f0v0~1h600y1i0x700q0d1f0v0~2y1i-1x1q1v0~3h400y1i0f1q0v1~4h100y2q1v1';
+      var trackList = 'canvasfeatures,alignments2,methylplot,smalignments,wigglexy';
+      var expectedGeneral = {
+        basic: {highResolutionMode: 1,
+            'show_overview': true,
+            'show_tracklist': false,
+            'show_nav': false,
+            'show_menu': true,
+            'show_tracklabels': true
+        }, view: {trackPadding: 15},
+        methylation: {
+          CG: true,
+            CHG: true,
+            CHH: true,
+            '4mC': false,
+            '5hmC': true,
+            '6mA': true
+        }, smallrna: {
+          '21': false,
+            '22': false,
+            '23': false,
+            '24': false,
+            'pi': false,
+            'Others': true
+        }
+
+      };
+      var expectedTracks = {
+        canvasfeatures: {maxHeight: 600, histograms: {height: 600, min: 0}, yScalePosition: 'center', displayStyle: 'default'},
+        alignments2: {maxHeight: 600, histograms: {height: 600, min: 0, max: 700}, displayMode: 'compact', displayStyle: 'default', yScalePosition: 'center'},
+        methylplot: {yScalePosition: 'center', 'min_score': -1, 'max_score': 1, style: {}},
+        smalignments: {maxHeight: 400, histograms: {height: 400, min: 0}, yScalePosition: 'center', displayStyle: 'features', type: 'ChangeHTMLFeatures'},
+        wigglexy: {style: {height: 100}, yScalePosition: 'left', type: 'ChangeHTMLFeatures'}
+      };
+      var decoded = encodeDecodeUtil.decode(inUrl, trackList);
+      expect(decoded.general).toEqual(expectedGeneral);
+      expect(decoded.tracks).toEqual(expectedTracks);
+    }); // end should full decode
     }); // end Test decode methods
   }); // end Test EncodeDecodeUtil
 
