@@ -246,7 +246,7 @@ define('ScreenShotPlugin/ParametersUtil', [
         } else if(/\b(MotifDensity)/.test(tType) && pluginConfigs.htmlFeatures.motifdens){
           lang.mixin(out, this._htmlParameters(pluginConfigs));
         }
-        // Canvas/Alignments2 have maxHeight option and possibly histogram with min/max and height
+        // Canvas/Alignments2/smAlignments have maxHeight option and possibly histogram with min/max and height
         // test for histograms and not SNPCoverage
         if (config.histograms !== undefined && !/SNPCoverage$/.test(tType)) {
           lang.mixin(out, this._histogramParameters(config));

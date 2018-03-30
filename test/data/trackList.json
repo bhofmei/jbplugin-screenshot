@@ -45,7 +45,7 @@
       "key": "Mt-0 Snps",
       "label": "t3_mt-snps",
       "category": "SNPs",
-      "type": "JBrowse/View/Track/HTMLVariants",
+      "type": "JBrowse/View/Track/CanvasVariants",
       "urlTemplate": "raw/Mt-0_short.vcf.gz",
       "storeClass": "JBrowse/Store/SeqFeature/VCFTabix"
     },

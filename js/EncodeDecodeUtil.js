@@ -54,7 +54,7 @@ define('ScreenShotPlugin/EncodeDecodeUtil', [
           };
         }
         // check for extra time
-        if (params.time.value) {
+        if (params.time && params.time.value) {
           outDict['requestSettings'] = {
             maxWait: (params.time.extra.value * 1000)
           };
@@ -98,16 +98,16 @@ define('ScreenShotPlugin/EncodeDecodeUtil', [
         for (param in params) {
           var data = params[param];
           if (param === 'methylation'){
-            var types = ['CG', 'CHG', 'CHH', '4mC', '5hmC', '6mA'];
+            var typesM = ['CG', 'CHG', 'CHH', '4mC', '5hmC', '6mA'];
             output += eLabels[param];
-            array.forEach(types, function (t) {
+            array.forEach(typesM, function (t) {
               output += thisB._encodeBoolean(data[t])
             });
           }
           else if (param === 'smallrna') {
             output += eLabels[param];
-            var types = ['21', '22', '23', '24', 'pi', 'Others'];
-            array.forEach(types, function (t) {
+            var typesS = ['21', '22', '23', '24', 'pi', 'Others'];
+            array.forEach(typesS, function (t) {
               output += thisB._encodeBoolean(data[t])
             });
           } else if ((param === 'zoom') || (param === 'trackSpacing'))
@@ -278,6 +278,7 @@ define('ScreenShotPlugin/EncodeDecodeUtil', [
         // input and trackLabels are both arrays -- iterate through input
         var out = {};
         array.forEach(input, function (parmStr) {
+
           var resultT = /^[0-9]+/.exec(parmStr);
           if (resultT === null)
             return;
