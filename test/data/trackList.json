@@ -46,7 +46,7 @@
       "label": "t3_mt-snps",
       "category": "SNPs",
       "type": "JBrowse/View/Track/CanvasVariants",
-      "urlTemplate": "raw/Mt-0_short.vcf.gz",
+      "urlTemplate": "raw/Mt-0.vcf.gz",
       "storeClass": "JBrowse/Store/SeqFeature/VCFTabix"
     },
     {
