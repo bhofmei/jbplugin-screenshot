@@ -161,7 +161,10 @@ b. Fork this plugin, add the support, then submit a pull request.
 ## Issues/Bugs
 This plugin is difficult to test and debug because it relies on PhantomJS Cloud.
 
-### General troubleshooting
+### Testing
+This plugin comes with several types of tests to handle potential issues. Read the [testing documenation](test/TEST.md) carefully to **correctly** and **appropriately** test this plugin on your instance of JBrowse.
+
+### General Troubleshooting
 1. **If account login information is required to access the browser, it will not work.** There are ways around this, although they are not currently implemented because I haven't figured out a good way to do it securely and lack of demand.
 2. **If the PhantomJS window is blank**
   * In the full request URL, change the render type to "json" and resubmit. Look for error messages.
