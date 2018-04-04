@@ -226,7 +226,7 @@ define('ScreenShotPlugin/ParametersUtil', [
           lang.mixin(out, this._xyParameters(config));
         }
         // test for wiggle density (same as xy but no y axis)
-        else if( /\b(Density)/.test(tType) || /Density$/.test(tType)){
+        else if (/\b(Density)/.test(tType) || /Density$/.test(tType)) {
           lang.mixin(out, this._densityParameters(config));
         }
         // else get track height from maxHeight and set ypos = false
@@ -241,9 +241,9 @@ define('ScreenShotPlugin/ParametersUtil', [
           lang.mixin(out, this._htmlParameters(pluginConfigs));
         } else if (/StrandedXYPlot$/.test(tType) && pluginConfigs.htmlFeatures.strandedplot) {
           lang.mixin(out, this._htmlParameters(pluginConfigs));
-        } else if( (/\b(XYPlot)/.test(tType) || /\b(Density)/.test(tType)) && pluginConfigs.htmlFeatures.wiggle){
+        } else if ((/\b(XYPlot)/.test(tType) || /\b(Density)/.test(tType)) && pluginConfigs.htmlFeatures.wiggle) {
           lang.mixin(out, this._htmlParameters(pluginConfigs));
-        } else if(/\b(MotifDensity)/.test(tType) && pluginConfigs.htmlFeatures.motifdens){
+        } else if (/\b(MotifDensity)/.test(tType) && pluginConfigs.htmlFeatures.motifdens) {
           lang.mixin(out, this._htmlParameters(pluginConfigs));
         }
         // Canvas/Alignments2/smAlignments have maxHeight option and possibly histogram with min/max and height
@@ -251,10 +251,18 @@ define('ScreenShotPlugin/ParametersUtil', [
         if (config.histograms !== undefined && !/SNPCoverage$/.test(tType)) {
           lang.mixin(out, this._histogramParameters(config));
         }
+
         // test canvas features and alignments
         if (/CanvasFeatures$/.test(tType) || /Alignments2$/.test(tType) || /smAlignments$/.test(tType)) {
           // check for SeqViews plugin
           lang.mixin(out, this._seqViewParameters(config, pluginConfigs));
+        } else if (/HTMLFeatures$/.test(tType) && pluginConfigs.seqViewsPlugin) {
+          lang.mixin(out, {
+            style: {
+              title: 'Feature style',
+              value: (config.displayStyle === undefined ? 'default' : config.displayStyle)
+            }
+          });
         }
 
         return out;
@@ -310,7 +318,7 @@ define('ScreenShotPlugin/ParametersUtil', [
         };
       },
 
-      _densityParameters: function(config){
+      _densityParameters: function (config) {
         return {
           height: {
             title: 'Track height',
