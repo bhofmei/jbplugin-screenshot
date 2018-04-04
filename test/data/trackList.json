@@ -232,6 +232,9 @@
       "style": {
         "className": "feature",
         "color": "#d504b2"
+      },
+      "histograms": {
+        "color": "#d504b2"
       }
     }
    ]
