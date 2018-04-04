@@ -1,0 +1,8 @@
+{
+  "MethylationPlugin": false,
+  "MotifDensityPlugin": false,
+  "SmallRNAPlugin": false,
+  "SeqViewsPlugin": false,
+  "StrandedPlotPlugin": false,
+  "WiggleSVGPlotPlugin": false
+}

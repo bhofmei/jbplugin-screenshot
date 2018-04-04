@@ -223,7 +223,7 @@
     },
     {
       "key": "AC positions",
-      "label": "t20_ac_pos",
+      "label": "t20_ac-pos",
       "category": "Genome",
       "type": "JBrowse/View/Track/CanvasFeatures",
       "compress": 0,
@@ -239,7 +239,7 @@
     },
     {
       "key": "Methylation coverage",
-      "label": "t11_stranded-methyl",
+      "label": "t21_stranded-methyl",
       "category": "Stranded Plots",
       "type": "StrandedPlotPlugin/View/Track/Wiggle/StrandedXYPlot",
       "storeClass": "StrandedPlotPlugin/Store/SeqFeature/StrandedBigWig",
