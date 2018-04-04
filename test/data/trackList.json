@@ -61,7 +61,7 @@
       "key": "RNA-seq with unstranded coverage",
       "label": "t5_rnaseq-un",
       "category": "RNA-seq",
-       "type": "JBrowse/View/Track/Alignments2",
+      "type": "JBrowse/View/Track/Alignments2",
       "maxFeatureScreenDensity": 0.5,
       "histograms": {
         "color": "#b1b1b1",
@@ -208,6 +208,18 @@
       "type": "JBrowse/View/Track/Wiggle/XYPlot",
       "storeClass": "JBrowse/Store/SeqFeature/BigWig",
       "urlTemplate": "raw/chip_h3k9m2_zscore.bw"
+    },
+    {
+      "key": "WT rep 2 Small RNA",
+      "label": "t19_smrna2",
+      "category": "Small RNA",
+      "type": "SmallRNAPlugin/View/Track/smAlignments",
+      "histograms": {
+        "storeClass": "JBrowse/Store/SeqFeature/BigWig",
+        "urlTemplate": "raw/wt-2_smrna.bw"
+      },
+      "storeClass": "JBrowse/Store/SeqFeature/BAM",
+      "urlTemplate": "raw/wt-2_smrna.bam"
     }
    ]
 }
