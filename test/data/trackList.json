@@ -236,6 +236,18 @@
       "histograms": {
         "color": "#d504b2"
       }
+    },
+    {
+      "key": "Methylation coverage",
+      "label": "t11_stranded-methyl",
+      "category": "Stranded Plots",
+      "type": "StrandedPlotPlugin/View/Track/Wiggle/StrandedXYPlot",
+      "storeClass": "StrandedPlotPlugin/Store/SeqFeature/StrandedBigWig",
+      "urlTemplate": "raw/line19-G3-rep2_methylation_short.bw",
+      "style": {
+        "pos_color": "#26A69A",
+        "neg_color": "#d95965"
+      }
     }
    ]
 }
