@@ -1,31 +1,40 @@
-/* global console, expect, describe, it, beforeEach */
 require([
   'dojo/_base/declare',
   'dojo/_base/array',
   'dojo/_base/lang',
   'dojo/request',
   'dojo/dom',
-  'dojo/_base/window',
-  'dojo/dom-style',
   'dojo/query',
-  'dojo/dom-construct',
-  'dojo/dom-attr'
+  'dojo/dom-construct'
 ], function (
   declare,
   array,
   lang,
   request,
   dom,
-  win,
-  domStyle,
   query,
-  domConstruct,
-   domAttr
+  domConstruct
 ) {
 
   var statusError = function (statusCode) {
     if (statusCode === 200) {
       return null;
+    } else if (statusCode === 400){
+      return 'BAD REQUEST: request had (syntax) error; fix error before resubmitting'
+    } else if (statusCode === 401){
+      return 'UNAUTHORIZED: invad ApiKey'
+    } else if (statusCode === 402){
+      return 'PAYMENT REQUIRED: out of credits; use custom ApiKey, purchase more credits, or try again tomorrow'
+    } else if (statusCode === 403){
+      return 'FORBIDDEN: request flagged due to abuse'
+    } else if(statusCode === 424){
+      return 'FAILED DEPENDENCY: target page was not reachable or request timed out'
+    } else if(statusCode === 500){
+      return 'INTERNAL SERVER ERROR: retry request; if issue persists, see phantomjscloud.com'
+    } else if (statusCode === 502){
+      return 'BAD GATEWAY: request did not reach PhantomJS cloud; check network connection; if issue persists, see phantomjscloud.com'
+    } else if (statusCode === 503){
+      return 'SERVER TOO BUSY: try again later'
     }
   };
 
