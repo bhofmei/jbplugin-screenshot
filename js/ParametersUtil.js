@@ -253,16 +253,9 @@ define('ScreenShotPlugin/ParametersUtil', [
         }
 
         // test canvas features and alignments
-        if (/CanvasFeatures$/.test(tType) || /Alignments2$/.test(tType) || /smAlignments$/.test(tType)) {
+        if (/(Canvas|HTML)Features$/.test(tType) || /Alignments2$/.test(tType) || /smAlignments$/.test(tType)) {
           // check for SeqViews plugin
           lang.mixin(out, this._seqViewParameters(config, pluginConfigs));
-        } else if (/HTMLFeatures$/.test(tType) && pluginConfigs.seqViewsPlugin) {
-          lang.mixin(out, {
-            style: {
-              title: 'Feature style',
-              value: (config.displayStyle === undefined ? 'default' : config.displayStyle)
-            }
-          });
         }
 
         return out;
@@ -371,12 +364,15 @@ define('ScreenShotPlugin/ParametersUtil', [
       },
 
       _seqViewParameters: function (config, pluginConfig) {
-        var newM = {
+        var newM = {};
+        if(config.displayMode !== undefined){
+          newM = {
           mode: {
             title: 'Display mode',
             value: config.displayMode
           }
         };
+        }
         if (pluginConfig.seqViewsPlugin) {
           lang.mixin(newM, {
             style: {
