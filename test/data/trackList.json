@@ -220,6 +220,19 @@
       },
       "storeClass": "JBrowse/Store/SeqFeature/BAM",
       "urlTemplate": "raw/wt-2_smrna.bam"
+    },
+    {
+      "key": "AC positions",
+      "label": "t20_ac_pos",
+      "category": "Genome",
+      "type": "JBrowse/View/Track/CanvasFeatures",
+      "compress": 0,
+      "urlTemplate": "tracks/ac_pos/{refseq}/trackData.json",
+      "storeClass": "JBrowse/Store/SeqFeature/NCList",
+      "style": {
+        "className": "feature",
+        "color": "#d504b2"
+      }
     }
    ]
 }
