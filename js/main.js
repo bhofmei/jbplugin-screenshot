@@ -2054,6 +2054,7 @@ define([
               delete params[t].histograms;
             }
             var style = params[t].style;
+            thisB.browser.trackConfigsByName[t].style = thisB.browser.trackConfigsByName[t]['style'] || {};
             if (style !== undefined) {
               lang.mixin(thisB.browser.trackConfigsByName[t]['style'], style);
               delete params[t].style;
