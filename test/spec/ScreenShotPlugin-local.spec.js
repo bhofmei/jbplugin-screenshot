@@ -6,7 +6,7 @@ require([
   'dojo/request',
   'dojo/dom',
   'dojo/query',
-  'dojo/dom-construct'
+  'dojo/dom-construct',
 ], function (
   declare,
   array,
@@ -19,7 +19,7 @@ require([
 
   console.log('TESTING LOCAL JBROWSE')
 
-  var parseFileData = function (incoming) {
+var parseFileData = function (incoming) {
     var output = {};
     var data = incoming;
     if (data) {
@@ -145,8 +145,8 @@ require([
       // should have at least 1 positive and negative feature
       var posFeat = query('.plus-feature', track);
       var negFeat = query('.minus-feature', track);
-      expect(posFeat.length).toBeGreaterThan(1);
-      expect(negFeat.length).toBeGreaterThan(1);
+      expect(posFeat.length).toBeGreaterThan(1, 'Not enough positive strand features');
+      expect(negFeat.length).toBeGreaterThan(1, 'Not enough negative strand features');
     }); // end should have TE track, HTML
 
     it('should have RNA-seq track, Alignment', function () {
@@ -157,8 +157,8 @@ require([
       // should have positive and negative features
       var posFeat = query('.plus-alignment', track);
       var negFeat = query('.minus-alignment', track);
-      expect(posFeat.length).toBeGreaterThan(400);
-      expect(negFeat.length).toBeGreaterThan(40);
+      expect(posFeat.length).toBeGreaterThan(400, 'Not enough positive strand features');
+      expect(negFeat.length).toBeGreaterThan(40, 'Not enough negative strand features');
     }); // end should have RNA-seq track, Alignment
 
     it('should have SNP track', function () {
