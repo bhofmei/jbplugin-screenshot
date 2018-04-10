@@ -1,4 +1,4 @@
-/* global console, expect, describe, it, beforeEach */
+/* globals console, expect, describe, it, beforeEach */
 require([
   'dojo/_base/declare',
   'dojo/_base/array',
@@ -18,6 +18,8 @@ require([
   parametersUtil,
   encodeDecodeUtil
 ) {
+
+  console.log('TESTING PROGRAM LOGIC');
   describe('Inital test', function () {
     var test = true;
     it('jasimine is working', function () {

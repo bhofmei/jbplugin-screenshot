@@ -63,7 +63,7 @@ echo ""
 echo "Taking screenshot to test for JBrowse HTML features..."
 echo ""
 
-#wget -nv -O 'fileA.json' "https://phantomjscloud.com/api/browser/v2/${apiKey}/?request={url:\"${testURL_A}\",renderType:\"json\",outputAsJson:true}"
+wget -nv -O 'fileA.json' "https://phantomjscloud.com/api/browser/v2/${apiKey}/?request={url:\"${testURL_A}\",renderType:\"json\",outputAsJson:true}"
 #testFile fileA.json
 
 ## traditional installation test - CanvasFeatures and View
@@ -71,10 +71,10 @@ echo ""
 echo "Taking screenshot to test for JBrowse Canvas features and view options..."
 echo ""
 
-dataB='%26loc=Chr5%3A39136..43995%26tracks=t1_genes%2Ct5_rnaseq-un%2Ct3_mt-snps%2Ct6_rnaseq-snp%26highlight=%26screenshot=p20o0r0n0u0b1m111111s000000z1~0h600y1v0i0q0d0f0~1h600y1v0i0q0d1f0~2h40y1i0q0~3h100y2i0q1'
+dataB='%26loc=Chr5%3A39136..43995%26tracks=t1_genes%2Ct5_rnaseq-un%2Ct3_mt-snps%2Ct6_rnaseq-snp%26highlight=%26screenshot=p20o0r0n0u0b1m111111s000000z1~0h600y1v0i0q0d0f0~1h600y1v0i0q0d1f0~2h20y1i0q0~3h100y2i0q1'
 testURL_B=${dataURL}${dataB}
 
-#wget -nv -O 'fileB.json' "https://phantomjscloud.com/api/browser/v2/${apiKey}/?request={url:\"${testURL_B}\",renderType:\"json\",outputAsJson:true,requestSettings:{maxWait:100000}}"
+wget -nv -O 'fileB.json' "https://phantomjscloud.com/api/browser/v2/${apiKey}/?request={url:\"${testURL_B}\",renderType:\"json\",outputAsJson:true,requestSettings:{maxWait:100000}}"
 #testFile fileB.json
 
 if [ $methyl == true ];
@@ -126,7 +126,7 @@ then
   echo ""
   echo "Taking screenshot to test for StrandedPlotPlugin..."
   echo ""
-  dataG='%26loc=Chr5%3A1..19660%26tracks=t11_stranded-methyl%2Ct12_stranded%26highlight=%26screenshot=p20o0r0n0u0b1m111111s000000z1~0y3i-200x200q1v0~1y2q1v1'
+  dataG='%26loc=Chr5%3A1..19660%26tracks=t21_stranded-methyl%2Ct12_stranded%26highlight=%26screenshot=p20o0r0n0u0b1m111111s000000z1~0y3i-200x200q1v0~1y2q1v1'
   testURL_G=${dataURL}${dataG}
 
   wget -nv -O 'fileG.json' "https://phantomjscloud.com/api/browser/v2/${apiKey}/?request={url:\"${testURL_G}\",renderType:\"json\",outputAsJson:true,requestSettings:{maxWait:100000}}"

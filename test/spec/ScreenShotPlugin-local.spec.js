@@ -17,6 +17,8 @@ require([
   domConstruct
 ) {
 
+  console.log('TESTING LOCAL JBROWSE')
+
   var parseFileData = function (incoming) {
     var output = {};
     var data = incoming;
@@ -82,6 +84,7 @@ require([
     return (errors.length > 0 ? errors : false);
   };
 
+  describe('Local installation tests: ', function(){
   describe('Inital test', function () {
     var test = true;
     it('jasimine is working', function () {
@@ -89,7 +92,7 @@ require([
     });
   });
 
-  /*describe('Test installation - HTML tracks', function () {
+  describe('Test local - HTML tracks', function () {
     var data, content, tracks, events;
     beforeAll(function (done) {
       request('fileA.json', {
@@ -167,9 +170,9 @@ require([
       expect(feats.length).toBeGreaterThan(100);
     }); // end should have SNP track
   });
-  // end Test installation - HTML tracks*/
+  // end Test local - HTML tracks
 
-  /*describe('Test installation - Canvas tracks and view options', function () {
+  describe('Test local - Canvas tracks and view options', function () {
     var data, content, tracks, events;
     beforeAll(function (done) {
       request('fileB.json', {
@@ -228,7 +231,7 @@ require([
       expect(trackType).toBe('track_jbrowse_view_track_alignments2');
       // should have 1 overflow as compact
       var overflow = query('.height_overflow_message', track);
-      expect(overflow.length).toBe(1);
+      expect(overflow.length).toBe(1, 'Expected 1 overflow message');
       // check height
       var height = parseInt(track.style.height.replace('px', ''));
       expect(height).toBeLessThan(621);
@@ -260,9 +263,9 @@ require([
       var height = parseInt(track.style.height.replace('px', ''));
       expect(height).toBe(120);
     }); // end should have SNP Cov - SNPCoverage, y-scale, height
-  }); // end Test installation - Canvas tracks and view options*/
+  }); // end Test local - Canvas tracks and view options
 
-  describe('Test for plugins', function () {
+  describe('Test local for plugins', function () {
     var plugins;
 
     beforeAll(function (done) {
@@ -892,5 +895,6 @@ require([
 
     }); // end Test WiggleSVGPlugin
 
-  }); // end Test for plugins
+  }); // end Test local for plugins
+    }); // end Local installation tests
 });
