@@ -1829,7 +1829,7 @@ define([
         var baseUrl = this._defaultConfig().baseUrl;
         var browser = this.browser;
         this.isScreenshot = false;
-        this.config.version = '1.6.11';
+        this.config.version = '1.7.0';
         console.log('ScreenShotPlugin starting - v'+this.config.version);
 
         // PhantomJS Username

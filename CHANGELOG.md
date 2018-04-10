@@ -2,6 +2,14 @@
 
 ## [Unreleased]
 
+## [v1.7.0] - 2018-04-10
+- ADDED tests
+  - unit tests
+  - phantomJS Cloud tests
+  - local installation integration test
+- ADDED test dataset
+- FIXED error setting height when style not defined in track config
+
 ## [v1.6.10] - 2017-09-26
 - ADDED support for extended modifications (4mC, 5hmC, 6mA) for methylation plugin
 

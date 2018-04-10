@@ -1,6 +1,6 @@
 {
   "name": "screenshot-browse-plugin",
-  "version": "1.6.10",
+  "version": "1.7.0",
   "description": "Take easy, configurable JBrowse screenshots with PhantomJS cloud",
   "main": "main.js",
   "scripts": {
