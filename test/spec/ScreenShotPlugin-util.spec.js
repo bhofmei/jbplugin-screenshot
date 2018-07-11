@@ -779,7 +779,7 @@ require([
             }
           };
           var paramsUrl = encodeDecodeUtil.encodePhantomJSSettings(params);
-          var expected = '?request={url:"http://url.com",renderType:"JPG",requestSettings:{maxWait:50000},renderSettings:{zoomFactor:2,quality:100,viewPort:{width:2800,height:3000}}}'
+          var expected = '?request={url:"http://url.com",renderType:"JPG",renderSettings:{zoomFactor:2,quality:100,viewPort:{width:2800,height:3000}},requestSettings:{maxWait:50000}}'
           expect(paramsUrl.toLowerCase()).toEqual(expected.toLowerCase());
         }); // should get output for extra time
       }); // end Test PhantomJS encode
