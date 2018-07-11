@@ -147,7 +147,7 @@ define("ScreenShotPlugin/View/Dialog/ScreenShotDialog", [
 
         var footerText = 'Local configuration changes will be ignored. Default configuration will be used unless specified in this dialog.<br>Rendering will open a new window.';
 
-        if(thisB.pluginConfig.auth === false || (thisB.pluginConfig.auth.username === undefined || thisB.pluginConfig.auth.password === undefined)){
+        if(thisB.pluginConfig.auth !== null && ( thisB.pluginConfig.auth === false || thisB.pluginConfig.auth.username === undefined || thisB.pluginConfig.auth.password === undefined)){
           footerText += '<div class="screenshot-dialog-pane-bottom-error">Issue with plugin authentication configuration. Screenshot may not work.</div>'
         }
 
