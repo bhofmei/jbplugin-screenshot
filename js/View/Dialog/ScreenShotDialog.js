@@ -14,7 +14,7 @@ define("ScreenShotPlugin/View/Dialog/ScreenShotDialog", [
     "dijit/form/Select",
     "dijit/form/ValidationTextBox",
     'dijit/layout/ContentPane',
-    'dijit/layout/TabContainer',
+    './TabContainer',
     'dijit/form/Button',
     'JBrowse/View/Dialog/WithActionBar',
     'JBrowse/Model/Location',
