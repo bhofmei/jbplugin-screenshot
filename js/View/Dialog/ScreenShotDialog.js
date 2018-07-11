@@ -145,9 +145,15 @@ define("ScreenShotPlugin/View/Dialog/ScreenShotDialog", [
         });
         thisB._paneTracks(mainPaneBottom);
 
+        var footerText = 'Local configuration changes will be ignored. Default configuration will be used unless specified in this dialog.<br>Rendering will open a new window.';
+
+        if(thisB.pluginConfig.auth === false || (thisB.pluginConfig.auth.username === undefined || thisB.pluginConfig.auth.password === undefined)){
+          footerText += '<div class="screenshot-dialog-pane-bottom-error">Issue with plugin authentication configuration. Screenshot may not work.</div>'
+        }
+
         var paneFooter = dom.create('div', {
           className: 'screenshot-dialog-pane-bottom-warning',
-          innerHTML: 'Local configuration changes will be ignored. Default configuration will be used unless specified in this dialog.<br>Rendering will open a new window.'
+          innerHTML: footerText
         });
 
         this.set('content', [
@@ -843,7 +849,7 @@ define("ScreenShotPlugin/View/Dialog/ScreenShotDialog", [
         var apiKey = jsParams.key.value ? (jsParams.key.extra.value === '' ? this.defaultApi : jsParams.key.extra.value) : this.defaultApi;
         // encode jsParams
         jsParams['url'] = currentUrl;
-        var jsEncode = Util.encodePhantomJSSettings(jsParams);
+        var jsEncode = Util.encodePhantomJSSettings(jsParams, this.pluginConfig.auth);
         // put it all together
         return this.requestUrl + apiKey + '/' + jsEncode;
       }

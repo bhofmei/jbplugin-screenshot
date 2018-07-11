@@ -20,9 +20,9 @@ define('ScreenShotPlugin/EncodeDecodeUtil', [
         return this._encodeGeneralSettings(gInputs) + this._endcodeTrackSettings(tInputs);
       },
 
-      encodePhantomJSSettings: function (params) {
+      encodePhantomJSSettings: function (params, auth) {
         // params include url, format, height, width, zoom, time
-        // ?request={url:"http://www.highcharts.com/demo/pie-donut",renderType:"jpg",renderSettings:{zoomFactor:2,viewport:{width:100,height:500}}}
+        // returns ?request={url:"http://www.highcharts.com/demo/pie-donut",renderType:"jpg",renderSettings:{zoomFactor:2,viewport:{width:100,height:500}}}
         // split parameters into pdf type and image type
         var outDict = {
           url: params.url,
@@ -53,13 +53,25 @@ define('ScreenShotPlugin/EncodeDecodeUtil', [
             height: params.image.height.value
           };
         }
+        // request settings
+        var requestDict = {};
         // check for extra time
         if (params.time && params.time.value) {
-          outDict['requestSettings'] = {
+          /*outDict['requestSettings'] = {
             maxWait: (params.time.extra.value * 1000)
-          };
+          };*/
+          requestDict['maxTime'] = (params.time.extra.value * 1000);
         }
+        // authentication required
+        if(auth && auth.username && auth.password){
+          requestDict['authentication'] = {userName: auth.username, password: auth.password};
+        }
+
         outDict['renderSettings'] = renderDict;
+        if(Object.keys(requestDict).length > 0){
+          outDict['requestSettings'] = requestDict;
+        }
+
         var outString = json.stringify(outDict);
         outString = outString.replace(/\"([^(\")"]+)\":/g, "$1:");
         return '?request=' + outString;

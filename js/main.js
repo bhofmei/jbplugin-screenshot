@@ -2,6 +2,7 @@ define([
     'dojo/_base/declare',
     'dojo/_base/lang',
     'dojo/_base/array',
+  'dojo/request/xhr',
     'dojo/dom',
     "dojo/dom-attr",
     'dojo/dom-construct',
@@ -16,6 +17,7 @@ define([
     declare,
     lang,
     array,
+    xhr,
     dom,
     domAttr,
     domConstr,
@@ -32,7 +34,7 @@ define([
         var baseUrl = this._defaultConfig().baseUrl;
         var browser = this.browser;
         this.isScreenshot = false;
-        this.config.version = '1.7.0';
+        this.config.version = '1.8.0';
         console.log('ScreenShotPlugin starting - v'+this.config.version);
 
         // PhantomJS Username
@@ -52,7 +54,22 @@ define([
         };
         if (args.htmlFeatures !== undefined)
           this.config.htmlFeatures = args.htmlFeatures;
+
+        // HTTP authentication
+        this.config.auth = null;
         var thisB = this;
+
+        if (args.pwdFile){
+          xhr(args.pwdFile, {
+            handleAs: 'json'
+          }).then(function(data){
+            thisB.config.auth = data;
+          }, function(err){
+            console.log(err);
+            thisB.config.auth = false;
+          });
+        }
+
 
         // other plugins
         browser.afterMilestone('initPlugins', function () {

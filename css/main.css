@@ -48,6 +48,11 @@ div.screenshot-dialog-pane h2 {
   bottom: 0;
   clear: both;
 }
+.screenshot-dialog-pane-bottom-error {
+  font-size: larger;
+  font-weight: bold;
+  margin-top: 5px;
+}
 .dijitDialogPaneActionBar.screenshot-dialog-actionbar {
   padding-top: 5px;
 }
