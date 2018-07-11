@@ -60,7 +60,7 @@ define('ScreenShotPlugin/EncodeDecodeUtil', [
           /*outDict['requestSettings'] = {
             maxWait: (params.time.extra.value * 1000)
           };*/
-          requestDict['maxTime'] = (params.time.extra.value * 1000);
+          requestDict['maxWait'] = (params.time.extra.value * 1000);
         }
         // authentication required
         if(auth && auth.username && auth.password){
