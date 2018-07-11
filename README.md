@@ -65,6 +65,50 @@ For _jbrowse_conf.json_
 ```
 
 You can also use your own API key by inputting it in the dialog pane with the "Use Custom ApiKey" parameter.
+
+## Password Protection
+Currently only works for HTTP Basic Authentication
+
+Assumes that the base JBrowse folder is protected with a `.htaccess` file and subfolders do not have additional protections. This [article](https://www.gaslampmedia.com/generate-htaccess-password-htpasswd-from-the-command-line/) offers basic instructions for setting this up. Both files should have `644` permissions
+
+This solution is not ideal as the username and password get passed as text to PhantomJS Cloud and become part of the source URL for the resulting image. However, it works and is mainly a problem when sharing downloaded images directly.
+
+I will be working on a better solution taking advantage of JBrowse's use of Node.js in the future.
+
+### Username and password
+I recommend having separate username/password that is only for screenshots so it can be updated regularly without affecting the other users.
+
+#### Adding to htaccess
+Assuming the `.htaccess` and `.htpasswd` files are already created, add a new user with
+```
+htpasswd <path to .htpasswd file> <new username>
+```
+and enter the new password at the prompt.
+
+#### Save for plugin access
+For this plugin, create a separate file, i.e. `sc-usr.json`, in the main JBrowse folder. Paste the following into the file, using your username/password created above.
+```
+{
+    "username": "new_user",
+    "password": "new_password"
+}
+```
+
+Set the file permissions by `chmod 600 sc-usr.json`.
+
+#### Updating username/password
+Update the username and/or password regularly. You need to update both the `.htpasswd` and `sc-usr.json` files.
+
+### Plugin configuration
+In the plugin configuration, add the following line to point to this file so the username/password is included when requesting the screenshot.
+
+In _jbrowse.conf_,
+
+```
+[plugins.ScreenShotPlugin]
+location = ...
+pwdFile = sc-usr.json
+```
     
 ## Use
 Click the "Screen shot" button in the browser. A dialog box will open with options for the screenshot. You can also press the `s` key as a shortcut to open the dialog box.
