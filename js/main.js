@@ -3,14 +3,14 @@ define([
     'dojo/_base/lang',
     'dojo/_base/array',
     'dojo/dom',
-    "dojo/dom-attr",
+    'dojo/dom-attr',
     'dojo/dom-construct',
     'dijit/form/Button',
     'dijit/registry',
     'ScreenShotPlugin/View/Dialog/ScreenShotDialog',
     'ScreenShotPlugin/EncodeDecodeUtil',
     'JBrowse/Plugin',
-    "JBrowse/Browser"
+    'JBrowse/Browser'
 ],
   function (
     declare,
