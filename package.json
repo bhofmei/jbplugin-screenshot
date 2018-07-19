@@ -23,7 +23,7 @@
   "homepage": "https://github.com/bhofmei/jbplugin-screenshot#readme",
     "devDependencies": {
         "jasmine": "^2.7.0",
-        "jbrowse": "git+https://github.com/bhofmei/jbrowse"
+        "jbrowse": "git+https://github.com/bhofmei/jbrowse#1.12.3-testing"
     },
   "jbrowsePlugin": {
     "name": "ScreenShotPlugin"
