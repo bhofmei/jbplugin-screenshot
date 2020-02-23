@@ -85,7 +85,7 @@ define([
             }).show();
           }
 
-          if (browser.config.show_menu && (thisB.isScreenshot === false || thisB.config.dialog)) {
+          if (browser.config.show_nav && browser.config.show_menu && (thisB.isScreenshot === false || thisB.config.dialog)) {
             var button = new dijitButton({
               className: 'screenshot-button',
               innerHTML: 'Screen Shot',
